@@ -1,0 +1,16 @@
+name: [DEV] Docker Compose Test Build
+
+on:
+  push:
+    branches:
+    - dev
+    
+jobs:
+  test-build:
+    name: Test docker-compose build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Build Docker Compose
+      run: docker-compose build --no-cache
