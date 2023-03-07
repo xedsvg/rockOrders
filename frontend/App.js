@@ -2,7 +2,7 @@ import { baseUrl } from "./settings";
 
 import React, { useEffect, useState } from "react";
 
-import { Box, Center, Text, extendTheme, NativeBaseProvider, VStack, useTheme, ScrollView, Heading } from "native-base";
+import { View, Center, Text, extendTheme, NativeBaseProvider, VStack, useTheme, ScrollView, Heading } from "native-base";
 
 const newColorTheme = {
   brand: {
@@ -90,7 +90,7 @@ export default function App() {
         ) : null }
       </Navbar>
 
-      <Center flex={1} >
+      <View flex={1} minWidth="full">
         {viewMode === "scan" && user == "customer" && (
           <Home
             restaurantName={restaurantName}
@@ -105,7 +105,7 @@ export default function App() {
         {viewMode === "table" && user == "customer" && <Table />}
 
         {/* {user == "owner" && <Owner ownerId={ownerId} />} */}
-      </Center>
+      </View>
       </VStack>
     </NativeBaseProvider>
   );

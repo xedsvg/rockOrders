@@ -1,32 +1,29 @@
-// export default function Item({ item, addToOrder, removeFromOrder }) {
-
 import React, { useState, useEffect } from "react";
-import { View, Text, Image } from "react-native";
-import { Button, Icon, Box } from "native-base";
+import { View, Text, Image, Button, Box, Icon } from "native-base";
 import { Ionicons } from "@expo/vector-icons";
 
 const Product = ({ product, addToCart, removeFromCart }) => {
   const [qty, setQty] = useState(0);
 
-  const remove = async () => {
+  useEffect(() => {
+    product.qty ? setQty(product.qty) : null;
+  }, []);
+
+  const decrement = async () => {
     await removeFromCart(product);
     setQty(qty - 1);
   };
-
   const add = async () => {
     await addToCart(product);
     setQty(qty + 1);
   };
-  let {
+  const increment = add;
+  const {
     id = 0,
     name = "Unavailable",
     price = "0",
     image = "https://prnewswire2-a.akamaihd.net/p/1893751/sp/189375100/thumbnail/entry_id/1_z1bkmcrb/def_height/1500/def_width/1500/version/100011/type/1",
   } = product;
-
-  useEffect(() => {
-    product.qty ? setQty(product.qty) : null;
-  }, []);
 
   return (
     <Box
@@ -34,63 +31,93 @@ const Product = ({ product, addToCart, removeFromCart }) => {
       borderColor="gray.300"
       borderRadius="md"
       overflow="hidden"
-      minWidth="100%"
+      maxWidth="45%"
+      marginBottom="2.5"
     >
-      <View style={{ flexDirection: "row", alignItems: "center", padding: 10 }}>
+      <View
+        style={{ flexDirection: "column", alignItems: "center", padding: 10 }}
+      >
         <Image
           source={{ uri: image }}
-          style={{ width: 100, height: 100, marginRight: 10 }}
+          style={{ width: 150, height: 150 }}
+          alt={product.name}
         />
-        <View>
-          <Text>
-            {name} ({qty})
-          </Text>
-          <Text style={{ marginTop: 10 }}>{price} RON</Text>
 
-          <View
-            style={{ flexDirection: "row", alignItems: "center", padding: 10 }}
-          >
-            <Button
-              onPress={add}
-              leftIcon={
-                <Icon as={Ionicons} name="cart" size="sm" color="white" />
-              }
+        <View
+          paddingTop="1.5"
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            width: "100%",
+          }}
+        >
+          <Text>{name}</Text>
+          <Text bold>{price} RON</Text>
+        </View>
+
+        {/* Not Added */}
+        {!qty ? (
+          <View>
+            <View
+              paddingTop="1.5"
+              style={{ flexDirection: "row", alignItems: "center" }}
             >
-              <Text
-                ml={2}
-                fontSize="md"
-                style={{
-                  color: "white",
-                  textAlign: "center",
-                }}
-              >
-                Add
-              </Text>
-            </Button>
-
-            {qty ? (
               <Button
-                onPress={remove}
-                colorScheme="danger"
-                size="sm"
-                leftIcon={
-                  <Icon as={Ionicons} name="remove" size="sm" color="white" />
-                }
+                borderRadius="full"
+                onPress={add}
+                paddingTop="1"
+                paddingBottom="1"
               >
-                <Text
-                  ml={2}
-                  fontSize="md"
-                  style={{
-                    color: "white",
-                    textAlign: "center",
-                  }}
-                >
-                  Remove
+                <Text bold fontSize="xs" lineHeight="sm" color="white">
+                  ADD
                 </Text>
               </Button>
-            ) : null}
+            </View>
           </View>
-        </View>
+        ) : null}
+
+        {/* Added  */}
+        {qty ? (
+          <View
+            paddingTop="1.5"
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              width: "100%",
+            }}
+          >
+            <Button
+              borderRadius="full"
+              paddingTop="1"
+              paddingBottom="1"
+              colorScheme="danger"
+              variant="outline"
+              onPress={decrement}
+              leftIcon={
+                <Icon
+                  as={Ionicons}
+                  name="remove"
+                  size="sm"
+                  colorScheme="danger"
+                />
+              }
+            ></Button>
+
+            <Text>{qty}</Text>
+
+            <Button
+              borderRadius="full"
+              paddingTop="1"
+              paddingBottom="1"
+              colorScheme="danger"
+              variant="outline"
+              onPress={increment}
+              leftIcon={
+                <Icon as={Ionicons} name="add" size="sm" colorScheme="danger" />
+              }
+            ></Button>
+          </View>
+        ) : null}
       </View>
     </Box>
   );

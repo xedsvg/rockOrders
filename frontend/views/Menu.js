@@ -1,6 +1,7 @@
 import { baseUrl } from "../settings";
 
 import React, { useEffect, useState } from "react";
+import { View } from "native-base";
 import Item from "../components/Item";
 
 export default function Menu({ restaurantId, cart, setCart }) {
@@ -67,7 +68,13 @@ export default function Menu({ restaurantId, cart, setCart }) {
   }, []);
 
   return (
-    <>
+    <View
+        justifyContent="space-evenly"
+        alignItems="start"
+        flexWrap="wrap"
+        flexDirection="row"
+        >
+
       {menuItems.map((item) => (
         <Item
           key={item._id}
@@ -76,6 +83,6 @@ export default function Menu({ restaurantId, cart, setCart }) {
           removeFromCart={removeItemToCart}
         />
       ))}
-    </>
+    </View>
   );
 }
