@@ -1,4 +1,4 @@
-name: [DEV] Docker Compose Test Build
+name: (DEV) Docker Compose Test Build
 
 on:
   push:
