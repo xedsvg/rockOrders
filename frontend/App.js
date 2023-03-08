@@ -33,6 +33,7 @@ export default function App() {
 
   const [tableId, setTableId] = useState(null);
 
+  const [orders, setOrders] = useState([]);
   const [cart, setCart] = useState([]);
 
   useEffect(() => {
@@ -102,7 +103,7 @@ export default function App() {
         {viewMode === "menu" && user == "customer" && (
           <Menu restaurantId={restaurantId} cart={cart} setCart={setCart} ExitButtonHandler={ExitButtonHandler}/>
         )}
-        {viewMode === "table" && user == "customer" && <Table />}
+        {viewMode === "table" && user == "customer" && <Table orders={orders} setOrders={setOrders} cart={cart} setCart={setCart}/>}
 
         {/* {user == "owner" && <Owner ownerId={ownerId} />} */}
       </View>

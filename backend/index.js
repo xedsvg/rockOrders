@@ -146,12 +146,18 @@ app.delete("/deleteOrder/:id", async (req, res) => {
 });
 
 app.get("/settings", async (req, res) => {
-  const restaurantId = "63dc24937a3e728ecda1d982"; /// set this as env or get it from licence server
-  const restaurantName = "RocknRolla"; /// set this as env or get it from licence server
+  const restaurantDetails = await Restaurants.findOne();
+  // const restaurantId = "63dc24937a3e728ecda1d982"; /// set this as env or get it from licence server
+  // const restaurantName = "RocknRolla"; /// set this as env or get it from licence server
+
+  const restaurantId = restaurantDetails._id;
+  const restaurantName = restaurantDetails.name;
+  const ownerName = restaurantDetails.OwnerName;
 
   res.send({
     restaurantId,
     restaurantName,
+    ownerName
   });
 });
 

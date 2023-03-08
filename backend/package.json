@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "backfill": "node backfill.js",
     "dev": "nodemon index.js",
-    "start": "node index.js"
+    "start": "node backfill.js & node index.js"
   },
   "keywords": [],
   "author": "xed",

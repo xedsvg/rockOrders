@@ -3,8 +3,6 @@ import React, { useEffect } from "react";
 import {
   VStack,
   HStack,
-  Badge,
-  Spacer,
   Heading,
   Text,
   Center,
@@ -13,13 +11,12 @@ import {
   Button,
   Box,
   ScrollView,
-  Pressable,
 } from "native-base";
 
 import TableStatus from "../components/TableStatus";
 import Order from "../components/Order";
 
-export default function Table({}) {
+export default function Table({ orders, setOrders, cart, setCart }) {
   useEffect(() => {}, []);
   const { isOpen, onOpen, onClose } = useDisclose();
   return (
@@ -28,10 +25,13 @@ export default function Table({}) {
       <VStack flex={1} space={1} alignItems="flex-start">
         {/* **** Table Status **** */}
        <TableStatus />
+
         {/* **** Active Orders **** */}
         <ScrollView h="10">
-        <Order />
+        {cart.length ? <Order cart={cart}/>: null}
+        {(orders.length || cart.length) ? orders.map((order)=> (<Order order={order}/>)): <Order />}
         </ScrollView>
+
        </VStack>
 
       {/* **** Tab Details and Actions **** */}
