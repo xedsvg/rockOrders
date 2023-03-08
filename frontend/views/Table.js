@@ -7,7 +7,6 @@ import {
   Text,
   Center,
   Actionsheet,
-  useDisclose,
   Button,
   Box,
   ScrollView,
@@ -16,12 +15,11 @@ import {
 import TableStatus from "../components/TableStatus";
 import Order from "../components/Order";
 
-export default function Table({ orders, setOrders, cart, setCart }) {
+export default function Table({ orders, setOrders, cart, setCart, isOpen, onClose }) {
   useEffect(() => {}, []);
-  const { isOpen, onOpen, onClose } = useDisclose();
+
   return (
     <Center flex={1}>
-      <Button onPress={onOpen}>View tab</Button>
       <VStack flex={1} space={1} alignItems="flex-start">
         {/* **** Table Status **** */}
        <TableStatus />

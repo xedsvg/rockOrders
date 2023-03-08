@@ -9,7 +9,6 @@ import {
   Text,
   Center,
 } from "native-base";
-import { MaterialIcons } from "@expo/vector-icons";
 
 const Categories = ({ categories }) => {
   const click = () => console.log("click click");

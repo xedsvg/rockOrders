@@ -2,7 +2,7 @@ import { baseUrl } from "./settings";
 
 import React, { useEffect, useState } from "react";
 
-import { View, Center, Text, extendTheme, NativeBaseProvider, VStack, useTheme, ScrollView, Heading } from "native-base";
+import { View, Center, Text, extendTheme, NativeBaseProvider, VStack, useDisclose } from "native-base";
 
 const newColorTheme = {
   brand: {
@@ -35,6 +35,8 @@ export default function App() {
 
   const [orders, setOrders] = useState([]);
   const [cart, setCart] = useState([]);
+
+  const { isOpen, onOpen, onClose } = useDisclose();
 
   useEffect(() => {
     (async () => {
@@ -86,7 +88,7 @@ export default function App() {
             <Text onPress={GoToMenuButtonHandler} color="blueGray.200">Menu</Text>
         </Center>,
           <Center w="20" rounded="md" shadow={3} key="cart"> 
-            <Text onPress={() => setViewMode("cart")} color="blueGray.200">View Tab</Text>
+            <Text onPress={onOpen} color="blueGray.200">View Tab</Text>
         </Center>]
         ) : null }
       </Navbar>
@@ -101,9 +103,9 @@ export default function App() {
         )}
 
         {viewMode === "menu" && user == "customer" && (
-          <Menu restaurantId={restaurantId} cart={cart} setCart={setCart} ExitButtonHandler={ExitButtonHandler}/>
+          <Menu restaurantId={restaurantId} cart={cart} setCart={setCart} isOpen={isOpen} onOpen={onOpen} onClose={onClose} ExitButtonHandler={ExitButtonHandler}/>
         )}
-        {viewMode === "table" && user == "customer" && <Table orders={orders} setOrders={setOrders} cart={cart} setCart={setCart}/>}
+        {viewMode === "table" && user == "customer" && <Table orders={orders} setOrders={setOrders} cart={cart} setCart={setCart} isOpen={isOpen} onOpen={onOpen} onClose={onClose} />}
 
         {/* {user == "owner" && <Owner ownerId={ownerId} />} */}
       </View>
