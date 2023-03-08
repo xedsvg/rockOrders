@@ -3,17 +3,20 @@ import { baseUrl } from "../settings";
 import React, { useEffect, useState } from "react";
 import { View, Text, Center, Actionsheet, Box, VStack, HStack, Button, Heading, Divider } from "native-base";
 
-import Item from "../components/Item";
+import Products from "../components/Products";
+
 import Categories from "../components/Categories";
 
 export default function Menu({ restaurantId, cart, setCart, isOpen, onClose }) {
-  const [menuItems, setMenuItems] = useState([]);
+  const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [subCategories, setSubCategories] = useState([]);
 
   const [selectedCategories, setSelectedCategories] = useState([]);
+  const [category, setCategory] = useState("");
 
-  const addItemToCart = (item) => {
+
+  const addToCart = (item) => {
     let itemInCart = false;
     let localCart = cart;
 
@@ -32,7 +35,7 @@ export default function Menu({ restaurantId, cart, setCart, isOpen, onClose }) {
     setCart(localCart);
   };
 
-  const removeItemToCart = (item) => {
+  const removeFromCart = (item) => {
     let localCart = cart;
     if (localCart.length) {
       localCart = localCart.map((cartProduct) => {
@@ -47,11 +50,11 @@ export default function Menu({ restaurantId, cart, setCart, isOpen, onClose }) {
   };
 
   // Adds the qty for a product in cart to the menu object
-  const crossCheckCartAndMenu = (menuItems) => {
-    if (!cart.length) return menuItems;
+  const crossCheckCartAndMenu = (products) => {
+    if (!cart.length) return products;
 
     cart.every((cartProduct) => {
-      menuItems = menuItems.map((menuProduct) => {
+      products = products.map((menuProduct) => {
         if (menuProduct._id === cartProduct._id) {
           menuProduct.qty = cartProduct.qty;
         }
@@ -60,14 +63,14 @@ export default function Menu({ restaurantId, cart, setCart, isOpen, onClose }) {
       return true;
     });
 
-    return menuItems;
+    return products;
   };
 
-  const extractCategoriesAndSubCategories = (menuItems) => {
+  const extractCategoriesAndSubCategories = (products) => {
     const categories = new Set();
     const subCategories = new Set();
 
-    menuItems.every((menuItem) => {
+    products.every((menuItem) => {
       menuItem.category ? categories.add(menuItem.category) : null;
       menuItem.subCategory ? subCategories.add(menuItem.subCategory) : null;
       return true;
@@ -91,31 +94,15 @@ export default function Menu({ restaurantId, cart, setCart, isOpen, onClose }) {
         await fetch(`${baseUrl}/getMenu/${restaurantId}`)
       ).json();
 
-      setMenuItems(crossCheckCartAndMenu(products));
+      setProducts(crossCheckCartAndMenu(products));
       extractCategoriesAndSubCategories(products);
     })();
   }, []);
 
   return (
     <View>
-        <Categories categories={categories} />
-
-      <View
-        justifyContent="space-evenly"
-        alignItems="start"
-        flexWrap="wrap"
-        flexDirection="row"
-        marginTop="4"
-      >
-        {/* {menuItems.map((item) => (
-          <Item
-            key={item._id}
-            product={item}
-            addToCart={addItemToCart}
-            removeFromCart={removeItemToCart}
-          />
-        ))} */}
-      </View>
+        { !category ? <Categories categories={categories} setCategory={setCategory} /> : null }
+        {  category ? <Products products={products} addToCart={addToCart} removeFromCart={removeFromCart} /> : null }
 
       {/* Cart View and Actions */}
       <Center>
