@@ -7,7 +7,7 @@ import Products from "../components/Products";
 
 import Categories from "../components/Categories";
 
-export default function Menu({ restaurantId, cart, setCart, isOpen, onClose }) {
+export default function Menu({ restaurantId, cart, setCart, isOpen, onClose, setViewCartOrTabButton }) {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [subCategories, setSubCategories] = useState([]);
@@ -93,7 +93,7 @@ export default function Menu({ restaurantId, cart, setCart, isOpen, onClose }) {
       const products = await (
         await fetch(`${baseUrl}/getMenu/${restaurantId}`)
       ).json();
-
+      setViewCartOrTabButton("View Order");
       setProducts(crossCheckCartAndMenu(products));
       extractCategoriesAndSubCategories(products);
     })();

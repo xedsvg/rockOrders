@@ -15,8 +15,10 @@ import {
 import TableStatus from "../components/TableStatus";
 import Order from "../components/Order";
 
-export default function Table({ orders, setOrders, cart, setCart, isOpen, onClose }) {
-  useEffect(() => {}, []);
+export default function Table({ orders, setOrders, cart, setCart, isOpen, onClose, setViewCartOrTabButton }) {
+  useEffect(() => {
+    setViewCartOrTabButton("View Tab");
+  }, []);
 
   return (
     <Center flex={1}>

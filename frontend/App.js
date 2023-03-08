@@ -36,6 +36,7 @@ export default function App() {
   const [orders, setOrders] = useState([]);
   const [cart, setCart] = useState([]);
 
+  const [viewCartOrTabButton, setViewCartOrTabButton] = useState("");
   const { isOpen, onOpen, onClose } = useDisclose();
 
   useEffect(() => {
@@ -88,7 +89,7 @@ export default function App() {
             <Text onPress={GoToMenuButtonHandler} color="blueGray.200">Menu</Text>
         </Center>,
           <Center w="20" rounded="md" shadow={3} key="cart"> 
-            <Text onPress={onOpen} color="blueGray.200">View Tab</Text>
+            <Text onPress={onOpen} color="blueGray.200">{viewCartOrTabButton}</Text>
         </Center>]
         ) : null }
       </Navbar>
@@ -103,9 +104,9 @@ export default function App() {
         )}
 
         {viewMode === "menu" && user == "customer" && (
-          <Menu restaurantId={restaurantId} cart={cart} setCart={setCart} isOpen={isOpen} onOpen={onOpen} onClose={onClose} ExitButtonHandler={ExitButtonHandler}/>
+          <Menu restaurantId={restaurantId} cart={cart} setCart={setCart} isOpen={isOpen} onOpen={onOpen} onClose={onClose} ExitButtonHandler={ExitButtonHandler} setViewCartOrTabButton={setViewCartOrTabButton}/>
         )}
-        {viewMode === "table" && user == "customer" && <Table orders={orders} setOrders={setOrders} cart={cart} setCart={setCart} isOpen={isOpen} onOpen={onOpen} onClose={onClose} />}
+        {viewMode === "table" && user == "customer" && <Table orders={orders} setOrders={setOrders} cart={cart} setCart={setCart} isOpen={isOpen} onOpen={onOpen} onClose={onClose} setViewCartOrTabButton={setViewCartOrTabButton}/>}
 
         {/* {user == "owner" && <Owner ownerId={ownerId} />} */}
       </View>
