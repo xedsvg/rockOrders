@@ -13,7 +13,7 @@ services:
       NODE_ENV: PRODUCTION
       MONGODB_HOST: mongo
       API_PORT: 3000
-    command: npm start
+    command: npm run demo
     depends_on:
       - mongo
   frontend:
