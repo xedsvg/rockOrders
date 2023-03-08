@@ -1,10 +1,15 @@
-import React from "react";
-import { View } from "native-base";
+import React, { useState } from "react";
+import { View, Heading } from "native-base";
 
 import Product from "./Product";
 
-const Products = ({ products, addToCart, removeFromCart }) => {
+const Products = ({ category, products, addToCart, removeFromCart }) => {
+  const [ message, setMessage ] = useState(`What ${category} would you like?`);
 
+  const addToCartAndChangeMessage = (product) => {
+    addToCart(product);
+    setMessage(`Excellent! Any other ${category}?`);
+  }
   return (
     <View
       justifyContent="space-evenly"
@@ -13,14 +18,21 @@ const Products = ({ products, addToCart, removeFromCart }) => {
       flexDirection="row"
       marginTop="4"
     >
-      {products.map((product) => (
-        <Product
-          key={product._id}
-          product={product}
-          addToCart={addToCart}
-          removeFromCart={removeFromCart}
-        />
-      ))}
+      <Heading marginBottom="2rem" marginTop="1rem" color="black" bold>
+        {message}
+      </Heading>
+
+      {products.map((product) => {
+        if (product.category === category)
+          return (
+            <Product
+              key={product._id}
+              product={product}
+              addToCart={addToCartAndChangeMessage}
+              removeFromCart={removeFromCart}
+            />
+          );
+      })}
     </View>
   );
 };

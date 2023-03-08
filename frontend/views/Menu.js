@@ -102,7 +102,7 @@ export default function Menu({ restaurantId, cart, setCart, isOpen, onClose }) {
   return (
     <View>
         { !category ? <Categories categories={categories} setCategory={setCategory} /> : null }
-        {  category ? <Products products={products} addToCart={addToCart} removeFromCart={removeFromCart} /> : null }
+        {  category ? <Products category={category} products={products} addToCart={addToCart} removeFromCart={removeFromCart} /> : null }
 
       {/* Cart View and Actions */}
       <Center>
