@@ -69,6 +69,7 @@ mongoose
     price: Number,
     quantity: Number,
     restaurantId: String,
+    category: String,
     imgUrl: String,
   });
   

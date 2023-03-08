@@ -28,6 +28,7 @@ const productSchema = new mongoose.Schema({
   price: Number,
   quantity: Number,
   restaurantId: String,
+  category: String,
   imgUrl: String,
 });
 
