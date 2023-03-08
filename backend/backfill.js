@@ -25,7 +25,8 @@ mongoose
     "name": "vin",
     "price": "10",
     "imgUrl": "",
-    "stock": 1
+    "stock": 1,
+    "category": "vin"
   },{
     "name": "alune",
     "price": "7.5",
@@ -39,16 +40,23 @@ mongoose
     "stock": 1,
     "category": "rontaieli"
   },{
-    "name": "suc",
+    "name": "granini",
     "price": "10",
     "imgUrl": "",
-    "stock": 1
+    "stock": 1,
+    "category": "suc"
   },{
     "name": "bere 0.5",
     "price": "10",
     "category": "bere",
     "imgUrl": "",
     "stock": 1
+  },{
+    "name": "B69",
+    "price": "13",
+    "imgUrl": "",
+    "stock": 1,
+    "category": "shots"
   }];
 
   const restaurantSchema = new mongoose.Schema({

@@ -10,6 +10,11 @@ const Products = ({ category, products, addToCart, removeFromCart }) => {
     addToCart(product);
     setMessage(`Excellent! Any other ${category}?`);
   }
+  
+  const removeFromCartAndChangeMessage = (product) => {
+    removeFromCart(product);
+    setMessage(`Less is more! Any other ${category}?`);
+  }
   return (
     <View
       justifyContent="space-evenly"
@@ -29,7 +34,7 @@ const Products = ({ category, products, addToCart, removeFromCart }) => {
               key={product._id}
               product={product}
               addToCart={addToCartAndChangeMessage}
-              removeFromCart={removeFromCart}
+              removeFromCart={removeFromCartAndChangeMessage}
             />
           );
       })}
