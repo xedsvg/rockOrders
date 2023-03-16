@@ -10,11 +10,12 @@ mongoose
 
 
   const dummyProducts = [{
-    "name": "bere halba",
+    "name": "Tuborg",
     "price": "10",
     "imgUrl": "",
     "stock": 1,
-    "category": "bere"
+    "category": "bere",
+    "subCategory": "Bottled"
   },{
     "name": "pizza",
     "price": "40",
@@ -46,17 +47,41 @@ mongoose
     "stock": 1,
     "category": "suc"
   },{
-    "name": "bere 0.5",
-    "price": "10",
-    "category": "bere",
-    "imgUrl": "",
-    "stock": 1
-  },{
     "name": "B69",
     "price": "13",
     "imgUrl": "",
     "stock": 1,
     "category": "shots"
+  },{
+    "name": "Guinness",
+    "price": "14",
+    "imgUrl": "",
+    "stock": 1,
+    "category": "bere",
+    "subCategory": "Draught"
+  },{
+    "name": "Tuborg",
+    "price": "11",
+    "imgUrl": "",
+    "stock": 1,
+    "category": "bere",
+    "subCategory": "Bottled"
+  },{
+    "name": "Holsten Wheat",
+    "price": "80",
+    "imgUrl": "",
+    "stock": 1,
+    "category": "bere",
+    "subCategory": "3L Tower"
+  },{
+    "name": "Weihenstephaner Hefe Weissbier",
+    "price": "10",
+    "category": "bere",
+    "imgUrl": "",
+    "stock": 1,
+    "alcoholContent": "5.4% vol",
+    "volume": "500 ml",
+    "subCategory": "Bottled"
   }];
 
   const restaurantSchema = new mongoose.Schema({
@@ -67,6 +92,10 @@ mongoose
   const productSchema = new mongoose.Schema({
     name: String,
     price: Number,
+    stock: Number,
+    alcoholContent: String,
+    volume: String,
+    subCategory: String,
     quantity: Number,
     restaurantId: String,
     category: String,
