@@ -1,24 +1,16 @@
 import React, { useState } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  Image,
-  TextInput,
-} from "react-native";
+import { Text, View, Button, Image, Input, VStack } from "native-base";
 
 export default function Home({ GoToTableHandler, LoginButtonHandler }) {
-  
   const [image, setImage] = useState(null);
-  const [idData, setIdData] = useState(null);  //table 3
-  
+  const [idData, setIdData] = useState(null); //table 3
+
   const clickImage = async () => {
-    setIdData('63dce85b98df5617195153fc');
+    setIdData("63dce85b98df5617195153fc");
   };
 
   return (
-    <View>
+    <VStack space={3}>
       <Image
         style={{
           width: 270,
@@ -26,50 +18,29 @@ export default function Home({ GoToTableHandler, LoginButtonHandler }) {
           alignSelf: "center",
           marginBottom: 30,
         }}
+        alt="qr"
         source={require("../assets/images/qr_code.gif")}
       />
 
-      <TouchableOpacity
-        style={{ paddingTop: 10, marginTop: 10, marginBottom: 40, margin: 10 }}
-        onPress={() => {
-          clickImage();
-        }}
+      <Button
+        onPress={clickImage}
       >
-        <View style={styles.button}>
-          <Text
-            style={{
-              color: "white",
-              textAlign: "center",
-            }}
-          >
-            Scan QR code
-          </Text>
-        </View>
-      </TouchableOpacity>
+        Scan QR code
+      </Button>
 
       {idData ? (
-        <TouchableOpacity
+        <Button
           style={{
-            paddingTop: 10,
-            marginTop: 10,
             marginBottom: 40,
-            margin: 10,
+            color: "white",
+                textAlign: "center",
           }}
-          onPress={async () => {
-            await GoToTableHandler(idData);
+          onPress={() => {
+            GoToTableHandler(idData);
           }}
         >
-          <View style={styles.button}>
-            <Text
-              style={{
-                color: "white",
-                textAlign: "center",
-              }}
-            >
               Go to Table
-            </Text>
-          </View>
-        </TouchableOpacity>
+        </Button>
       ) : null}
 
       {location.hostname === "hlocalhost" ? (
@@ -91,7 +62,7 @@ export default function Home({ GoToTableHandler, LoginButtonHandler }) {
             For Shop owner use only*
           </Text>
 
-          <TextInput
+          <Input
             style={{
               height: 40,
               backgroundColor: "white",
@@ -117,8 +88,8 @@ export default function Home({ GoToTableHandler, LoginButtonHandler }) {
               marginBottom: 20,
               margin: 10,
             }}
-            onPress={async () => {
-              await LoginButtonHandler(restaurantId);
+            onPress={() => {
+              LoginButtonHandler(restaurantId);
             }}
           >
             <View
@@ -140,20 +111,6 @@ export default function Home({ GoToTableHandler, LoginButtonHandler }) {
           </TouchableOpacity>
         </>
       ) : null}
-    </View>
+    </VStack>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  button: {
-    backgroundColor: "#222222",
-    padding: 12,
-    borderRadius: 6,
-  },
-});

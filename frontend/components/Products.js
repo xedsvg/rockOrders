@@ -55,7 +55,7 @@ const Products = ({ category, products, addToCart, removeFromCart }) => {
           <Heading size="sm" marginBottom="2rem" marginTop="1rem" color="black" bold>
             { subCategory || 'Other'}
           </Heading>
-          <HStack>
+          <HStack justifyContent={"space-evenly"} flexWrap="wrap">
           {localProducts.map((product) => {
             if (product.subCategory === subCategory)
               return (

@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { LogBox } from 'react-native';
 
 import {
   VStack,
@@ -18,18 +19,21 @@ import Order from "../components/Order";
 export default function Table({ orders, setOrders, cart, setCart, isOpen, onClose, setViewCartOrTabButton }) {
   useEffect(() => {
     setViewCartOrTabButton("View Tab");
+    LogBox.ignoreLogs(['Animated: `useNativeDriver`']);
+    LogBox.ignoreLogs(['setNativeProps is deprecated']);
   }, []);
 
   return (
-    <Center flex={1}>
+    <Center flex={1} w="full">
       <VStack flex={1} space={1} alignItems="flex-start">
         {/* **** Table Status **** */}
        <TableStatus />
 
         {/* **** Active Orders **** */}
-        <ScrollView h="10">
+        <ScrollView h="10" w="full">
         {cart.length ? <Order cart={cart}/>: null}
         {(orders.length || cart.length) ? orders.map((order)=> (<Order order={order}/>)): <Order />}
+
         </ScrollView>
 
        </VStack>

@@ -1,15 +1,23 @@
 import { baseUrl } from "./settings";
 
 import React, { useEffect, useState } from "react";
-
-import { View, Center, Text, extendTheme, NativeBaseProvider, VStack, useDisclose } from "native-base";
+import { View, Center, Text, extendTheme, NativeBaseProvider, VStack, useDisclose, Icon, Divider } from "native-base";
+import { MaterialIcons } from "@expo/vector-icons";
 
 const newColorTheme = {
   brand: {
     900: "#8287af",
     800: "#7c83db",
     700: "#b3bef6",
+    "error": "",
+    "warning": "",
+    "success": ""
   },
+  paper: {
+    "light": "#fff",
+    "medium": "#f7f7f7",
+    "dark": "#e5e6ed"
+  }
 };
 const theme = extendTheme({ colors: newColorTheme });
 
@@ -47,7 +55,6 @@ export default function App() {
       } = await (await fetch(`${baseUrl}/settings`)).json();
       await setRestaurantId(restaurantId);
       await setRestaurantName(restaurantName);
-      console.log(restaurantId, restaurantName)
     })();
   }, []);
   
@@ -78,23 +85,26 @@ export default function App() {
 
   return (
     <NativeBaseProvider theme={theme}>
-      <VStack flex={1} space={2} alignItems="center">
+      <VStack flex={1} space={2} alignItems="center" bg="brand.800">
       
-      <Navbar restaurantName={restaurantName} >
+      <Navbar restaurantName={restaurantName}>
         {(user == "customer" && viewMode != "scan") ? (
-          [<Center w="20" rounded="md" shadow={3} key="back"> 
-            <Text onPress={() => setViewMode("scan")} color="blueGray.200">Back</Text>
+          [<Center w="20" key="back"> 
+            <Icon as={<MaterialIcons name="chevron-left" />} size={5} onPress={() => setViewMode("scan")} color="blueGray.200" />
+            <Text color="blueGray.200">Back</Text>
           </Center>,
-          <Center w="20" rounded="md" shadow={3} key="menu"> 
-            <Text onPress={GoToMenuButtonHandler} color="blueGray.200">Menu</Text>
+          <Center w="20" key="menu" > 
+            <Icon as={<MaterialIcons name="event-note" />} onPress={GoToMenuButtonHandler} size={5} color="blueGray.200" />
+            <Text color="blueGray.200">Menu</Text>
         </Center>,
-          <Center w="20" rounded="md" shadow={3} key="cart"> 
-            <Text onPress={onOpen} color="blueGray.200">{viewCartOrTabButton}</Text>
+          <Center w="20" key="cart"> 
+            <Icon as={<MaterialIcons name={viewCartOrTabButton.includes("Order") ? "shopping-cart" : "list-alt"} />} onPress={onOpen} size={5} color="blueGray.200" />
+            <Text color="blueGray.200">{viewCartOrTabButton}</Text>
         </Center>]
         ) : null }
       </Navbar>
 
-      <View flex={1} minWidth="full">
+      <View flex={1} minWidth="full" padding="3vw" borderTopRadius={25} zIndex={1} top="-4vh" background="paper.medium">
         {viewMode === "scan" && user == "customer" && (
           <Home
             restaurantName={restaurantName}

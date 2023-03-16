@@ -10,14 +10,15 @@ import {
   Text,
   Button,
   View,
+  Divider
 } from "native-base";
 
-export default function Order({ cart, order }) {
+export default function Order({ cart }) {
   if (cart) {
     return (
-      <VStack space={4} alignItems="center" marginBottom="2.5" minWidth="85%">
-        <Box alignItems="center">
-          <Pressable maxW="96">
+      <VStack space={4} alignItems="center" marginBottom="2.5">
+        <Box alignItems="center" w="full">
+          <Pressable w="full">
             {({ isHovered, isPressed }) => {
               return (
                 <Box
@@ -76,7 +77,11 @@ export default function Order({ cart, order }) {
                       </Text>
                     </View>
                   ))}
-                  <Button colorScheme="success"> Send Order!</Button>
+                  <Divider bg="transparent" thickness="10"/>
+                  <HStack justifyContent="space-between">
+                    <Button colorScheme="warning"> Add details</Button>
+                    <Button colorScheme="success"> Send Order!</Button>
+                  </HStack>
                 </Box>
               );
             }}
@@ -88,7 +93,7 @@ export default function Order({ cart, order }) {
     return (
       <VStack space={4} alignItems="center" marginBottom="2.5">
         <Box alignItems="center">
-          <Pressable maxW="96">
+          <Pressable w="full">
             {({ isHovered, isPressed }) => {
               return (
                 <Box

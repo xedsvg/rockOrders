@@ -26,7 +26,9 @@
       }
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "themeColor": "#7c83db",
+      "primaryColor": "#7c83db"
     }
   }
 }

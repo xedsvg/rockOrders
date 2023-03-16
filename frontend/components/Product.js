@@ -4,6 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 const Product = ({ product, addToCart, removeFromCart }) => {
   const [qty, setQty] = useState(0);
+  // const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     product.qty ? setQty(product.qty) : null;
@@ -22,8 +23,12 @@ const Product = ({ product, addToCart, removeFromCart }) => {
     id = 0,
     name = "Unavailable",
     price = "0",
-    image = "https://prnewswire2-a.akamaihd.net/p/1893751/sp/189375100/thumbnail/entry_id/1_z1bkmcrb/def_height/1500/def_width/1500/version/100011/type/1",
+    alcoholContent = "",
+    volume = "",
+    image = "https://rocknrolla.ro/images/rnr-placeholder.jpg",
   } = product;
+
+  const extraDetails = alcoholContent || volume ? true : false;
 
   return (
     <Box
@@ -31,12 +36,10 @@ const Product = ({ product, addToCart, removeFromCart }) => {
       borderColor="gray.300"
       borderRadius="md"
       overflow="hidden"
-      maxWidth="45%"
+      maxWidth="43%"
       marginBottom="2.5"
     >
-      <View
-        style={{ flexDirection: "column", alignItems: "center", padding: 10 }}
-      >
+      <View style={{ flexDirection: "column", padding: 10 }}>
         <Image
           source={{ uri: image }}
           style={{ width: 150, height: 150 }}
@@ -52,44 +55,37 @@ const Product = ({ product, addToCart, removeFromCart }) => {
           }}
         >
           <Text>{name}</Text>
-          <Text bold>{price} RON</Text>
         </View>
 
-        {/* Not Added */}
-        {!qty ? (
-          <View>
-            <View
-              paddingTop="1.5"
-              style={{ flexDirection: "row", alignItems: "center" }}
-            >
-              <Button
-                borderRadius="full"
-                onPress={add}
-                paddingTop="1"
-                paddingBottom="1"
-              >
-                <Text bold fontSize="xs" lineHeight="sm" color="white">
-                  ADD
-                </Text>
-              </Button>
-            </View>
-          </View>
-        ) : null}
+        <Text fontSize="xs">{alcoholContent}</Text>
+        <Text fontSize="xs" bold>
+          {volume}
+        </Text>
 
-        {/* Added  */}
-        {qty ? (
-          <View
-            paddingTop="1.5"
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              width: "100%",
-            }}
-          >
+        <View
+          paddingTop="1.5"
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            width: "100%",
+          }}
+        >
+          {!qty ? (
             <Button
               borderRadius="full"
+              onPress={add}
               paddingTop="1"
               paddingBottom="1"
+            >
+              <Text bold fontSize="xs" lineHeight="sm" color="white">
+                ADD
+              </Text>
+            </Button>
+          ) : null}
+
+          {qty ? (
+            <Button
+              borderRadius="full"
               colorScheme="danger"
               variant="outline"
               onPress={decrement}
@@ -97,27 +93,29 @@ const Product = ({ product, addToCart, removeFromCart }) => {
                 <Icon
                   as={Ionicons}
                   name="remove"
+                  lineHeight="sm"
                   size="sm"
                   colorScheme="danger"
                 />
               }
             ></Button>
+          ) : null}
 
-            <Text>{qty}</Text>
+          {qty ? <Text>{qty}</Text> : null}
 
+          {qty ? (
             <Button
               borderRadius="full"
-              paddingTop="1"
-              paddingBottom="1"
               colorScheme="danger"
               variant="outline"
               onPress={increment}
               leftIcon={
-                <Icon as={Ionicons} name="add" size="sm" colorScheme="danger" />
+                <Icon as={Ionicons} name="add" lineHeight="sm" size="sm" colorScheme="danger" />
               }
             ></Button>
-          </View>
-        ) : null}
+          ) : null}
+          <Text bold>{price} RON</Text>
+        </View>
       </View>
     </Box>
   );

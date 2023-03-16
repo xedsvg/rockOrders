@@ -13,7 +13,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 
 const Categories = ({ categories, setCategory }) => {
   return (
-    <View flexDirection="row" justifyContent="space-evenly" flexWrap="wrap">
+    <View flexDirection="row" justifyContent="space-between" flexWrap="wrap">
       <Heading marginBottom="2rem" marginTop="1rem" color="black" bold>
         What would you like to serve?
       </Heading>
