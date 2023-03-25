@@ -2,10 +2,10 @@ FROM node:16.10-alpine
 
 WORKDIR /backend
 
-COPY ./package*.json ./
-# COPY ./yarn.lock ./
+COPY ./package.json ./
+COPY ./yarn.lock ./
 
-RUN npm install
+RUN yarn
 COPY . .
 
-CMD [ "npm", "start" ]
+CMD [ "yarn", "start" ]
