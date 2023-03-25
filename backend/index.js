@@ -1,37 +1,27 @@
-// const startupDebugger = require("debug")("app:startup");
-
 const helmet = require("helmet");
-const morgan = require("morgan");
 
 const mongoose = require("mongoose");
-const { Restaurants, Tables, Products, Orders, Tabs, Servers } = require("./db/models");
+const { Restaurants, Tables, Products, Orders, Tabs, Waiters } = require("./db/models");
 
 const express = require("express");
 const cors = require("cors");
 const app = express();
 
-
-
 // const corsOptions = {
 //   origin: "http://localhost:19006",
 // };
 
-mongoose
-  .connect(`mongodb://${process.env.MONGODB_HOST}/rockandrolla?retryWrites=true&w=majority`, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+mongoose.connect(`mongodb://${process.env.MONGODB_HOST || "localhost"}/rockandrolla?retryWrites=true&w=majority`, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
   .then(() => console.log("Connection established to MongoDB..."))
   .catch((err) => console.log("Could not connect to MongoDB...", err));
-
 
 // app.use(cors(corsOptions));
 app.use(cors());
 app.use(express.json());
-app.use(helmet()); //secures the page by adding various http headers
-
-app.use(morgan("tiny"));
-// startupDebugger("Morgan enabled");
+app.use(helmet());
 
 app.get("/status", (req, res) => {
   res.sendStatus(200);
@@ -47,70 +37,165 @@ app.get("/getMenu/:id", async (req, res) => {
   res.send(menu_card);
 });
 
-app.post("/placeOrder", async (req, res) => {
-  let totAmo = 0,
-    itms = [],
-    tableNo = req.body.tableNo;
-  for (let i = 0; i < req.body.cart.length; i++) {
-    totAmo += req.body.cart[i].price * req.body.cart[i].quantity;
-    itms[i] = req.body.cart[i].name + " x" + req.body.cart[i].quantity;
-  }
+app.get("/getRandomTable/:restaurantId", async (req, res) => {
+  const { params: { restaurantId } } = req;
 
-
-  const order = new Orders({
-    restaurantId: req.body.cart[0].restaurantId,
-    tableNo: tableNo,
-    items: itms.toString(),
-    totalAmount: totAmo,
-  });
-
-  try {
-    const result = await order.save();
-  } catch (e) {
-  }
-
-  res.send("accepted");
+  const randomTable = await Tables.findOne({ restaurantId });
+  res.send(randomTable);
 });
 
-// app.get('/getQrCodeData/:uri', async (req, res) => {
+app.get("/getTableSession/:tableId", async (req, res) => {
+  const { params: { tableId } } = req;
 
-//     let data = req.body.uri;
-//     console.log(qr.decode(req.body.uri));
+  try {
+    let table = await Tables.findById(tableId);
+    if (!table) {
+      res.sendStatus(204);
+    }
+    else {
+      if (!table.tabOpen) {
+        const newTab = await new Tabs({
+          restaurantId: table.restaurantId,
+          tableId: table._id,
+          status: "open",
+          lastUpdated: Date.now(),
+          createdAt: Date.now()
+        }).save();
 
-//     res.send(data);
-// });
+        table.currentTab = newTab._id;
+        table.tabOpen = true;
+        table = await table.save();
+      }
 
-app.post("/getRandomTable", async (req, res) => {
-  const id = req.params.id;
+      table = await table.populate({
+        path: 'currentTab',
+        populate: {
+          path: 'orders',
+          model: 'Orders'
+        }
+      }).execPopulate();
+      res.send(table);
 
-  const randomTable = await Tables.find({ restaurantId: id });
+    }
+  } catch (e) {
+    console.log(e);
+    res.sendStatus(500);
+  }
 
-  res.send(randomTable);
-})
+});
+
+app.get("/tabs/:tabId", async (req, res) => {
+  const { params: { tabId } } = req;
+
+  try {
+    let tab = await Tabs.findById(tabId);
+    if (!tab) {
+      res.sendStatus(204);
+    } else {
+      tab = await tab.populate('orders').execPopulate();
+      res.send(tab);
+    }
+  } catch (e) {
+    console.log(e);
+    res.sendStatus(500);
+  }
+});
+
+app.post("/orders/new/:tabId", async (req, res) => {
+  const { body: { cartProducts }, params: { tabId } } = req;
+  if (!cartProducts || !tabId) {
+    res.sendStatus(400);
+  } else {
+    try {
+      const tab = await Tabs.findById(tabId);
+      if (!tab) {
+        res.send(204)
+      } else {
+        const totalAmount = cartProducts.reduce((total, cartProduct) => total + parseInt(cartProduct.qty) * parseFloat(cartProduct.price.toFixed(2)), 0);
+        const items = cartProducts.flatMap(({ qty, _id }) => Array(qty).fill(_id));
+        // const variations = cartProducts.flatMap(({id, variation}) => Array(qty).fill({id, variation}));
+        const order = new Orders({
+          tabId: tab._id,
+          restaurantId: tab.restaurantId,
+          totalAmount,
+          items
+        });
+        tab.orders.push(order._id);
+
+        await Promise.all([order.save(), tab.save()]);
+        res.send(order);
+      }
+    } catch (e) {
+      res.sendStatus(500);
+    }
+  }
+});
+
 /************   User-End    ****************/
 
 /************   Owner    ****************/
 
-app.get("/getOrders/:id", async (req, res) => {
-  const { id } = req.params;
 
-  const order = await Orders.find({ restaurantId: id });
+// app.post("/tabs/open", async (req, res) => {
+//   const { body: { restaurantId } } = req;
+//   if(!restaurantId) {
+//     res.sendStatus(400);
+//   } else {
+//     try {
+//     const order = await Orders.find(orderId);
+//     res.send(order);
+//   } catch (e) {
+//     res.send(500);
+//   }}
+// });
 
-  res.send(order);
-});
-
-app.delete("/deleteOrder/:id", async (req, res) => {
-  const { id } = req.params;
-
-  let order = await Orders.findByIdAndDelete(id);
-
-  if (!order) {
-    res.status(404).send("The course with the given id was not found");
-    return;
+app.get("/orders/:orderId", async (req, res) => {
+  const { params: { orderId } } = req;
+  if (!orderId) {
+    res.sendStatus(400);
+  } else {
+    try {
+      const order = await Orders.findById(orderId);
+      res.send(order);
+    } catch (e) {
+      res.send(500);
+    }
   }
-
-  res.send(order);
 });
+
+app.post("/orders/update/:orderId", async (req, res) => {
+  const { body: { status }, params: { orderId } } = req;
+  if (!status || !orderId) {
+    res.sendStatus(400);
+  } else if (!["received", "inProgress", "done", 'canceled'].some((msg) => msg === status)) {
+    res.sendStatus(422);
+  } else {
+    try {
+      const order = await Orders.findById(orderId);
+      if (!order) {
+        res.sendStatus(204);
+      } else {
+        order.status = status;
+        await order.save();
+        res.send(order);
+      }
+    } catch (e) {
+      res.send(500);
+    }
+  }
+});
+
+//   const { id } = req.params;
+
+//   let order = await Orders.findByIdAndDelete(id);
+
+//   if (!order) {
+//     res.status(404).send("The course with the given id was not found");
+//     return;
+//   }
+
+//   res.send(order);
+// });
 
 app.get("/settings", async (req, res) => {
   const restaurantDetails = await Restaurants.findOne();
@@ -128,30 +213,30 @@ app.get("/settings", async (req, res) => {
   });
 });
 
-app.get("/login/:id", async (req, res) => {
-  const id = req.params.id;
-  let restaurantDetails;
-  try {
-    restaurantDetails = await Restaurants.findById(id);
-  } catch (e) {
-  }
-  restaurantDetails ? res.send(restaurantDetails) : res.send({ _id: -1 });
-});
+// app.get("/login/:id", async (req, res) => {
+//   const id = req.params.id;
+//   let restaurantDetails;
+//   try {
+//     restaurantDetails = await Restaurants.findById(id);
+//   } catch (e) {
+//   }
+//   restaurantDetails ? res.send(restaurantDetails) : res.send({ _id: -1 });
+// });
 
-app.post("/addItem", async (req, res) => {
-  const obj = req.body;
+// app.post("/addItem", async (req, res) => {
+//   const obj = req.body;
 
-  const product = new Products(obj);
+//   const product = new Products(obj);
 
-  try {
-    await product.save();
+//   try {
+//     await product.save();
 
-  } catch (e) {
-    for (field in e.errors) console.log(e.errors[field].message);
-  }
+//   } catch (e) {
+//     for (field in e.errors) console.log(e.errors[field].message);
+//   }
 
-  res.send(obj);
-});
+//   res.send(obj);
+// });
 
 /************   Owner-End    ****************/
 // const crdate = new Date(Date.now()).toISOString();
@@ -170,6 +255,30 @@ app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}..`)
 });
 
+/***************** Helper Functions *****************/
+const closeTab = async (tabId) => {
+  try {
+    const now = Date.now();
+    const tab = await Tabs.findById(tabId);
+
+    if (tab.status !== 'closed') {
+      tab.status = 'closed';
+      tab.lastUpdated = now;
+      await tab.save();
+
+      const table = await Restaurants.findById(tab.restaurantId);
+      table.olderTabs.push(tab._id);
+      table.tabOpen = false;
+      table.lastUpdated = now;
+      table.currentTab = null;
+      await table.save();
+      return true;
+    } else return false;
+  } catch (e) {
+    console.log(e);
+    return false;
+  }
+}
 
 // item = {
 //   name: cuba libre

@@ -1,25 +1,33 @@
 const mongoose = require('mongoose');
-const { Schema: { Types: { ObjectId } } } = require('mongoose');
+const { Schema: { Types: { ObjectId } } } = mongoose;
+const { model, Schema } = mongoose;
 
-const restaurantSchema = new mongoose.Schema({
+const restaurantSchema = Schema({
     name: String,
     OwnerName: String,
     //open hours - todo for last order before!
 });
-const Restaurants = mongoose.model("Restaurants", restaurantSchema);
 
-const tableSchema = new mongoose.Schema({
+const tableSchema = Schema({
     restaurantId: String,
     tableNo: Number,
     tabOpen: Boolean,
-    date: Date
+    options: Array,
+    currentTab: {
+        type: ObjectId,
+        ref: 'Tabs'
+    },
+    olderTabs: [{
+        type: ObjectId,
+        ref: 'Tabs'
+    }],
+    lastUpdated: Date
 });
-const Tables = mongoose.model("Tables", tableSchema);
 
-const productSchema = new mongoose.Schema({
+const productSchema = Schema({
     restaurantId: {
         type: ObjectId,
-        ref: Restaurants
+        ref: 'Restaurants'
     },
     name: String,
     price: Number,
@@ -35,42 +43,73 @@ const productSchema = new mongoose.Schema({
     category: String,
     imgUrl: String,
 });
-const Products = mongoose.model("Products", productSchema);
 
-const tabSchema = new mongoose.Schema({
-    restaurantId: String,
+const tabSchema = Schema({
+    restaurantId: {
+        type: ObjectId,
+        ref: 'Restaurants'
+    },
     tableId: {
         type: ObjectId,
-        ref: Tables
+        ref: 'Tables'
     },
-    status: String, // closed-open
+    orders: [
+        {
+            type: ObjectId,
+            ref: 'Orders'
+        }
+    ],
+    status: String, // request-to-close,closed,open
+    callWaiter: String, // called, pending-arival, not-called
     lastUpdated: Date,
     createdAt: Date
 });
-const Tabs = mongoose.model("Tabs", tabSchema);
 
-const orderSchema = new mongoose.Schema({
-    status: String, // received, inProgress, done
-    restaurantId: String,
-    tabId: {
-        type: ObjectId,
-        ref: Tabs
-    },
-    items: String,
-    totalAmount: Number,
-});
-const Orders = mongoose.model("Orders", orderSchema);
-
-const serverSchema = new mongoose.Schema({
+const orderSchema = Schema({
+    status: {
+        type:String,
+        default: 'recieved'
+    }, // received, inProgress, done, canceled
     restaurantId: {
         type: ObjectId,
-        ref: Restaurants
+        ref: 'Restaurants'
+    },
+    tabId: {
+        type: ObjectId,
+        ref: 'Tabs'
+    },
+    items: [{
+        type: ObjectId,
+        ref: 'Products'
+    }],
+    // variations: [],
+    totalAmount: Number,
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
+    lastUpdated: {
+        type: Date,
+        default: Date.now
+    }
+});
+
+const waiterSchema = Schema({
+    restaurantId: {
+        type: ObjectId,
+        ref: 'Restaurants'
     },
     name: String,
     enabled: Boolean,
     createdAt: Date
 });
-const Servers = mongoose.model("Servers", serverSchema);
+
+const Restaurants = model("Restaurants", restaurantSchema);
+const Tables = model("Tables", tableSchema);
+const Products = model("Products", productSchema);
+const Tabs = model("Tabs", tabSchema);
+const Orders = model("Orders", orderSchema);
+const Waiters = model("Waiters", waiterSchema);
 
 module.exports = {
     Restaurants,
@@ -78,5 +117,5 @@ module.exports = {
     Products,
     Orders,
     Tabs,
-    Servers
+    Waiters
 }

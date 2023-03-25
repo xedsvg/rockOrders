@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { Restaurants, Tables, Products, Orders, Tabs, Servers } = require("./db/models");
+const { Restaurants, Tables, Products, Waiters } = require("./db/models");
 
 const dummyProducts = [{
   "name": "Tuborg",
@@ -98,6 +98,7 @@ const dummyProducts = [{
 }];
 
 const restaurant = new Restaurants({
+  _id: '641ef47dd6a1260012acd8c7',
   name: "NotRocknRolla",
   OwnerName: "Pablo e Sobar"
 });
@@ -105,7 +106,7 @@ const restaurant = new Restaurants({
 (async () => {
   try {
 
-    await mongoose.connect(`mongodb://${process.env.MONGODB_HOST}/rockandrolla?retryWrites=true&w=majority`, {
+    await mongoose.connect(`mongodb://${process.env.MONGODB_HOST || 'localhost'}/rockandrolla?retryWrites=true&w=majority`, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
     });

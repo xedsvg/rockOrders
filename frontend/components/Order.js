@@ -20,6 +20,7 @@ export default function Order({ cart }) {
   }
 
   if (cart) {
+    console.log(cart);
     return (
       <VStack space={4} alignItems="center" marginBottom="2.5">
         <Box alignItems="center" w="full">

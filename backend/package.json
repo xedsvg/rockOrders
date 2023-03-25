@@ -8,7 +8,6 @@
     "backfill": "node backfill.js",
     "demo": "node backfill.js & node index.js",
     "start": "node index.js"
-
   },
   "keywords": [],
   "author": "xed",
@@ -19,5 +18,8 @@
     "helmet": "^4.4.1",
     "mongoose": "^5.11.14",
     "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
   }
 }
