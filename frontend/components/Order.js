@@ -14,6 +14,11 @@ import {
 } from "native-base";
 
 export default function Order({ cart }) {
+
+  const sendOrder = () => {
+    alert("send order clicked");
+  }
+
   if (cart) {
     return (
       <VStack space={4} alignItems="center" marginBottom="2.5">
@@ -80,7 +85,7 @@ export default function Order({ cart }) {
                   <Divider bg="transparent" thickness="10"/>
                   <HStack justifyContent="space-between">
                     <Button colorScheme="warning"> Add details</Button>
-                    <Button colorScheme="success"> Send Order!</Button>
+                    <Button colorScheme="success" onPress={sendOrder}> Send Order!</Button>
                   </HStack>
                 </Box>
               );
