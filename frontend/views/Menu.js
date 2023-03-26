@@ -1,20 +1,16 @@
 import { baseUrl } from "../settings";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { View, Text, Center, Actionsheet, Box, VStack, HStack, Button, Heading, Divider } from "native-base";
 
 import Products from "../components/Products";
-
 import Categories from "../components/Categories";
 
-export default function Menu({ restaurantId, cart, setCart, isOpen, onClose, setViewCartOrTabButton }) {
-  const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [subCategories, setSubCategories] = useState([]);
-
-  const [selectedCategories, setSelectedCategories] = useState([]);
-  const [category, setCategory] = useState("");
-
+export default function Menu({ 
+  restaurantId, cart, setCart, isOpen, onClose, setViewCartOrTabButton,
+  products, setProducts, categories, setCategories, subCategories, setSubCategories,
+  selectedCategories, setSelectedCategories, category, setCategory
+}) {
 
   const addToCart = (item) => {
     let itemInCart = false;
@@ -102,7 +98,7 @@ export default function Menu({ restaurantId, cart, setCart, isOpen, onClose, set
   return (
     <View>
         { !category ? <Categories categories={categories} setCategory={setCategory} /> : null }
-        {  category ? <Products category={category} products={products} addToCart={addToCart} removeFromCart={removeFromCart} /> : null }
+        { category ? <Products category={category} products={products} addToCart={addToCart} removeFromCart={removeFromCart} /> : null }
 
       {/* Cart View and Actions */}
       <Center>

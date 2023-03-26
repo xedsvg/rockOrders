@@ -6,8 +6,8 @@ import { MaterialIcons } from "@expo/vector-icons";
 
 import { theme } from "./theme";
 
-import Navbar from "./views/Navbar";
-import Home from "./views/Home";
+import Navbar from "./components/Navbar";
+import QrScan from "./views/QrScan";
 import Table from "./views/Table";
 import Menu from "./views/Menu";
 
@@ -15,19 +15,34 @@ import Menu from "./views/Menu";
 
 export default function App() {
 
+  /*********************** Prep this for a state library ************************/
+  /*********** Navigation and navigation history ************/
   const [viewMode, setViewMode] = useState("scan");
   const [viewHistory, setViewHistory] = useState(["scan"]);
 
+  /*********** User vs Owner view ************/
   const [user, setUser] = useState("customer");
 
+  /*********** Restaurant info ************/
   const [restaurantId, setRestaurantId] = useState(null);
   const [restaurantName, setRestaurantName] = useState(null);
 
+  /*********** Table info ************/
   const [tableId, setTableId] = useState(null);
 
+  /*********** Menu info ************/  
   const [orders, setOrders] = useState([]);
   const [cart, setCart] = useState([]);
 
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [subCategories, setSubCategories] = useState([]);
+
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [category, setCategory] = useState("");
+
+
+  /*********** Tab and Cart view state ************/
   const [viewCartOrTabButton, setViewCartOrTabButton] = useState("");
   const { isOpen, onOpen, onClose } = useDisclose();
 
@@ -96,7 +111,7 @@ export default function App() {
 
       <View flex={1} minWidth="full" padding="3vw" borderTopRadius={25} zIndex={1} top="-4vh" background="paper.medium">
         {viewMode === "scan" && user == "customer" && (
-          <Home
+          <QrScan
             restaurantName={restaurantName}
             GoToTableHandler={GoToTableHandler}
             LoginButtonHandler={LoginButtonHandler}
@@ -104,7 +119,17 @@ export default function App() {
         )}
 
         {viewMode === "menu" && user == "customer" && (
-          <Menu restaurantId={restaurantId} cart={cart} setCart={setCart} isOpen={isOpen} onOpen={onOpen} onClose={onClose} BackButtonHandler={BackButtonHandler} setViewCartOrTabButton={setViewCartOrTabButton}/>
+          <Menu
+          restaurantId={restaurantId}
+          cart={cart} setCart={setCart} 
+          BackButtonHandler={BackButtonHandler} setViewCartOrTabButton={setViewCartOrTabButton}
+          isOpen={isOpen} onOpen={onOpen} onClose={onClose} 
+          products={products} setProducts={setProducts}
+          categories={categories} setCategories={setCategories}
+          subCategories={subCategories} setSubCategories={setSubCategories}
+          selectedCategories={selectedCategories} setSelectedCategories={setSelectedCategories}
+          category={category} setCategory={setCategory}
+          />
         )}
         {viewMode === "table" && user == "customer" && <Table orders={orders} setOrders={setOrders} cart={cart} setCart={setCart} isOpen={isOpen} onOpen={onOpen} onClose={onClose} setViewCartOrTabButton={setViewCartOrTabButton}/>}
 

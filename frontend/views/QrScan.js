@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Text, View, Button, Image, Input, VStack } from "native-base";
 
-export default function Home({ GoToTableHandler, LoginButtonHandler }) {
+export default function QrScan({ GoToTableHandler, LoginButtonHandler }) {
   const [image, setImage] = useState(null);
   const [idData, setIdData] = useState(null);
 
