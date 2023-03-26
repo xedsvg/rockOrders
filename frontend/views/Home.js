@@ -3,7 +3,7 @@ import { Text, View, Button, Image, Input, VStack } from "native-base";
 
 export default function Home({ GoToTableHandler, LoginButtonHandler }) {
   const [image, setImage] = useState(null);
-  const [idData, setIdData] = useState(null); //table 3
+  const [idData, setIdData] = useState(null);
 
   const clickImage = async () => {
     setIdData("63dce85b98df5617195153fc");

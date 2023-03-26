@@ -4,37 +4,21 @@ import React, { useEffect, useState } from "react";
 import { View, Center, Text, extendTheme, NativeBaseProvider, VStack, useDisclose, Icon, Divider } from "native-base";
 import { MaterialIcons } from "@expo/vector-icons";
 
-const newColorTheme = {
-  brand: {
-    900: "#8287af",
-    800: "#7c83db",
-    700: "#b3bef6",
-    "error": "",
-    "warning": "",
-    "success": ""
-  },
-  paper: {
-    "light": "#fff",
-    "medium": "#f7f7f7",
-    "dark": "#e5e6ed"
-  }
-};
-const theme = extendTheme({ colors: newColorTheme });
+import { theme } from "./theme";
 
 import Navbar from "./views/Navbar";
 import Home from "./views/Home";
 import Table from "./views/Table";
 import Menu from "./views/Menu";
+
 // import Owner from "./views/Owner/Owner";
 
 export default function App() {
 
   const [viewMode, setViewMode] = useState("scan");
+  const [viewHistory, setViewHistory] = useState(["scan"]);
 
   const [user, setUser] = useState("customer");
-  const [ownerId, setOwnerId] = useState();
-
-  const [qrCode_url, setQrCode_url] = useState(null);
 
   const [restaurantId, setRestaurantId] = useState(null);
   const [restaurantName, setRestaurantName] = useState(null);
@@ -60,16 +44,22 @@ export default function App() {
   
 
   const GoToMenuButtonHandler = async () => {
-    await setViewMode("menu");
+    const goToView = "menu";
+    await setViewHistory([...viewHistory, goToView]);
+    await setViewMode(goToView);
   };
 
   const GoToTableHandler = async (tableId) => {
+    const goToView = "table";
     await setTableId(tableId);
-    await setViewMode("table");
+    await setViewHistory([...viewHistory, goToView]);
+    await setViewMode(goToView);
   };
 
-  const ExitButtonHandler = () => {
-    setViewMode("scan");
+  const BackButtonHandler = async () => {
+    const goToView = viewHistory[viewHistory.length - 2 ];
+    await setViewMode(goToView);
+    await setViewHistory(viewHistory.slice(0, -1));
   };
 
   const LoginButtonHandler = async (id) => {
@@ -90,7 +80,7 @@ export default function App() {
       <Navbar restaurantName={restaurantName}>
         {(user == "customer" && viewMode != "scan") ? (
           [<Center w="20" key="back"> 
-            <Icon as={<MaterialIcons name="chevron-left" />} size={5} onPress={() => setViewMode("scan")} color="blueGray.200" />
+            <Icon as={<MaterialIcons name="chevron-left" />} size={5} onPress={BackButtonHandler} color="blueGray.200" />
             <Text color="blueGray.200">Back</Text>
           </Center>,
           <Center w="20" key="menu" > 
@@ -114,7 +104,7 @@ export default function App() {
         )}
 
         {viewMode === "menu" && user == "customer" && (
-          <Menu restaurantId={restaurantId} cart={cart} setCart={setCart} isOpen={isOpen} onOpen={onOpen} onClose={onClose} ExitButtonHandler={ExitButtonHandler} setViewCartOrTabButton={setViewCartOrTabButton}/>
+          <Menu restaurantId={restaurantId} cart={cart} setCart={setCart} isOpen={isOpen} onOpen={onOpen} onClose={onClose} BackButtonHandler={BackButtonHandler} setViewCartOrTabButton={setViewCartOrTabButton}/>
         )}
         {viewMode === "table" && user == "customer" && <Table orders={orders} setOrders={setOrders} cart={cart} setCart={setCart} isOpen={isOpen} onOpen={onOpen} onClose={onClose} setViewCartOrTabButton={setViewCartOrTabButton}/>}
 
