@@ -1,7 +1,7 @@
 import { baseUrl } from "./settings";
 
 import React, { useEffect, useState } from "react";
-import { View, Center, Text, extendTheme, NativeBaseProvider, VStack, useDisclose, Icon, Divider } from "native-base";
+import { View, Center, Text, NativeBaseProvider, VStack, useDisclose, Icon } from "native-base";
 import { MaterialIcons } from "@expo/vector-icons";
 
 import { theme } from "./theme";
@@ -29,6 +29,7 @@ export default function App() {
 
   /*********** Table info ************/
   const [tableId, setTableId] = useState(null);
+  const [tableInfo, setTableInfo] = useState(null);
 
   /*********** Menu info ************/  
   const [orders, setOrders] = useState([]);
@@ -57,6 +58,13 @@ export default function App() {
     })();
   }, []);
   
+  const grabTableInfo = async (tableId) => {
+    const { currentTab: { orders }, tableNo } = await (await fetch(`${baseUrl}/getTableSession/${tableId}`)).json();
+    await setTableInfo({ tableNo });
+    await setOrders(orders);
+  };
+
+
 
   const GoToMenuButtonHandler = async () => {
     const goToView = "menu";
@@ -66,6 +74,7 @@ export default function App() {
 
   const GoToTableHandler = async (tableId) => {
     const goToView = "table";
+    await grabTableInfo(tableId);
     await setTableId(tableId);
     await setViewHistory([...viewHistory, goToView]);
     await setViewMode(goToView);
@@ -113,6 +122,9 @@ export default function App() {
         {viewMode === "scan" && user == "customer" && (
           <QrScan
             restaurantName={restaurantName}
+            restaurantId={restaurantId}
+            tableId={tableId}
+            setTableId={setTableId}
             GoToTableHandler={GoToTableHandler}
             LoginButtonHandler={LoginButtonHandler}
           />
@@ -131,7 +143,7 @@ export default function App() {
           category={category} setCategory={setCategory}
           />
         )}
-        {viewMode === "table" && user == "customer" && <Table orders={orders} setOrders={setOrders} cart={cart} setCart={setCart} isOpen={isOpen} onOpen={onOpen} onClose={onClose} setViewCartOrTabButton={setViewCartOrTabButton}/>}
+        {viewMode === "table" && user == "customer" && <Table tableInfo={tableInfo} orders={orders} setOrders={setOrders} cart={cart} setCart={setCart} isOpen={isOpen} onOpen={onOpen} onClose={onClose} setViewCartOrTabButton={setViewCartOrTabButton}/>}
 
         {/* {user == "owner" && <Owner ownerId={ownerId} />} */}
       </View>

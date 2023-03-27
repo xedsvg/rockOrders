@@ -5,7 +5,6 @@ import { Ionicons } from "@expo/vector-icons";
 const Product = ({ product, addToCart, removeFromCart }) => {
   const [qty, setQty] = useState(0);
   const [showModal, setShowModal] = useState(false);
-  // const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     product.qty ? setQty(product.qty) : null;

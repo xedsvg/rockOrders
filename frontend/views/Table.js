@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import { LogBox } from 'react-native';
 
 import {
   VStack,
@@ -16,27 +15,26 @@ import {
 import TableStatus from "../components/TableStatus";
 import Order from "../components/Order";
 
-export default function Table({ orders, setOrders, cart, setCart, isOpen, onClose, setViewCartOrTabButton }) {
+export default function Table({ tableInfo, orders, cart, isOpen, onClose, setViewCartOrTabButton }) {
   useEffect(() => {
     setViewCartOrTabButton("View Tab");
-    LogBox.ignoreLogs(['Animated: `useNativeDriver`']);
-    LogBox.ignoreLogs(['setNativeProps is deprecated']);
   }, []);
 
   return (
     <Center flex={1} w="full">
       <VStack flex={1} space={1} alignItems="flex-start">
+
         {/* **** Table Status **** */}
-       <TableStatus />
+        <TableStatus tableInfo={tableInfo} />
 
         {/* **** Active Orders **** */}
         <ScrollView h="10" w="full">
-        {cart.length ? <Order cart={cart}/>: null}
-        {(orders.length || cart.length) ? orders.map((order)=> (<Order order={order}/>)): <Order />}
-
+          {cart.length ? <Order key={"current-cart"} cart={cart} /> : null}
+          {console.log(orders.length)}
+          {(orders.length || cart.length) ? orders.map((order, orderNr) => { order.nr = orderNr + 1; console.log(`Order nr ${order.nr}`); return (<Order key={order._id || "placeholder"} order={order} />)}) : <Order />}
         </ScrollView>
 
-       </VStack>
+      </VStack>
 
       {/* **** Tab Details and Actions **** */}
       <Center>

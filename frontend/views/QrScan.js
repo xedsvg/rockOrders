@@ -1,13 +1,19 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Text, View, Button, Image, Input, VStack } from "native-base";
 
-export default function QrScan({ GoToTableHandler, LoginButtonHandler }) {
-  const [image, setImage] = useState(null);
-  const [idData, setIdData] = useState(null);
+export default function QrScan({ GoToTableHandler, LoginButtonHandler, tableId, setTableId, restaurantId }) {
 
-  const clickImage = async () => {
-    setIdData("63dce85b98df5617195153fc");
+  const grabRandomTable = async () => {
+    const response = await fetch(
+      `http://localhost:3000/getRandomTable/${restaurantId}`
+    );
+    const data = await response.json();
+    setTableId(data._id);
   };
+
+  useEffect(() => {
+    grabRandomTable();
+  }, [restaurantId]);
 
   return (
     <VStack space={3}>
@@ -23,12 +29,12 @@ export default function QrScan({ GoToTableHandler, LoginButtonHandler }) {
       />
 
       <Button
-        onPress={clickImage}
+        onPress={null}
       >
         Scan QR code
       </Button>
 
-      {idData ? (
+      {tableId ? (
         <Button
           style={{
             marginBottom: 40,
@@ -36,7 +42,7 @@ export default function QrScan({ GoToTableHandler, LoginButtonHandler }) {
                 textAlign: "center",
           }}
           onPress={() => {
-            GoToTableHandler(idData);
+            GoToTableHandler(tableId);
           }}
         >
               Go to Table

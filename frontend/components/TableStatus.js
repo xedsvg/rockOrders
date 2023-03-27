@@ -4,7 +4,9 @@ import { Box, HStack, Avatar, VStack, Text } from "native-base";
 
 import waiter from "../assets/icons/waiter.svg";
 
-export default function TableStatus({}) {
+export default function TableStatus({tableInfo}) {
+  const { tableNo } = tableInfo;
+
   useEffect(() => {}, []);
 
   return (
@@ -13,7 +15,7 @@ export default function TableStatus({}) {
         <Avatar size="48px" source={{ uri: waiter }} />
         <VStack>
           <Text color="coolGray.800" _dark={{ color: "warmGray.50" }} bold>
-            You are seated at table 50
+            You are seated at table {tableNo}
           </Text>
           <Text color="coolGray.600" _dark={{ color: "warmGray.200" }}>
             Serving you: Ioana

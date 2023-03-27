@@ -13,14 +13,32 @@ import {
   Divider
 } from "native-base";
 
-export default function Order({ cart }) {
+export default function Order({ cart, order }) {
+  if (order) {
+    cart = order.items;
+    order.total = 0;
+    // map reduce the cart so that same items are grouped together and have a qty property and a total price
+    cart = cart.reduce((acc, item) => {
+      const existingItem = acc.find((i) => i._id === item._id);
+      order.total += item.price;
+      if (existingItem) {
+        existingItem.qty += 1;
+        existingItem.totalPrice += item.price;
+        return acc;
+      } else {
+        item.qty = 1;
+        item.totalPrice = item.price;
+        return [...acc, item];
+      }
+    }
+      , []);
+  }
 
   const sendOrder = () => {
-    alert("send order clicked");
+    alert("send cart clicked");
   }
 
   if (cart) {
-    console.log(cart);
     return (
       <VStack space={4} alignItems="center" marginBottom="2.5">
         <Box alignItems="center" w="full">
@@ -32,8 +50,8 @@ export default function Order({ cart }) {
                     isPressed
                       ? "coolGray.200"
                       : isHovered
-                      ? "coolGray.200"
-                      : "coolGray.100"
+                        ? "coolGray.200"
+                        : "coolGray.100"
                   }
                   style={{
                     transform: [
@@ -45,23 +63,23 @@ export default function Order({ cart }) {
                   p="5"
                   rounded="8"
                   shadow={3}
-                  borderWidth="1"
-                  borderColor="coolGray.300"
+                  bcartWidth="1"
+                  bcartColor="coolGray.300"
                 >
                   <HStack alignItems="center">
                     <Badge
-                      colorScheme="warning"
+                      colorScheme={order?.status === 'recieved' ? "success" : "warning"}
                       _text={{
                         color: "white",
                       }}
                       variant="solid"
                       rounded="4"
                     >
-                      Open order
+                      {order?.status ? order.status[0].toUpperCase() + order.status.slice(1) : "Not sent"}
                     </Badge>
                     <Spacer />
                     <Text fontSize={10} color="coolGray.800">
-                      now
+                      {order?.lastUpdated ? order.lastUpdated.split("T")[1].split(".")[0] : "now"}
                     </Text>
                   </HStack>
                   <Text
@@ -70,24 +88,40 @@ export default function Order({ cart }) {
                     fontWeight="medium"
                     fontSize="xl"
                   >
-                    Current order
+                    {order?.nr ? `Order #${order.nr}` : "Current order"}
                   </Text>
                   {cart.map((cartItem) => (
                     <View flexDirection="row" justifyContent="space-between" key={cartItem._id}>
                       <Text mt="2" fontSize="sm" color="coolGray.700">
                         {cartItem.qty} x {cartItem.name}
                       </Text>
-                      
+
                       <Text mt="2" fontSize="sm" color="coolGray.700">
                         {cartItem.price * cartItem.qty} RON
                       </Text>
                     </View>
                   ))}
-                  <Divider bg="transparent" thickness="10"/>
-                  <HStack justifyContent="space-between">
-                    <Button colorScheme="warning"> Add details</Button>
-                    <Button colorScheme="success" onPress={sendOrder}> Send Order!</Button>
-                  </HStack>
+                  <Divider bg="transparent" thickness="10" />
+                  <Divider bg="black" thickness="1" />
+                  <View flexDirection="row" justifyContent="space-between" key="total">
+                    <Text mt="2" fontSize="sm" color="coolGray.700">
+                      Total:
+                    </Text>
+
+                    <Text mt="2" fontSize="sm" color="coolGray.700">
+                      {order?.total || cart.reduce((total, cartItem) => total += cartItem.price * cartItem.qty, [])} RON
+                    </Text>
+                  </View>
+                  {!order?.status &&
+                    <View>
+                      <Divider bg="transparent" thickness="10" />
+                      <HStack justifyContent="space-between">
+                        <Button colorScheme="warning"> Add details</Button>
+                        <Button colorScheme="success" onPress={sendOrder}> Send Order!</Button>
+                      </HStack>
+                    </View>
+                  }
+
                 </Box>
               );
             }}
@@ -107,8 +141,8 @@ export default function Order({ cart }) {
                     isPressed
                       ? "coolGray.200"
                       : isHovered
-                      ? "coolGray.200"
-                      : "coolGray.100"
+                        ? "coolGray.200"
+                        : "coolGray.100"
                   }
                   style={{
                     transform: [
@@ -120,8 +154,8 @@ export default function Order({ cart }) {
                   p="5"
                   rounded="8"
                   shadow={3}
-                  borderWidth="1"
-                  borderColor="coolGray.300"
+                  bcartWidth="1"
+                  bcartColor="coolGray.300"
                 >
                   <HStack alignItems="center">
                     <Badge
@@ -145,10 +179,10 @@ export default function Order({ cart }) {
                     fontWeight="medium"
                     fontSize="xl"
                   >
-                    Order nr #0
+                    cart nr #0
                   </Text>
                   <Text mt="2" fontSize="sm" color="coolGray.700">
-                    Details: Your orders will appear here!
+                    Details: Your carts will appear here!
                   </Text>
                 </Box>
               );

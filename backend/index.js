@@ -38,10 +38,15 @@ app.get("/getMenu/:id", async (req, res) => {
 });
 
 app.get("/getRandomTable/:restaurantId", async (req, res) => {
-  const { params: { restaurantId } } = req;
+  if (!req.params.restaurantId) {
+    res.sendStatus(400);
+  } else {
+    const { params: { restaurantId } } = req;
 
-  const randomTable = await Tables.findOne({ restaurantId });
-  res.send(randomTable);
+    const randomTable = await Tables.findOne({ restaurantId });
+    const { _id = null } = randomTable || {};
+    res.send( { _id } );
+  }
 });
 
 app.get("/getTableSession/:tableId", async (req, res) => {
@@ -71,7 +76,10 @@ app.get("/getTableSession/:tableId", async (req, res) => {
         path: 'currentTab',
         populate: {
           path: 'orders',
-          model: 'Orders'
+          options: { sort: { createdAt: -1 } },
+          populate: {
+            path: 'items'
+          }
         }
       }).execPopulate();
       res.send(table);
