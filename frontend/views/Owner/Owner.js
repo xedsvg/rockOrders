@@ -15,8 +15,17 @@ export default function Owner({restaurantId}) {
         await setOrders(orders);
     }
 
-    const changeStatusHandler = async () => {
-    }
+    const changeStatusHandler = async (orderId, status) => {
+      const data = await fetch(`${baseUrl}/orders/update/${orderId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status: status })
+      });
+      alert("Order status changed to " + status + data.status);
+    };
+  
 
     useEffect(()=>{
         (async () => {

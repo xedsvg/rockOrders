@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, Animated } from "react-native";
 import { Button } from "native-base";
 
@@ -19,10 +19,11 @@ const getItemsWithQuantities = (items) => {
 export default function Order({ orders, changeStatusHandler }) {
     const [opacityValue] = useState(new Animated.Value(1));
     const [flashingOrders, setFlashingOrders] = useState([]);
-
+    const [flashing, setFlashing] = useState(false);
+    
     useEffect(() => {
         const intervalId = setInterval(() => {
-            const flashing = [];
+            const flashingOrders = [];
             const now = new Date();
 
             orders.forEach((order) => {
@@ -30,13 +31,15 @@ export default function Order({ orders, changeStatusHandler }) {
                 const diffMs = now - lastUpdated;
                 const diffMin = diffMs / 1000 / 60;
                 if (diffMin >= 5) {
-                    flashing.push(order._id);
+                    flashingOrders.push(order._id);
                 }
             });
 
-            setFlashingOrders(flashing);
+            setFlashingOrders(flashingOrders);
+            console.log(flashing);
+            if (flashingOrders.length > 0 && flashing) {
+            console.log('flashing');
 
-            if (flashing.length > 0) {
                 Animated.loop(
                     Animated.sequence([
                         Animated.timing(opacityValue, {
@@ -58,7 +61,7 @@ export default function Order({ orders, changeStatusHandler }) {
         }, 5000);
 
         return () => clearInterval(intervalId);
-    }, [orders, opacityValue]);
+    }, [orders, opacityValue, flashing]);
 
     const groupedOrders = {};
 
@@ -85,7 +88,14 @@ export default function Order({ orders, changeStatusHandler }) {
             {!sortedOrders.length && <Text style={styles.title}>
                 "No orders"
             </Text>}
-            {sortedOrders.length &&
+
+            <Button style={styles.button} onPress={() => {
+                setFlashing(!flashing);
+            }}>
+                {flashing ? "Disable Flashing" : "Enable Flashing"} 
+            </Button>
+
+            {sortedOrders.length > 0 &&
                 <View style={styles.orders}>
                     {sortedOrders.map((item) => {
                         const items = getItemsWithQuantities(item.items);
@@ -120,14 +130,32 @@ export default function Order({ orders, changeStatusHandler }) {
                                         <Text style={styles.label}>Total:</Text>
                                         <Text style={styles.totalAmount}>{item.totalAmount}</Text>
                                     </View>
-
+                                    {item.status}
                                     <Button
+                                        disabled={item.status !== "recieved"}
                                         style={styles.button}
                                         onPress={async () => {
                                             changeStatusHandler(item._id, "inProgress");
                                         }}
                                     >
-                                        Start Preparing 🍽️
+                                        Prepare order 🍽
+                                    </Button>
+                                    <Button
+                                        disabled={item.status !== "inProgress"}
+                                        style={styles.button}
+                                        onPress={async () => {
+                                            changeStatusHandler(item._id, "done");
+                                        }}
+                                    >
+                                        Take order to table 🚚
+                                    </Button>
+                                    <Button
+                                        style={styles.button}
+                                        onPress={async () => {
+                                            changeStatusHandler(item._id, "canceled");
+                                        }}
+                                    >
+                                        Cancel order ❌
                                     </Button>
                                 </View>
 

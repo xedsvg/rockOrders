@@ -167,6 +167,8 @@ app.get("/orders/:orderId", async (req, res) => {
   }
 });
 
+/************   Owner-End    ****************/
+
 app.post("/orders/update/:orderId", async (req, res) => {
   const { body: { status }, params: { orderId } } = req;
   if (!status || !orderId) {
@@ -189,25 +191,6 @@ app.post("/orders/update/:orderId", async (req, res) => {
   }
 });
 
-app.get("/settings", async (req, res) => {
-  const restaurantDetails = await Restaurants.findOne();
-  // const restaurantId = "63dc24937a3e728ecda1d982"; /// set this as env or get it from licence server
-  // const restaurantName = "RocknRolla"; /// set this as env or get it from licence server
-
-  const restaurantId = restaurantDetails._id;
-  const restaurantName = restaurantDetails.name;
-  const ownerName = restaurantDetails.OwnerName;
-
-  res.send({
-    restaurantId,
-    restaurantName,
-    ownerName
-  });
-});
-
-/************   Owner-End    ****************/
-
-// get active orders in the restaurant
 app.get("/orders/active/:restaurantId", async (req, res) => {
   const { params: { restaurantId } } = req;
   if (!restaurantId) {
@@ -225,7 +208,22 @@ app.get("/orders/active/:restaurantId", async (req, res) => {
   }
 });
 
-  
+app.get("/settings", async (req, res) => {
+  const restaurantDetails = await Restaurants.findOne();
+  // const restaurantId = "63dc24937a3e728ecda1d982"; /// set this as env or get it from licence server
+  // const restaurantName = "RocknRolla"; /// set this as env or get it from licence server
+
+  const restaurantId = restaurantDetails._id;
+  const restaurantName = restaurantDetails.name;
+  const ownerName = restaurantDetails.OwnerName;
+
+  res.send({
+    restaurantId,
+    restaurantName,
+    ownerName
+  });
+});
+
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {

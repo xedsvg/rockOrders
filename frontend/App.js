@@ -64,8 +64,6 @@ export default function App() {
     await setOrders(orders);
   };
 
-
-
   const GoToMenuButtonHandler = async () => {
     const goToView = "menu";
     await setViewHistory([...viewHistory, goToView]);
@@ -96,6 +94,17 @@ export default function App() {
     }
   };
 
+  const sendOrder = async (cart, tableInfo) => {
+    const { currentTabId } = tableInfo;
+    const data = await fetch(`http://localhost:3000/orders/new/${currentTabId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ cartProducts: cart })
+    });
+    alert("Order sent!");
+  };
 
   return (
     <NativeBaseProvider theme={theme}>
@@ -141,9 +150,11 @@ export default function App() {
           subCategories={subCategories} setSubCategories={setSubCategories}
           selectedCategories={selectedCategories} setSelectedCategories={setSelectedCategories}
           category={category} setCategory={setCategory}
+          sendOrder={sendOrder}
+          tableInfo={tableInfo}
           />
         )}
-        {viewMode === "table" && user == "customer" && <Table tableInfo={tableInfo} orders={orders} setOrders={setOrders} cart={cart} setCart={setCart} isOpen={isOpen} onOpen={onOpen} onClose={onClose} setViewCartOrTabButton={setViewCartOrTabButton}/>}
+        {viewMode === "table" && user == "customer" && <Table tableInfo={tableInfo} orders={orders} setOrders={setOrders} cart={cart} setCart={setCart} isOpen={isOpen} onOpen={onOpen} onClose={onClose} setViewCartOrTabButton={setViewCartOrTabButton} sendOrder={sendOrder}/>}
 
         {user == "owner" && <Owner restaurantId={restaurantId} />}
         {user == "customer" && <Button onPress={() => setUser("owner")}> Owner view </Button>}

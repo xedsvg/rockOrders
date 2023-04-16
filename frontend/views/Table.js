@@ -15,7 +15,7 @@ import {
 import TableStatus from "../components/TableStatus";
 import Order from "../components/Order";
 
-export default function Table({ tableInfo, orders, cart, isOpen, onClose, setViewCartOrTabButton }) {
+export default function Table({ tableInfo, orders, cart, isOpen, onClose, setViewCartOrTabButton, sendOrder }) {
   useEffect(() => {
     setViewCartOrTabButton("View Tab");
     console.log(tableInfo);
@@ -30,7 +30,7 @@ export default function Table({ tableInfo, orders, cart, isOpen, onClose, setVie
 
         {/* **** Active Orders **** */}
         <ScrollView h="10" w="full">
-          {cart.length ? <Order key={"current-cart"} cart={cart} tableInfo={tableInfo}/> : null}
+          {cart.length ? <Order key={"current-cart"} cart={cart} tableInfo={tableInfo} sendOrder={sendOrder}/> : null}
           {console.log(orders.length)}
           {(orders.length || cart.length) ? orders.map((order, orderNr) => { order.nr = orderNr + 1; console.log(`Order nr ${order.nr}`); return (<Order key={order._id || "placeholder"} order={order} />)}) : <Order />}
         </ScrollView>

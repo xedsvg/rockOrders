@@ -9,7 +9,8 @@ import Categories from "../components/Categories";
 export default function Menu({ 
   restaurantId, cart, setCart, isOpen, onClose, setViewCartOrTabButton,
   products, setProducts, categories, setCategories, subCategories, setSubCategories,
-  selectedCategories, setSelectedCategories, category, setCategory
+  selectedCategories, setSelectedCategories, category, setCategory,
+  sendOrder, tableInfo
 }) {
 
   const addToCart = (item) => {
@@ -98,7 +99,7 @@ export default function Menu({
   return (
     <View>
         { !category ? <Categories categories={categories} setCategory={setCategory} /> : null }
-        { category ? <Products category={category} products={products} addToCart={addToCart} removeFromCart={removeFromCart} /> : null }
+        {  category ? <Products category={category} products={products} addToCart={addToCart} removeFromCart={removeFromCart} /> : null }
 
       {/* Cart View and Actions */}
       <Center>
@@ -123,7 +124,7 @@ export default function Menu({
                 </HStack>
               </VStack>
               <Divider bg="white" thickness="5" />
-              <Button disabled={!cart.length} my="2">Send order!</Button>
+              <Button disabled={!cart.length} onPress={()=>{sendOrder(cart, tableInfo)}} my="2">Send order!</Button>
             </Box>
           </Actionsheet.Content>
         </Actionsheet>

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-
 import {
   Box,
   Pressable,
@@ -13,19 +12,14 @@ import {
   Divider
 } from "native-base";
 
-export default function Order({ cart, order, tableInfo }) {
-
-  const sendOrder = async () => {
-    const { currentTabId } = tableInfo;
-    const data = await fetch(`http://localhost:3000/orders/new/${currentTabId}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ cartProducts: cart })
-    });
-    cart = null;
-    order = data;
+export default function Order({ cart, order, tableInfo, sendOrder }) {
+  const [localCart, setLocalCart] = useState(cart);
+  const [localOrder, setLocalOrder] = useState(order);
+  
+  const sendOrderOverride = async () => {
+    sendOrder(cart, tableInfo);
+    cart = [];
+    order = cart;
     alert("Order sent!");
   };
 
@@ -128,7 +122,7 @@ export default function Order({ cart, order, tableInfo }) {
                       <Divider bg="transparent" thickness="10" />
                       <HStack justifyContent="space-between">
                         <Button colorScheme="warning"> Add details</Button>
-                        <Button colorScheme="success" onPress={sendOrder}> Send Order!</Button>
+                        <Button colorScheme="success" onPress={sendOrderOverride}> Send Order!</Button>
                       </HStack>
                     </View>
                   }
