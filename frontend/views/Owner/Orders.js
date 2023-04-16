@@ -1,5 +1,5 @@
-import React from "react";
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import React, { useEffect, useState, useRef } from "react";
+import { StyleSheet, Text, View, Animated } from "react-native";
 import { Button } from "native-base";
 
 const getItemsWithQuantities = (items) => {
@@ -17,7 +17,51 @@ const getItemsWithQuantities = (items) => {
 };
 
 export default function Order({ orders, changeStatusHandler }) {
+    const [opacityValue] = useState(new Animated.Value(1));
+    const [flashingOrders, setFlashingOrders] = useState([]);
+
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            const flashing = [];
+            const now = new Date();
+
+            orders.forEach((order) => {
+                const lastUpdated = new Date(order.lastUpdated);
+                const diffMs = now - lastUpdated;
+                const diffMin = diffMs / 1000 / 60;
+                if (diffMin >= 5) {
+                    flashing.push(order._id);
+                }
+            });
+
+            setFlashingOrders(flashing);
+
+            if (flashing.length > 0) {
+                Animated.loop(
+                    Animated.sequence([
+                        Animated.timing(opacityValue, {
+                            toValue: 0.5,
+                            duration: 500,
+                            useNativeDriver: true,
+                        }),
+                        Animated.timing(opacityValue, {
+                            toValue: 1,
+                            duration: 500,
+                            useNativeDriver: true,
+                        }),
+                    ])
+                ).start();
+            } else {
+                opacityValue.setValue(1);
+            }
+
+        }, 5000);
+
+        return () => clearInterval(intervalId);
+    }, [orders, opacityValue]);
+
     const groupedOrders = {};
+
     orders.forEach((order) => {
         const tableId = order.tabId.tableId;
         if (groupedOrders[tableId]) {
@@ -31,6 +75,11 @@ export default function Order({ orders, changeStatusHandler }) {
         orders.sort((a, b) => a.tabId.tableId.localeCompare(b.tabId.tableId))
     );
 
+    const flashColor = opacityValue.interpolate({
+        inputRange: [0, 1],
+        outputRange: ['rgba(255, 0, 0, 1)', 'rgba(255, 255, 255, 1)']
+    });
+
     return (
         <View>
             {!sortedOrders.length && <Text style={styles.title}>
@@ -40,14 +89,22 @@ export default function Order({ orders, changeStatusHandler }) {
                 <View style={styles.orders}>
                     {sortedOrders.map((item) => {
                         const items = getItemsWithQuantities(item.items);
+                        const isFlashing = flashingOrders.includes(item._id);
 
                         return (
-                            <View style={styles.container} key={item._id}>
+                            <Animated.View
+                                style={[
+                                    styles.container,
+                                    { backgroundColor: isFlashing ? flashColor : "white" }
+                                ]}
+                                key={item._id}
+                            >
                                 <View>
-                                <Text style={styles.tableNo}>
-                                    Table Nr: 2
-                                </Text>
-                                <View style={styles.separator} />
+                                    <Text style={styles.tableNo}>
+                                        Table Nr: 2
+                                    </Text>
+                                    <View style={styles.separator} />
+                                    <Text style={styles.lastUpdated}> {item.lastUpdated.substring(11, 16)} </Text>
                                 </View>
 
                                 <View style={styles.items}>
@@ -59,21 +116,22 @@ export default function Order({ orders, changeStatusHandler }) {
                                 </View>
 
                                 <View>
-                                <View style={styles.total}>
-                                    <Text style={styles.label}>Total:</Text>
-                                    <Text style={styles.totalAmount}>{item.totalAmount}</Text>
+                                    <View style={styles.total}>
+                                        <Text style={styles.label}>Total:</Text>
+                                        <Text style={styles.totalAmount}>{item.totalAmount}</Text>
+                                    </View>
+
+                                    <Button
+                                        style={styles.button}
+                                        onPress={async () => {
+                                            changeStatusHandler(item._id, "inProgress");
+                                        }}
+                                    >
+                                        Start Preparing 🍽️
+                                    </Button>
                                 </View>
 
-                                <Button
-                                    style={styles.button}
-                                    onPress={async () => {
-                                        changeStatusHandler(item._id, "inProgress");
-                                    }}
-                                >
-                                    Start Preparing 🍽️
-                                </Button>
-                                </View>
-                            </View>
+                            </Animated.View>
                         );
                     })}
                 </View>
@@ -83,6 +141,11 @@ export default function Order({ orders, changeStatusHandler }) {
 }
 
 const styles = StyleSheet.create({
+    lastUpdated: {
+        marginTop: 5,
+        fontSize: 14,
+        textAlign: "center",
+    },
     orders: {
         display: 'grid',
         gridTemplateColumns: 'repeat(5, 1fr)',
@@ -113,7 +176,7 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: "black",
         marginHorizontal: 90,
-        marginTop: 10,
+        marginTop: 5,
         justifySelf: "flex-start",
     },
     items: {
