@@ -1,7 +1,7 @@
 import { baseUrl } from "./settings";
 
 import React, { useEffect, useState } from "react";
-import { View, Center, Text, NativeBaseProvider, VStack, useDisclose, Icon } from "native-base";
+import { View, Center, Text, NativeBaseProvider, VStack, useDisclose, Icon, Button } from "native-base";
 import { MaterialIcons } from "@expo/vector-icons";
 
 import { theme } from "./theme";
@@ -11,7 +11,7 @@ import QrScan from "./views/QrScan";
 import Table from "./views/Table";
 import Menu from "./views/Menu";
 
-// import Owner from "./views/Owner/Owner";
+import Owner from "./views/Owner/Owner";
 
 export default function App() {
 
@@ -59,8 +59,8 @@ export default function App() {
   }, []);
   
   const grabTableInfo = async (tableId) => {
-    const { currentTab: { orders }, tableNo } = await (await fetch(`${baseUrl}/getTableSession/${tableId}`)).json();
-    await setTableInfo({ tableNo });
+    const { currentTab: { orders, _id }, tableNo } = await (await fetch(`${baseUrl}/getTableSession/${tableId}`)).json();
+    await setTableInfo({ tableNo, currentTabId: _id });
     await setOrders(orders);
   };
 
@@ -145,7 +145,8 @@ export default function App() {
         )}
         {viewMode === "table" && user == "customer" && <Table tableInfo={tableInfo} orders={orders} setOrders={setOrders} cart={cart} setCart={setCart} isOpen={isOpen} onOpen={onOpen} onClose={onClose} setViewCartOrTabButton={setViewCartOrTabButton}/>}
 
-        {/* {user == "owner" && <Owner ownerId={ownerId} />} */}
+        {user == "owner" && <Owner restaurantId={restaurantId} />}
+        {user == "customer" && <Button onPress={() => setUser("owner")}> Owner view </Button>}
       </View>
       </VStack>
     </NativeBaseProvider>

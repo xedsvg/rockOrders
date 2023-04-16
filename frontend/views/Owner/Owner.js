@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Alert} from 'react-native';
+
 import Orders from './Orders'
-import AddItem from './AddItem'
-import Support from './Support'
+
 import { baseUrl } from '../../settings';
 
-export default function Owner({ownerId}) {
-
+export default function Owner({restaurantId}) {
     const [viewMode, setViewMode] = useState("orders");
     const [orders, setOrders] = useState([]);
     
     const fetchOrders = async () => {
-        const orders = await (await fetch(`${baseUrl}/getOrders/${ownerId}`)).json();
+        const orders = await (await fetch(`${baseUrl}/orders/active/${restaurantId}`)).json();
         await setOrders(orders);
+    }
+
+    const changeStatusHandler = async () => {
     }
 
     useEffect(()=>{
@@ -20,42 +22,6 @@ export default function Owner({ownerId}) {
             await fetchOrders();
           })();
     },[])
-
-    const deleteItemButtonHandler = async (id) => {
-        const success = await (await fetch(`${baseUrl}/deleteOrder/${id}`, { 
-            method: "DELETE",
-            body: JSON.stringify({ id: id })
-        })).json();
-        if ( success ) {
-            Alert.alert(`Order deleted!`);
-            fetchOrders();
-        } else Alert.alert(`Error deleting order!`);
-    }
-
-    const AddItemButtonHandler = (obj) => {
-        fetch(`${baseUrl}/addItem/`,{
-            method:"post",
-            headers:{
-                'Content-Type':'application/json'
-            },
-            body:JSON.stringify({
-                name: obj.name,
-                price: obj.price,
-                quantity: obj.quantity,
-                restaurantId: ownerId,
-                imgUrl: obj.imgUrl
-            })
-        })
-        .then(res=>res.json())
-        .then(data=>{
-            Alert.alert(`New Item has been Added`);
-            console.log("This is received:-", data);
-        })
-        .catch(err=>{
-            Alert.alert("Some Error while Adding the Item...")
-            console.log(err.message);
-        });
-    }
 
     return (
         <View>
@@ -82,54 +48,9 @@ export default function Owner({ownerId}) {
                                 <Text style={{ marginLeft: 0, fontSize: 16,  lineHeight: 22, color: "black" }}>Orders</Text>
                             </View>
                         </TouchableOpacity>
-
-                        <TouchableOpacity
-                            style={{ 
-                                flex: 1,
-                                backgroundColor: viewMode === "add" ? "#999999" : null, 
-                                margin: 5,
-                                borderRadius: 8,
-                            }}
-                            onPress={() => setViewMode("add")}
-                        >
-                                <View
-                                    style={{
-                                        flex: 1,
-                                        flexDirection: 'row',
-                                        alignItems: 'center',
-                                        justifyContent: 'center'
-                                    }}
-                                >
-                                    <Text style={{ marginLeft: 0, fontSize: 16,  lineHeight: 22, color: "black" }}>Add Items</Text>
-                                </View>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            style={{ 
-                                flex: 1,
-                                backgroundColor: viewMode === "support" ? "#999999" : null, 
-                                margin: 5,
-                                borderRadius: 8,
-                            }}
-                            onPress={() => setViewMode("support")}
-                        >
-                            <View
-                                    style={{
-                                        flex: 1,
-                                        flexDirection: 'row',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                    }}
-                                >
-                                <Text style={{ marginLeft: 0, fontSize: 16,  lineHeight: 22, color: "black" }}>Support</Text>
-                            </View>
-                        </TouchableOpacity>
                     </View>
                 </View>  
-
-                {viewMode === "orders" && <Orders orders={orders} deleteItemButtonHandler={deleteItemButtonHandler} />}
-                {viewMode === "add" && <AddItem AddItemButtonHandler={AddItemButtonHandler} />}
-                {viewMode === "support" && <Support/>}
+                {viewMode === "orders" && <Orders orders={orders} changeStatusHandler={changeStatusHandler} />}
         </View>
     );
 }

@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 
-export default function Order({ orders, deleteItemButtonHandler }) {
+export default function Order({ orders, changeStatusHandler }) {
   return (
     <View>
       <Text
@@ -9,13 +9,12 @@ export default function Order({ orders, deleteItemButtonHandler }) {
           alignSelf: "center",
           marginBottom: 40,
           fontSize: 16,
-          
           color: "black",
         }}
       >
-        {orders ? "Current orders" : "No orders"}
+        {orders.length > 0 ? "Current orders" : "No orders"}
       </Text>
-      {orders ? (
+      {orders.length > 0 ? (
         <View>
           {orders.map((item) => {
             return (
@@ -32,13 +31,12 @@ export default function Order({ orders, deleteItemButtonHandler }) {
                   style={{
                     marginLeft: 0,
                     fontSize: 22,
-                    
                     marginTop: 10,
                     color: "black",
                     textAlign: "center",
                   }}
                 >
-                  Table No. {item.tableNo}
+                  Table No. {item.tabId.tableNo}
                 </Text>
                 <View
                   style={{
@@ -61,7 +59,6 @@ export default function Order({ orders, deleteItemButtonHandler }) {
                     style={{
                       marginLeft: 10,
                       fontSize: 16,
-                      
                       marginTop: 10,
                       color: "black",
                     }}
@@ -72,14 +69,13 @@ export default function Order({ orders, deleteItemButtonHandler }) {
                     style={{
                       marginLeft: 10,
                       fontSize: 14,
-                      
                       lineHeight: 22,
                       marginTop: 10,
                       color: "black",
                     }}
                   >
-                    {item.items.split(",").map((e) => {
-                      return <Text key={e}>{e + "\n"}</Text>;
+                    {item.items.map((e) => {
+                      return <Text key={e._id}>{e.name + "\n"}</Text>;
                     })}
                   </Text>
                 </View>
@@ -96,7 +92,6 @@ export default function Order({ orders, deleteItemButtonHandler }) {
                     style={{
                       marginLeft: 10,
                       fontSize: 16,
-                      
                       marginTop: 10,
                       color: "black",
                     }}
@@ -107,7 +102,6 @@ export default function Order({ orders, deleteItemButtonHandler }) {
                     style={{
                       marginLeft: 10,
                       fontSize: 16,
-                      
                       marginTop: 10,
                       color: "green",
                       marginBottom: 10,
@@ -125,7 +119,7 @@ export default function Order({ orders, deleteItemButtonHandler }) {
                     margin: 10,
                   }}
                   onPress={async () => {
-                    await deleteItemButtonHandler(item._id);
+                    changeStatusHandler(item._id, "inProgress");
                   }}
                 >
                   <View
@@ -139,10 +133,9 @@ export default function Order({ orders, deleteItemButtonHandler }) {
                       style={{
                         color: "white",
                         textAlign: "center",
-                        
                       }}
                     >
-                      Received by User 🖖🏼
+                      Start Preparing 🍽️
                     </Text>
                   </View>
                 </TouchableOpacity>

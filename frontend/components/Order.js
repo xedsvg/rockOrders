@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 import {
   Box,
@@ -13,7 +13,22 @@ import {
   Divider
 } from "native-base";
 
-export default function Order({ cart, order }) {
+export default function Order({ cart, order, tableInfo }) {
+
+  const sendOrder = async () => {
+    const { currentTabId } = tableInfo;
+    const data = await fetch(`http://localhost:3000/orders/new/${currentTabId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ cartProducts: cart })
+    });
+    cart = null;
+    order = data;
+    alert("Order sent!");
+  };
+
   if (order) {
     cart = order.items;
     order.total = 0;
@@ -32,10 +47,6 @@ export default function Order({ cart, order }) {
       }
     }
       , []);
-  }
-
-  const sendOrder = () => {
-    alert("send cart clicked");
   }
 
   if (cart) {
@@ -109,7 +120,7 @@ export default function Order({ cart, order }) {
                     </Text>
 
                     <Text mt="2" fontSize="sm" color="coolGray.700">
-                      {order?.total || cart.reduce((total, cartItem) => total += cartItem.price * cartItem.qty, [])} RON
+                      {order?.total || cart.reduce((total, cartItem) => total += cartItem.price * cartItem.qty, 0)} RON
                     </Text>
                   </View>
                   {!order?.status &&

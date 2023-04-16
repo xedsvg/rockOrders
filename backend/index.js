@@ -45,7 +45,7 @@ app.get("/getRandomTable/:restaurantId", async (req, res) => {
 
     const randomTable = await Tables.findOne({ restaurantId });
     const { _id = null } = randomTable || {};
-    res.send( { _id } );
+    res.send({ _id });
   }
 });
 
@@ -109,6 +109,20 @@ app.get("/tabs/:tabId", async (req, res) => {
   }
 });
 
+// app.post("/tabs/open", async (req, res) => {
+//   const { body: { restaurantId } } = req;
+//   if(!restaurantId) {
+//     res.sendStatus(400);
+//   } else {
+//     try {
+//     const order = await Orders.find(orderId);
+//     res.send(order);
+//   } catch (e) {
+//     res.send(500);
+//   }}
+// });
+
+
 app.post("/orders/new/:tabId", async (req, res) => {
   const { body: { cartProducts }, params: { tabId } } = req;
   if (!cartProducts || !tabId) {
@@ -117,7 +131,7 @@ app.post("/orders/new/:tabId", async (req, res) => {
     try {
       const tab = await Tabs.findById(tabId);
       if (!tab) {
-        res.send(204)
+        res.send(204);
       } else {
         const totalAmount = cartProducts.reduce((total, cartProduct) => total + parseInt(cartProduct.qty) * parseFloat(cartProduct.price.toFixed(2)), 0);
         const items = cartProducts.flatMap(({ qty, _id }) => Array(qty).fill(_id));
@@ -138,24 +152,6 @@ app.post("/orders/new/:tabId", async (req, res) => {
     }
   }
 });
-
-/************   User-End    ****************/
-
-/************   Owner    ****************/
-
-
-// app.post("/tabs/open", async (req, res) => {
-//   const { body: { restaurantId } } = req;
-//   if(!restaurantId) {
-//     res.sendStatus(400);
-//   } else {
-//     try {
-//     const order = await Orders.find(orderId);
-//     res.send(order);
-//   } catch (e) {
-//     res.send(500);
-//   }}
-// });
 
 app.get("/orders/:orderId", async (req, res) => {
   const { params: { orderId } } = req;
@@ -193,18 +189,6 @@ app.post("/orders/update/:orderId", async (req, res) => {
   }
 });
 
-//   const { id } = req.params;
-
-//   let order = await Orders.findByIdAndDelete(id);
-
-//   if (!order) {
-//     res.status(404).send("The course with the given id was not found");
-//     return;
-//   }
-
-//   res.send(order);
-// });
-
 app.get("/settings", async (req, res) => {
   const restaurantDetails = await Restaurants.findOne();
   // const restaurantId = "63dc24937a3e728ecda1d982"; /// set this as env or get it from licence server
@@ -221,42 +205,27 @@ app.get("/settings", async (req, res) => {
   });
 });
 
-// app.get("/login/:id", async (req, res) => {
-//   const id = req.params.id;
-//   let restaurantDetails;
-//   try {
-//     restaurantDetails = await Restaurants.findById(id);
-//   } catch (e) {
-//   }
-//   restaurantDetails ? res.send(restaurantDetails) : res.send({ _id: -1 });
-// });
-
-// app.post("/addItem", async (req, res) => {
-//   const obj = req.body;
-
-//   const product = new Products(obj);
-
-//   try {
-//     await product.save();
-
-//   } catch (e) {
-//     for (field in e.errors) console.log(e.errors[field].message);
-//   }
-
-//   res.send(obj);
-// });
-
 /************   Owner-End    ****************/
-// const crdate = new Date(Date.now()).toISOString();
-// for(let i=1; i< 21; i++) {
-//   const table = new Table({
-//     restaurantId: "63dc24937a3e728ecda1d982",
-//     tableNo: i,
-//     Date: crdate
-//   });
-//   table.save();
-// }
 
+// get active orders in the restaurant
+app.get("/orders/active/:restaurantId", async (req, res) => {
+  const { params: { restaurantId } } = req;
+  if (!restaurantId) {
+    res.sendStatus(400);
+  } else {
+    try {
+      const orders = await Orders.find({
+        restaurantId,
+        status: { $in: ["recieved", "inProgress"] }
+      }).populate('items').populate('tabId').exec();
+      res.send(orders);
+    } catch (e) {
+      res.sendStatus(500);
+    }
+  }
+});
+
+  
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
