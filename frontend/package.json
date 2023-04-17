@@ -1,8 +1,8 @@
 {
   "main": "main.js",
-    "engines": {
-      "node": ">=0.10.3 <17"
-    },
+  "engines": {
+    "node": ">=0.10.3 <17"
+  },
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@expo/webpack-config": "^0.17.2",
+    "@hookstate/core": "^4.0.1",
     "expo": "^47.0.13",
     "expo-app-loading": "~2.1.1",
     "expo-barcode-scanner": "~12.1.0",

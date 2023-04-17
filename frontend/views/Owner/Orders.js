@@ -20,7 +20,7 @@ export default function Order({ orders, changeStatusHandler }) {
     const [opacityValue] = useState(new Animated.Value(1));
     const [flashingOrders, setFlashingOrders] = useState([]);
     const [flashing, setFlashing] = useState(false);
-    
+
     useEffect(() => {
         const intervalId = setInterval(() => {
             const flashingOrders = [];
@@ -38,7 +38,7 @@ export default function Order({ orders, changeStatusHandler }) {
             setFlashingOrders(flashingOrders);
             console.log(flashing);
             if (flashingOrders.length > 0 && flashing) {
-            console.log('flashing');
+                console.log('flashing');
 
                 Animated.loop(
                     Animated.sequence([
@@ -66,7 +66,7 @@ export default function Order({ orders, changeStatusHandler }) {
     const groupedOrders = {};
 
     orders.forEach((order) => {
-        const tableId = order.tabId.tableId;
+        const tableId = order.tabId.tableId._id;
         if (groupedOrders[tableId]) {
             groupedOrders[tableId].push(order);
         } else {
@@ -75,7 +75,7 @@ export default function Order({ orders, changeStatusHandler }) {
     });
 
     const sortedOrders = Object.values(groupedOrders).flatMap((orders) =>
-        orders.sort((a, b) => a.tabId.tableId.localeCompare(b.tabId.tableId))
+        orders.sort((a, b) => a.tabId.tableId._id.localeCompare(b.tabId.tableId._id))
     );
 
     const flashColor = opacityValue.interpolate({
@@ -92,7 +92,7 @@ export default function Order({ orders, changeStatusHandler }) {
             <Button style={styles.button} onPress={() => {
                 setFlashing(!flashing);
             }}>
-                {flashing ? "Disable Flashing" : "Enable Flashing"} 
+                {flashing ? "Disable Flashing" : "Enable Flashing"}
             </Button>
 
             {sortedOrders.length > 0 &&
@@ -111,9 +111,10 @@ export default function Order({ orders, changeStatusHandler }) {
                             >
                                 <View>
                                     <Text style={styles.tableNo}>
-                                        Table Nr: 2
+                                        Table #{item.tabId.tableId.tableNo}
                                     </Text>
                                     <View style={styles.separator} />
+                                    <Text style={styles.lastUpdated}> {item.status} </Text>
                                     <Text style={styles.lastUpdated}> {item.lastUpdated.substring(11, 16)} </Text>
                                 </View>
 
@@ -130,10 +131,11 @@ export default function Order({ orders, changeStatusHandler }) {
                                         <Text style={styles.label}>Total:</Text>
                                         <Text style={styles.totalAmount}>{item.totalAmount}</Text>
                                     </View>
-                                    {item.status}
                                     <Button
-                                        disabled={item.status !== "recieved"}
-                                        style={styles.button}
+                                        isDisabled={item.status !== "recieved"}
+                                        variant="subtle"
+                                        colorScheme={"green"}
+                                        style={[styles.button, item.status !== "recieved" && styles.buttonDisabled]}
                                         onPress={async () => {
                                             changeStatusHandler(item._id, "inProgress");
                                         }}
@@ -141,16 +143,20 @@ export default function Order({ orders, changeStatusHandler }) {
                                         Prepare order 🍽
                                     </Button>
                                     <Button
-                                        disabled={item.status !== "inProgress"}
-                                        style={styles.button}
+                                        isDisabled={item.status !== "inProgress"}
+                                        variant="subtle"
+                                        colorScheme={"blue"}
+                                        style={[styles.button, item.status !== "inProgress" && styles.buttonDisabled]}
                                         onPress={async () => {
                                             changeStatusHandler(item._id, "done");
                                         }}
                                     >
                                         Take order to table 🚚
                                     </Button>
+                                    
                                     <Button
                                         style={styles.button}
+                                        backgroundColor={"#222222"}
                                         onPress={async () => {
                                             changeStatusHandler(item._id, "canceled");
                                         }}
@@ -240,8 +246,7 @@ const styles = StyleSheet.create({
         marginTop: 10,
         marginBottom: 20,
         margin: 10,
-        backgroundColor: "#222222",
         padding: 12,
         borderRadius: 6,
-    }
+    },
 });

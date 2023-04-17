@@ -200,7 +200,15 @@ app.get("/orders/active/:restaurantId", async (req, res) => {
       const orders = await Orders.find({
         restaurantId,
         status: { $in: ["recieved", "inProgress"] }
-      }).populate('items').populate('tabId').exec();
+      })
+      .populate('items')
+      .populate({
+        path: 'tabId',
+        populate: {
+          path: 'tableId'
+        }
+      }).exec();
+      console.log(orders);
       res.send(orders);
     } catch (e) {
       res.sendStatus(500);
