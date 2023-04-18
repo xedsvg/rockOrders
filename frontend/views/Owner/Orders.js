@@ -1,6 +1,21 @@
 import React, { useEffect, useState } from "react";
+
+import { globalState } from '../../state';
+
 import { StyleSheet, Text, View, Animated } from "react-native";
 import { Button } from "native-base";
+import { baseUrl } from '../../settings';
+
+const changeStatusHandler = async (orderId, status) => {
+  const data = await fetch(`${baseUrl}/orders/update/${orderId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ status: status })
+  });
+  alert("Order status changed to " + status + ' ' + data.status);
+};
 
 const getItemsWithQuantities = (items) => {
     const itemsMap = {};
@@ -16,17 +31,21 @@ const getItemsWithQuantities = (items) => {
     return Object.entries(itemsMap).map(([name, quantity]) => ({ name, quantity }));
 };
 
-export default function Order({ orders, changeStatusHandler }) {
+export default function Order() {
+    const state = globalState();
+    const { openOrders } = state;
+    
+    //Animations for flashing orders should not be moved to global state but maybe use hookState for consistency? meh
     const [opacityValue] = useState(new Animated.Value(1));
     const [flashingOrders, setFlashingOrders] = useState([]);
     const [flashing, setFlashing] = useState(false);
-
+        
     useEffect(() => {
         const intervalId = setInterval(() => {
             const flashingOrders = [];
             const now = new Date();
 
-            orders.forEach((order) => {
+            openOrders.forEach((order) => {
                 const lastUpdated = new Date(order.lastUpdated);
                 const diffMs = now - lastUpdated;
                 const diffMin = diffMs / 1000 / 60;
@@ -36,10 +55,7 @@ export default function Order({ orders, changeStatusHandler }) {
             });
 
             setFlashingOrders(flashingOrders);
-            console.log(flashing);
             if (flashingOrders.length > 0 && flashing) {
-                console.log('flashing');
-
                 Animated.loop(
                     Animated.sequence([
                         Animated.timing(opacityValue, {
@@ -61,11 +77,11 @@ export default function Order({ orders, changeStatusHandler }) {
         }, 5000);
 
         return () => clearInterval(intervalId);
-    }, [orders, opacityValue, flashing]);
+    }, [openOrders, opacityValue, flashing]);
 
     const groupedOrders = {};
 
-    orders.forEach((order) => {
+    openOrders.forEach((order) => {
         const tableId = order.tabId.tableId._id;
         if (groupedOrders[tableId]) {
             groupedOrders[tableId].push(order);

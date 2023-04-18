@@ -29,7 +29,7 @@ app.get("/status", (req, res) => {
 
 /************   User    ****************/
 
-app.get("/getMenu/:id", async (req, res) => {
+app.get("/menus/:id", async (req, res) => {
   const id = req.params.id;
 
   const menu_card = await Products.find({ restaurantId: id });
@@ -49,7 +49,7 @@ app.get("/getRandomTable/:restaurantId", async (req, res) => {
   }
 });
 
-app.get("/getTableSession/:tableId", async (req, res) => {
+app.get("/tables/:tableId", async (req, res) => {
   const { params: { tableId } } = req;
 
   try {
@@ -166,6 +166,7 @@ app.get("/orders/:orderId", async (req, res) => {
     }
   }
 });
+
 
 /************   Owner-End    ****************/
 

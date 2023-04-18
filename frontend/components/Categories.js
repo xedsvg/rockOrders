@@ -4,22 +4,23 @@ import {
   VStack,
   Circle,
   Pressable,
-  Icon,
   Heading,
   Text,
   Center,
 } from "native-base";
-import { MaterialIcons } from "@expo/vector-icons";
+import { globalState } from "../state";
 
-const Categories = ({ categories, setCategory }) => {
+const Categories = () => {
+  const state = globalState();
+  
   return (
     <View flexDirection="row" justifyContent="space-between" flexWrap="wrap">
       <Heading marginBottom="2rem" marginTop="1rem" color="black" bold>
         What would you like to serve?
       </Heading>
-      {categories.map((category) => (
+      {state.categories.map((category) => (
         <Pressable
-          onPress={() => {setCategory(category)}}
+          onPress={() => {state.category = category }}
           key={Math.round(Math.random() * 1000000000)}
           marginBottom="1rem"
         >
@@ -39,7 +40,6 @@ const Categories = ({ categories, setCategory }) => {
                   <Heading color="gray.900">
                     {category.charAt(0).toUpperCase()}
                   </Heading>
-                  {/* <Icon as={<MaterialIcons name="audiotrack" />} color="white" size={5} /> */}
                 </Circle>
                 <Center>
                   <Text color="gray.500">{category}</Text>

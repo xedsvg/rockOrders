@@ -1,8 +1,14 @@
 import React from "react";
+import { globalState } from "../state";
 
-import { Text, HStack, Center } from "native-base";
+import { View, Center, Text, Icon, HStack } from "native-base";
 
-export default function Navbar({ restaurantName, children }) {
+import { MaterialIcons } from "@expo/vector-icons";
+
+export default function Navbar({ onOpen }) {
+  const state = globalState();
+  const { restaurantName, user, cartOrTab, currentView } = state;
+
   return (
     <HStack
       bg="brand.800"
@@ -13,8 +19,22 @@ export default function Navbar({ restaurantName, children }) {
       marginBottom="3vh"
       zIndex={0}
     >
-      {children ? (
-        children
+
+      {(user == "customer" && currentView != "scan") ? (
+        <View>
+          <Center w="20" key="back">
+            <Icon as={<MaterialIcons name="chevron-left" />} size={5} onPress={state.viewGoBack} color="blueGray.200" />
+            <Text color="blueGray.200">Back</Text>
+          </Center>
+          <Center w="20" key="menu" >
+            <Icon as={<MaterialIcons name="event-note" />} onPress={() => {state.currentView = 'menu'}} size={5} color="blueGray.200" />
+            <Text color="blueGray.200">Menu</Text>
+          </Center>
+          <Center w="20" key="cart">
+            <Icon as={<MaterialIcons name={cartOrTab.includes("Order") ? "shopping-cart" : "list-alt"} />} onPress={onOpen} size={5} color="blueGray.200" />
+            <Text color="blueGray.200">{cartOrTab}</Text>
+          </Center>
+        </View>
       ) : (
         <Center w="20" rounded="md" >
           <Text color="gray.100">{restaurantName}</Text>

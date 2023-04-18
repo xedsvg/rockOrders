@@ -1,20 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { View, Heading, HStack, ScrollView } from "native-base";
+import { globalState } from "../state";
 
 import Product from "./Product";
 
-const Products = ({ category, products, addToCart, removeFromCart }) => {
+const Products = () => {
+  const state = globalState();
+  const { category, products } = state;
+
   const [message, setMessage] = useState(`What ${category} would you like?`);
   const [localProducts, setLocalProducts] = useState([]);
   const [localSubCategories, setLocalSubCategories] = useState([]);
 
   const addToCartAndChangeMessage = (product) => {
-    addToCart(product);
+    state.cartFunctions.add(product);
     setMessage(`Excellent! Any other ${category}?`);
   };
 
   const removeFromCartAndChangeMessage = (product) => {
-    removeFromCart(product);
+    state.cartFunctions.remove(product);
     setMessage(`Less is more! Any other ${category}?`);
   };
 

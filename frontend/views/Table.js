@@ -12,27 +12,32 @@ import {
   ScrollView,
 } from "native-base";
 
+import { globalState } from "../state";
+
 import TableStatus from "../components/TableStatus";
+import Cart from "../components/Cart";
 import Order from "../components/Order";
+import MockOrder from "../components/MockOrder";
 
-export default function Table({ tableInfo, orders, cart, isOpen, onClose, setViewCartOrTabButton, sendOrder }) {
+export default function Table({ isOpen, onClose }) {
+  const state = globalState();
+
   useEffect(() => {
-    setViewCartOrTabButton("View Tab");
-    console.log(tableInfo);
-  }, []);
-
+    state.cartOrTab = "View Tab";
+  }, [state.cart]);
+  
   return (
     <Center flex={1} w="full">
       <VStack flex={1} space={1} alignItems="flex-start">
 
         {/* **** Table Status **** */}
-        <TableStatus tableInfo={tableInfo} />
+        <TableStatus />
 
-        {/* **** Active Orders **** */}
+        {/* **** Current order and past orders **** */}
         <ScrollView h="10" w="full">
-          {cart.length ? <Order key={"current-cart"} cart={cart} tableInfo={tableInfo} sendOrder={sendOrder}/> : null}
-          {console.log(orders.length)}
-          {(orders.length || cart.length) ? orders.map((order, orderNr) => { order.nr = orderNr + 1; console.log(`Order nr ${order.nr}`); return (<Order key={order._id || "placeholder"} order={order} />)}) : <Order />}
+          {state.cart.length && <Cart/>}
+          {state.orders.length && state.orders.map((order, orderNr) => { return (<Order key={order._id} orderNr={orderNr} order={order} />) })}
+          {!state.orders.length && !state.cart.length && <MockOrder />}
         </ScrollView>
 
       </VStack>

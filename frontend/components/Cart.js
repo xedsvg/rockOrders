@@ -1,5 +1,6 @@
 import React from "react";
-import { useHookstate } from '@hookstate/core';
+import { globalState } from "../state";
+import { none } from "@hookstate/core";
 import {
   Box,
   Pressable,
@@ -8,12 +9,20 @@ import {
   VStack,
   Spacer,
   Text,
+  Button,
   View,
   Divider
 } from "native-base";
 
-export default function Order({ order, orderNr }) {
-  const mutableItems = JSON.parse(JSON.stringify(order.items));
+export default function Cart() {
+  const state = globalState();
+  const { tableInfo, cart, cartTotal } = state;
+
+  const sendOrder = async () => {
+    await state.api.sendOrder(cart, tableInfo);
+    state.cart = none;
+    state.tableInfo = await state.api.getTableInfo(tableInfo);
+  };
 
   return (
     <VStack space={4} alignItems="center" marginBottom="2.5">
@@ -44,18 +53,18 @@ export default function Order({ order, orderNr }) {
               >
                 <HStack alignItems="center">
                   <Badge
-                    colorScheme={order.status === 'recieved' ? "success" : "warning"}
+                    colorScheme="warning"
                     _text={{
                       color: "white",
                     }}
                     variant="solid"
                     rounded="4"
                   >
-                    {order.status}
+                    Not sent
                   </Badge>
                   <Spacer />
                   <Text fontSize={10} color="coolGray.800">
-                    {order.lastUpdated}
+                    now
                   </Text>
                 </HStack>
                 <Text
@@ -64,29 +73,19 @@ export default function Order({ order, orderNr }) {
                   fontWeight="medium"
                   fontSize="xl"
                 >
-                  {`Order #${orderNr}`}
+                  "Current order"
                 </Text>
-                {mutableItems.reduce((acc, item) => {
-                  const existingItem = acc.find((i) => i._id === item._id);
-                  if (existingItem) {
-                    existingItem.qty += 1;
-                    return acc;
-                  } else {
-                    item.qty = 1;
-                    return acc.concat(item);
-                  }
-                }, []).map((orderedItem) => (
-                  <View flexDirection="row" justifyContent="space-between" key={orderedItem._id}>
-                  <Text mt="2" fontSize="sm" color="coolGray.700">
-                    {orderedItem.qty} x {orderedItem.name}
-                  </Text>
+                {cart.map((cartItem) => (
+                  <View flexDirection="row" justifyContent="space-between" key={cartItem._id}>
+                    <Text mt="2" fontSize="sm" color="coolGray.700">
+                      {cartItem.qty} x {cartItem.name}
+                    </Text>
 
-                  <Text mt="2" fontSize="sm" color="coolGray.700">
-                    {orderedItem.price * orderedItem.qty} RON
-                  </Text>
-                </View>
+                    <Text mt="2" fontSize="sm" color="coolGray.700">
+                      {cartItem.price * cartItem.qty} RON
+                    </Text>
+                  </View>
                 ))}
-
                 <Divider bg="transparent" thickness="10" />
                 <Divider bg="black" thickness="1" />
                 <View flexDirection="row" justifyContent="space-between" key="total">
@@ -95,8 +94,15 @@ export default function Order({ order, orderNr }) {
                   </Text>
 
                   <Text mt="2" fontSize="sm" color="coolGray.700">
-                    {order.totalAmount} RON
+                    {cartTotal} RON
                   </Text>
+                </View>
+                <View>
+                  <Divider bg="transparent" thickness="10" />
+                  <HStack justifyContent="space-between">
+                    <Button colorScheme="warning"> Add details</Button>
+                    <Button colorScheme="success" onPress={sendOrder}> Send Order!</Button>
+                  </HStack>
                 </View>
               </Box>
             );

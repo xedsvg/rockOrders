@@ -1,19 +1,28 @@
-import React, { useEffect, useState } from "react";
-import { Text, View, Button, Image, Input, VStack } from "native-base";
+import { baseUrl } from "../settings";
 
-export default function QrScan({ GoToTableHandler, LoginButtonHandler, tableId, setTableId, restaurantId }) {
+import React from "react";
 
-  const grabRandomTable = async () => {
-    const response = await fetch(
-      `http://localhost:3000/getRandomTable/${restaurantId}`
-    );
-    const data = await response.json();
-    setTableId(data._id);
+import { Button, Image, VStack } from "native-base";
+import { globalState } from "../state";
+
+
+export default function QrScan() {
+  const state = globalState();
+
+  const { developerMode, restaurantId, api } = state;
+
+  const goToTableHandler = async () => {
+    state.tableInfo = await api.getTableInfo(state.tableId);
+    state.currentView = 'table';
+
   };
 
-  useEffect(() => {
-    grabRandomTable();
-  }, [restaurantId]);
+  const dev_getRandomTable = async () => {
+    const response = await fetch(`${baseUrl}/getRandomTable/${restaurantId}`);
+    const { _id } = await response.json();
+    state.tableId = _id;
+    goToTableHandler();
+  };
 
   return (
     <VStack space={3}>
@@ -29,94 +38,23 @@ export default function QrScan({ GoToTableHandler, LoginButtonHandler, tableId, 
       />
 
       <Button
-        onPress={null}
+        onPress={() => { alert("Not implemented!"); }}
       >
         Scan QR code
       </Button>
 
-      {tableId ? (
+      {developerMode && (
         <Button
           style={{
             marginBottom: 40,
             color: "white",
-                textAlign: "center",
+            textAlign: "center",
           }}
-          onPress={() => {
-            GoToTableHandler(tableId);
-          }}
+          onPress={dev_getRandomTable}
         >
-              Go to Table
+          (Development Mode) Go to Table
         </Button>
-      ) : null}
-
-      {location.hostname === "hlocalhost" ? (
-        <>
-          <View
-            style={{
-              borderBottomWidth: 1,
-              borderBottomColor: "black",
-              marginHorizontal: 50,
-              marginBottom: 20,
-            }}
-          />
-          <Text
-            style={{
-              color: "red",
-              textAlign: "center",
-            }}
-          >
-            For Shop owner use only*
-          </Text>
-
-          <Input
-            style={{
-              height: 40,
-              backgroundColor: "white",
-              color: "black",
-              borderWidth: 1,
-              borderColor: "#D1D1D1",
-              borderRadius: 5,
-              padding: 10,
-              marginTop: 28,
-              //
-              fontSize: 14,
-              marginHorizontal: 10,
-            }}
-            placeholder="Owner password"
-            // value={" "}
-            onChangeText={(text) => setRestaurantId(text)}
-          />
-          {/* Shop ID Button */}
-          <TouchableOpacity
-            style={{
-              paddingTop: 10,
-              marginTop: 20,
-              marginBottom: 20,
-              margin: 10,
-            }}
-            onPress={() => {
-              LoginButtonHandler(restaurantId);
-            }}
-          >
-            <View
-              style={{
-                backgroundColor: "gray",
-                padding: 12,
-                borderRadius: 6,
-              }}
-            >
-              <Text
-                style={{
-                  color: "white",
-                  textAlign: "center",
-                }}
-              >
-                Login Owner
-              </Text>
-            </View>
-          </TouchableOpacity>
-        </>
-      ) : null}
+      )}
     </VStack>
   );
 }
