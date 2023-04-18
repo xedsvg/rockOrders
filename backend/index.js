@@ -209,7 +209,6 @@ app.get("/orders/active/:restaurantId", async (req, res) => {
           path: 'tableId'
         }
       }).exec();
-      console.log(orders);
       res.send(orders);
     } catch (e) {
       res.sendStatus(500);
