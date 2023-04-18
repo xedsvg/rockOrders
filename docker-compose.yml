@@ -16,19 +16,19 @@ services:
     command: yarn run demo
     depends_on:
       - mongo
-  # frontend:
-  #   build:
-  #     context: ./frontend
-  #     dockerfile: Dockerfile
-  #   volumes:
-  #     - ./frontend:/app
-  #     - /app/node_modules
-  #   ports:
-  #     - '19006:19006'
-  #     - '19000:19000'
-  #   command: yarn web
-  #   depends_on:
-  #     - backend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - '19006:19006'
+      - '19000:19000'
+    command: yarn web
+    depends_on:
+      - backend
   mongo:
     image: mongo
     restart: always
