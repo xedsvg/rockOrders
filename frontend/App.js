@@ -8,9 +8,11 @@ import { View, NativeBaseProvider, VStack, useDisclose, Button } from "native-ba
 import { theme } from "./theme";
 
 import Navbar from "./components/Navbar";
+import ActionView from "./components/ActionView";
 import QrScan from "./views/QrScan";
 import Table from "./views/Table";
-import Menu from "./views/Menu";
+import Categories from "./views/Categories";
+import Products from "./views/Products";
 
 import Owner from "./views/Owner/Owner";
 
@@ -24,6 +26,7 @@ export default function App() {
     (async () => {
       state.api = new Api();
       const { restaurantId, restaurantName } = await state.api.getSettings();
+      state.products = await state.api.getMenu(restaurantId);
       state.restaurantId = restaurantId;
       state.restaurantName = restaurantName;
     })();
@@ -33,12 +36,15 @@ export default function App() {
     <NativeBaseProvider theme={theme}>
       <VStack flex={1} space={2} alignItems="center" bg="brand.800">
 
-        <Navbar onOpen={onOpen} />
+        <Navbar onOpen={onOpen}/>
 
         <View flex={1} minWidth="full" padding="3vw" borderTopRadius={25} zIndex={1} top="-4vh" background="paper.medium">
           {currentView === "scan"  && user == "customer" && <QrScan />}
-          {currentView === "menu"  && user == "customer" && <Menu  isOpen={isOpen} onClose={onClose}/>}
-          {currentView === "table" && user == "customer" && <Table isOpen={isOpen} onClose={onClose}/>}
+          {currentView === "categories"  && user == "customer" && <Categories/>}
+          {currentView === "products"  && user == "customer" && <Products/>}
+          {currentView === "table" && user == "customer" && <Table/>}
+
+          <ActionView isOpen={isOpen} onClose={onClose} />
 
           {user == "owner" && <Owner />}
           {user == "customer" && <Button onPress={() => state.user = "owner"}> Owner view </Button>}
