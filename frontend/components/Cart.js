@@ -14,7 +14,7 @@ import {
   Divider
 } from "native-base";
 
-export default function Cart() {
+const Cart = () => {
   const state = globalState();
   const { cart, cartTotal } = state;
 
@@ -106,3 +106,5 @@ export default function Cart() {
     </VStack>
   );
 }
+
+export default Cart;

@@ -6,7 +6,7 @@ import { Button, Image, VStack } from "native-base";
 import { globalState } from "../state";
 
 
-export default function QrScan() {
+const QrScan = () => {
   const state = globalState();
 
   const { developerMode, restaurantId, api } = state;
@@ -58,3 +58,5 @@ export default function QrScan() {
     </VStack>
   );
 }
+
+export default QrScan;

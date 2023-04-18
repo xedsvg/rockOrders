@@ -5,7 +5,7 @@ import { View, Center, Text, Icon, HStack } from "native-base";
 
 import { MaterialIcons } from "@expo/vector-icons";
 
-export default function Navbar({ onOpen }) {
+const Navbar = ({ onOpen }) => {
   const state = globalState();
   const { restaurantName, user, cartOrTab, currentView } = state;
 
@@ -27,7 +27,7 @@ export default function Navbar({ onOpen }) {
             <Text color="blueGray.200">Back</Text>
           </Center>
           <Center w="20" key="menu" >
-            <Icon as={<MaterialIcons name="event-note" />} onPress={() => {state.currentView = 'menu'}} size={5} color="blueGray.200" />
+            <Icon as={<MaterialIcons name="event-note" />} onPress={() => { state.currentView = 'categories' }} size={5} color="blueGray.200" />
             <Text color="blueGray.200">Menu</Text>
           </Center>
           <Center w="20" key="cart">
@@ -43,3 +43,5 @@ export default function Navbar({ onOpen }) {
     </HStack>
   );
 }
+
+export default Navbar;

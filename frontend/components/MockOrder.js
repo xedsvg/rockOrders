@@ -10,7 +10,7 @@ import {
     Text,
 } from "native-base";
 
-export default function MockOrder() {
+const MockOrder = () => {
 
     return (
         <VStack space={4} alignItems="center" marginBottom="2.5">
@@ -74,3 +74,5 @@ export default function MockOrder() {
         </VStack>
     );
 }
+
+export default MockOrder;

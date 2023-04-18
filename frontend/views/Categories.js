@@ -12,7 +12,7 @@ import { globalState } from "../state";
 
 const Categories = () => {
   const state = globalState();
-  
+
   return (
     <View flexDirection="row" justifyContent="space-between" flexWrap="wrap">
       <Heading marginBottom="2rem" marginTop="1rem" color="black" bold>
@@ -20,7 +20,10 @@ const Categories = () => {
       </Heading>
       {state.categories.map((category) => (
         <Pressable
-          onPress={() => {state.category = category }}
+          onPress={() => {
+            state.category = category
+            state.currentView = "products"
+          }}
           key={Math.round(Math.random() * 1000000000)}
           marginBottom="1rem"
         >
@@ -33,8 +36,8 @@ const Categories = () => {
                     isPressed
                       ? "coolGray.200"
                       : isHovered
-                      ? "coolGray.200"
-                      : "coolGray.300"
+                        ? "coolGray.200"
+                        : "coolGray.300"
                   }
                 >
                   <Heading color="gray.900">

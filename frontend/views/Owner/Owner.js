@@ -1,12 +1,11 @@
 import React, { useEffect } from 'react';
 import { globalState } from '../../state';
-import { View } from 'react-native';
 
-import Orders from './Orders'
+import OpenOrders from './OpenOrders'
 
 import { baseUrl } from '../../settings';
 
-export default function Owner() {
+const Owner = () => {
   const state = globalState();
   const { openOrders, restaurantId } = state;
 
@@ -23,3 +22,5 @@ export default function Owner() {
       <Orders/>
   );
 }
+
+export default Owner;

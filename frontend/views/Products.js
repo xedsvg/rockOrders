@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { View, Heading, HStack, ScrollView } from "native-base";
 import { globalState } from "../state";
 
-import Product from "./Product";
+import Product from "../components/Product";
 
 const Products = () => {
   const state = globalState();

@@ -29,6 +29,8 @@ const hstate = hookstate({
 
     openOrders: [],
 
+    ActionView: 'tab',
+
     api: null,
 
     developerMode: true
@@ -61,6 +63,14 @@ const extractCategoriesAndSubCategories = (products) => {
     return { categories: Array.from(categories), subCategories: Array.from(subCategories) };
 };
 
+// const cleanMenu = (products) => {
+//     return products.map((product) => {
+//         product.qty.set(none);
+//         product.totalPrice.set(none);
+//         return product;
+//     });
+// };
+
 export function globalState() {
     const ustate = useHookstate(hstate);
 
@@ -79,7 +89,7 @@ export function globalState() {
         get cart() {
             return ustate.cart.get();
         },
-        
+
         cartFunctions: {
             add(item) {
                 const mutableItem = JSON.parse(JSON.stringify(item));
@@ -128,11 +138,13 @@ export function globalState() {
                 const api = ustate.api.get();
                 const cart = ustate.cart.get();
                 const tableInfo = JSON.parse(JSON.stringify(ustate.tableInfo.get()));
+                const products = ustate.products.get();
 
                 await api.sendOrder(cart, tableInfo);
                 ustate.cart.set([]);
                 ustate.cartTotal.set(0);
                 ustate.tableInfo.set(await api.getTableInfo(tableInfo._id));
+                console.log(products);
             }
         },
 
@@ -217,14 +229,16 @@ export function globalState() {
             return ustate.viewHistory.get().slice(-1)[0];
         },
         set currentView(viewName) {
-            ustate.viewHistory.merge([viewName]);
+            if(ustate.viewHistory.get().slice(-1)[0] !== viewName){
+                ustate.viewHistory.merge([viewName]);
+            }
         },
         viewGoBack() {
             const viewHistory = JSON.parse(JSON.stringify(ustate.viewHistory.get()));
             viewHistory.pop();
             ustate.viewHistory.set(viewHistory);
         },
-        
+
         get openOrders() {
             return ustate.openOrders.get();
         },
@@ -246,5 +260,11 @@ export function globalState() {
             ustate.restaurantName.set(name);
         },
 
+        get ActionView() {
+            return ustate.ActionView.get();
+        },
+        set ActionView(value) {
+            ustate.ActionView.set(value);
+        }
     })
 }

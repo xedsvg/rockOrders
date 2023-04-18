@@ -31,7 +31,7 @@ const getItemsWithQuantities = (items) => {
     return Object.entries(itemsMap).map(([name, quantity]) => ({ name, quantity }));
 };
 
-export default function Order() {
+const OpenOrders = () => {
     const state = globalState();
     const { openOrders } = state;
     
@@ -266,3 +266,5 @@ const styles = StyleSheet.create({
         borderRadius: 6,
     },
 });
+
+export default OpenOrders;

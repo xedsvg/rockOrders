@@ -4,7 +4,7 @@ import { Box, HStack, Avatar, VStack, Text } from "native-base";
 
 import waiter from "../assets/icons/waiter.svg";
 
-export default function TableStatus() {
+const TableStatus = () => {
   const { tableNr } = globalState();
 
   return (
@@ -23,3 +23,5 @@ export default function TableStatus() {
     </Box>
   );
 }
+
+export default TableStatus;

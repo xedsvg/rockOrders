@@ -155,7 +155,7 @@ const Product = ({ product, addToCart, removeFromCart }) => {
                     style={{
                       whiteSpace: "pre-wrap"
                     }}>
-                    {[product.name]} 
+                    {[product.name]}
                   </Text>
                 </Center>
 

@@ -1,9 +1,3 @@
-// import {registerRootComponent} from 'expo';
-
-// import App from './App';
-
-// registerRootComponent(App);
-
 import "expo/build/Expo.fx";
 import { Platform } from "react-native";
 import { registerRootComponent } from "expo";

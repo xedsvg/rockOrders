@@ -1,5 +1,5 @@
 import React from "react";
-import { useHookstate } from '@hookstate/core';
+
 import {
   Box,
   Pressable,
@@ -12,7 +12,7 @@ import {
   Divider
 } from "native-base";
 
-export default function Order({ order, orderNr }) {
+const Order = ({ order, orderNr }) => {
   const mutableItems = JSON.parse(JSON.stringify(order.items));
 
   return (
@@ -106,3 +106,5 @@ export default function Order({ order, orderNr }) {
     </VStack>
   );
 }
+
+export default Order;
