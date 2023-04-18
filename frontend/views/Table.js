@@ -25,7 +25,7 @@ export default function Table({ isOpen, onClose }) {
   useEffect(() => {
     state.cartOrTab = "View Tab";
   }, [state.cart]);
-  
+
   return (
     <Center flex={1} w="full">
       <VStack flex={1} space={1} alignItems="flex-start">
@@ -35,9 +35,9 @@ export default function Table({ isOpen, onClose }) {
 
         {/* **** Current order and past orders **** */}
         <ScrollView h="10" w="full">
-          {state.cart.length ? <Cart/> : null}
-          {state.orders.length && state.orders.map((order, orderNr) => { return (<Order key={order._id} orderNr={orderNr} order={order} />) })}
-          {!state.orders.length && !state.cart.length && <MockOrder />}
+          {state.cart.length ? <Cart /> : null}
+          {state.orders.length ? state.orders.map((order, orderNr) => { return (<Order key={order._id} orderNr={orderNr} order={order} />) }) : null}
+          {(!state.orders.length && !state.cart.length) ? <MockOrder /> : null}
         </ScrollView>
 
       </VStack>

@@ -136,10 +136,6 @@ export function globalState() {
             }
         },
 
-        get tab() {
-            return ustate.tab.get();
-        },
-
         get tabTotal() {
             return ustate.tabTotal.get();
         },
@@ -147,6 +143,7 @@ export function globalState() {
         get products() {
             return ustate.products.get();
         },
+
         set products(products) {
             const { categories, subCategories } = extractCategoriesAndSubCategories(products);
             crossRefCartAndMenu(ustate.cart.get(), products);
