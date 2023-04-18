@@ -55,7 +55,7 @@ app.get("/tables/:tableId", async (req, res) => {
   try {
     let table = await Tables.findById(tableId);
     if (!table) {
-      res.sendStatus(204);
+      res.sendStatus(404);
     }
     else {
       if (!table.tabOpen) {
@@ -98,7 +98,7 @@ app.get("/tabs/:tabId", async (req, res) => {
   try {
     let tab = await Tabs.findById(tabId);
     if (!tab) {
-      res.sendStatus(204);
+      res.sendStatus(404);
     } else {
       tab = await tab.populate('orders').execPopulate();
       res.send(tab);
@@ -131,7 +131,7 @@ app.post("/orders/new/:tabId", async (req, res) => {
     try {
       const tab = await Tabs.findById(tabId);
       if (!tab) {
-        res.send(204);
+        res.sendStatus(404);
       } else {
         const totalAmount = cartProducts.reduce((total, cartProduct) => total + parseInt(cartProduct.qty) * parseFloat(cartProduct.price.toFixed(2)), 0);
         const items = cartProducts.flatMap(({ qty, _id }) => Array(qty).fill(_id));
@@ -180,7 +180,7 @@ app.post("/orders/update/:orderId", async (req, res) => {
     try {
       const order = await Orders.findById(orderId);
       if (!order) {
-        res.sendStatus(204);
+        res.sendStatus(404);
       } else {
         order.status = status;
         await order.save();

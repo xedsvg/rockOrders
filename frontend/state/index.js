@@ -16,6 +16,8 @@ const hstate = hookstate({
     cart: [],
     cartTotal: 0,
 
+    tabTotal: 0,
+
     products: [],
     categories: [],
     category: null,
@@ -70,7 +72,6 @@ export function globalState() {
         get api() {
             return ustate.api.get();
         },
-
         set api(api) {
             ustate.api.set(api);
         },
@@ -78,10 +79,7 @@ export function globalState() {
         get cart() {
             return ustate.cart.get();
         },
-        set cart(cart) {
-            ustate.cart.set(cart);
-        },
-
+        
         cartFunctions: {
             add(item) {
                 const mutableItem = JSON.parse(JSON.stringify(item));
@@ -114,7 +112,7 @@ export function globalState() {
                         ustate.cart[existingItemIndex].totalPrice.set(tp => tp - item.price);
                     } else {
                         //RTFM: hookstate delete syntax
-                        ustate.cart[existingItemIndex] = none;
+                        ustate.cart[existingItemIndex].set(none);
                         ustate.cartTotal.set(ct => ct - mutableItem.price);
                     }
                 }
@@ -126,6 +124,24 @@ export function globalState() {
                 return ustate.cartTotal.get();
             },
 
+            async send() {
+                const api = ustate.api.get();
+                const cart = ustate.cart.get();
+                const tableInfo = JSON.parse(JSON.stringify(ustate.tableInfo.get()));
+
+                await api.sendOrder(cart, tableInfo);
+                ustate.cart.set([]);
+                ustate.cartTotal.set(0);
+                ustate.tableInfo.set(await api.getTableInfo(tableInfo._id));
+            }
+        },
+
+        get tab() {
+            return ustate.tab.get();
+        },
+
+        get tabTotal() {
+            return ustate.tabTotal.get();
         },
 
         get products() {
@@ -153,7 +169,6 @@ export function globalState() {
         get category() {
             return ustate.category.get();
         },
-
         set category(category) {
             ustate.category.set(category);
         },
@@ -197,6 +212,7 @@ export function globalState() {
         set tableInfo(info) {
             ustate.tableNr.set(info.tableNo);
             ustate.orders.set(info.currentTab.orders);
+            ustate.tabTotal.set(info.currentTab.orders.reduce((acc, order) => acc + order.totalAmount, 0));
             ustate.tableInfo.set(info);
         },
 
@@ -211,6 +227,7 @@ export function globalState() {
             viewHistory.pop();
             ustate.viewHistory.set(viewHistory);
         },
+        
         get openOrders() {
             return ustate.openOrders.get();
         },

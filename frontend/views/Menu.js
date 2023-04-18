@@ -2,13 +2,14 @@ import React, { useEffect } from "react";
 import { View, Text, Center, Actionsheet, Box, VStack, HStack, Button, Heading, Divider } from "native-base";
 
 import { globalState } from "../state";
+import { none } from "@hookstate/core";
 
 import Products from "../components/Products";
 import Categories from "../components/Categories";
 
-export default function Menu({ isOpen, onClose, sendOrder }) {
+export default function Menu({ isOpen, onClose }) {
   const state = globalState();
-  const { restaurantId, cart } = state;
+  const { restaurantId } = state;
 
   useEffect(() => {
     state.cartOrTab = "View Order";
@@ -17,9 +18,6 @@ export default function Menu({ isOpen, onClose, sendOrder }) {
     })();
   }, []);
 
-  useEffect(() => {
-    console.log(cart)
-  }, [state.cart])
 
   return (
     <View>
@@ -49,7 +47,7 @@ export default function Menu({ isOpen, onClose, sendOrder }) {
                 </HStack>
               </VStack>
               <Divider bg="white" thickness="5" />
-              <Button disabled={!state.cart.length} onPress={() => { sendOrder(cart, tableInfo) }} my="2">Send order!</Button>
+              <Button disabled={!state.cart.length} onPress={state.cartFunctions.send} my="2">Send order!</Button>
             </Box>
           </Actionsheet.Content>
         </Actionsheet>

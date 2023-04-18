@@ -102,7 +102,7 @@ export default function Order() {
     return (
         <View>
             {!sortedOrders.length && <Text style={styles.title}>
-                "No orders"
+                No orders
             </Text>}
 
             <Button style={styles.button} onPress={() => {

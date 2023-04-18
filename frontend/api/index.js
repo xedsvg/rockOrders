@@ -29,8 +29,8 @@ export class Api {
     }
 
     async sendOrder(cart, tableInfo) {
-        const { currentTabId } = tableInfo;
-        const data = await this.post(`/orders/new/${currentTabId}`, { cartProducts: cart });
+        const { currentTab: { _id } } = tableInfo;
+        const data = await this.post(`/orders/new/${_id}`, { cartProducts: cart });
         this.notify("Order sent!");
     }
     

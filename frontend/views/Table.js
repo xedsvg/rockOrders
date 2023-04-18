@@ -35,7 +35,7 @@ export default function Table({ isOpen, onClose }) {
 
         {/* **** Current order and past orders **** */}
         <ScrollView h="10" w="full">
-          {state.cart.length && <Cart/>}
+          {state.cart.length ? <Cart/> : null}
           {state.orders.length && state.orders.map((order, orderNr) => { return (<Order key={order._id} orderNr={orderNr} order={order} />) })}
           {!state.orders.length && !state.cart.length && <MockOrder />}
         </ScrollView>
@@ -51,20 +51,9 @@ export default function Table({ isOpen, onClose }) {
                 <HStack alignItems="center" justifyContent="center">
                   <Heading>Your Tab</Heading>
                 </HStack>
-
-                <HStack alignItems="center" justifyContent="space-between">
-                  <Text fontWeight="medium">Sub Total</Text>
-                  <Text color="blueGray.400">$298.77</Text>
-                </HStack>
-
-                <HStack alignItems="center" justifyContent="space-between">
-                  <Text fontWeight="medium">Tax</Text>
-                  <Text color="blueGray.400">$38.84</Text>
-                </HStack>
-
                 <HStack alignItems="center" justifyContent="space-between">
                   <Text fontWeight="medium">Total Amount</Text>
-                  <Text color="emerald.600">$337.61</Text>
+                  <Text color="emerald.600">{state.tabTotal} RON</Text>
                 </HStack>
               </VStack>
               <Button my="2">Pay cash</Button>

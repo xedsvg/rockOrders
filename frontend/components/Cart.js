@@ -16,13 +16,7 @@ import {
 
 export default function Cart() {
   const state = globalState();
-  const { tableInfo, cart, cartTotal } = state;
-
-  const sendOrder = async () => {
-    await state.api.sendOrder(cart, tableInfo);
-    state.cart = none;
-    state.tableInfo = await state.api.getTableInfo(tableInfo);
-  };
+  const { cart, cartTotal } = state;
 
   return (
     <VStack space={4} alignItems="center" marginBottom="2.5">
@@ -101,7 +95,7 @@ export default function Cart() {
                   <Divider bg="transparent" thickness="10" />
                   <HStack justifyContent="space-between">
                     <Button colorScheme="warning"> Add details</Button>
-                    <Button colorScheme="success" onPress={sendOrder}> Send Order!</Button>
+                    <Button colorScheme="success" onPress={state.cartFunctions.send} > Send Order!</Button>
                   </HStack>
                 </View>
               </Box>
