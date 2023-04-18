@@ -34,7 +34,7 @@ export default function Menu({ isOpen, onClose }) {
                   {state.cart.length ? <Heading>Your Order</Heading> : <Heading>Your order is empty :(</Heading>}
                 </HStack>
 
-                {state.cart.length && state.cart.map((cartItem) => (
+                {state.cart.map((cartItem) => (
                   <HStack key={Math.round(Math.random() * 1000000000)} alignItems="center" justifyContent="space-between">
                     <Text fontWeight="medium">{cartItem.qty} x {cartItem.name}</Text>
                     <Text color="blueGray.400">{cartItem.qty * cartItem.price} RON</Text>
@@ -47,7 +47,7 @@ export default function Menu({ isOpen, onClose }) {
                 </HStack>
               </VStack>
               <Divider bg="white" thickness="5" />
-              <Button disabled={!state.cart.length} onPress={state.cartFunctions.send} my="2">Send order!</Button>
+              <Button isDisabled={!state.cart.length} onPress={state.cartFunctions.send} my="2">Send order!</Button>
             </Box>
           </Actionsheet.Content>
         </Actionsheet>
