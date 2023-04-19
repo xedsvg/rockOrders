@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import { globalState } from "./state";
 import { Api } from "./api";
 
-import { View, NativeBaseProvider, VStack, useDisclose, Button, ScrollView, Container } from "native-base";
+import { NativeBaseProvider, VStack, useDisclose, Button, ScrollView, Container } from "native-base";
 
 import { theme } from "./theme";
 

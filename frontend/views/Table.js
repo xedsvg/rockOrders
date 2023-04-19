@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Center } from "native-base";
 
 import TableStatus from "../components/TableStatus";
@@ -10,10 +10,6 @@ import { globalState } from "../state";
 
 const Table = () => {
   const state = globalState();
-
-  useEffect(() => {
-    state.cartOrTab = "View Tab";
-  }, [state.cart]);
 
   return [
     <Center> <TableStatus /> </Center>,

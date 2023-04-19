@@ -7,7 +7,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 
 const Navbar = ({ onOpen }) => {
   const state = globalState();
-  const { restaurantName, user, cartOrTab, currentView } = state;
+  const { restaurantName, user, currentView } = state;
 
   return (
     <HStack

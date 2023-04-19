@@ -24,8 +24,6 @@ const hstate = hookstate({
 
     subCategories: [],
 
-    viewCartOrTabButton: "",
-
     openOrders: [],
 
     ActionView: 'tab',
@@ -161,13 +159,6 @@ export function globalState() {
 
         get categories() {
             return ustate.categories.get();
-        },
-
-        get cartOrTab() {
-            return ustate.viewCartOrTabButton.get();
-        },
-        set cartOrTab(value) {
-            ustate.viewCartOrTabButton.set(value);
         },
 
         get user() {
