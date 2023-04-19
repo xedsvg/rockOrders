@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { View, Heading, HStack, ScrollView } from "native-base";
+import { View, Heading, HStack, Center } from "native-base";
 import { globalState } from "../state";
 
 import Product from "../components/Product";
 
 const Products = () => {
   const state = globalState();
-  const { category, products } = state;
+  const { category } = state;
 
   const [message, setMessage] = useState(`What ${category} would you like?`);
-  const [localProducts, setLocalProducts] = useState([]);
-  const [localSubCategories, setLocalSubCategories] = useState([]);
 
   const addToCartAndChangeMessage = (product) => {
     state.cartFunctions.add(product);
@@ -22,46 +20,27 @@ const Products = () => {
     setMessage(`Less is more! Any other ${category}?`);
   };
 
-  const extractProductsBasedOnCategory = () => {
-    const prod = products.filter((product) => product.category === category);
-    setLocalProducts(prod);
-    extractSubCategories(prod);
-  };
-
-  const extractSubCategories = (localProducts) => {
-    const localSubCat = new Set();
-    localProducts.map((product) => {
-      localSubCat.add(product.subCategory);
+  useEffect(() => {
+    const subCategoriesSet = new Set();
+    state.products.map((product) => {
+      if (product.category === category) {
+        subCategoriesSet.add(product.subCategory);
+      }
     });
-    setLocalSubCategories([...localSubCat]);
-  };
-
-
-  useEffect(()=> {
-     extractProductsBasedOnCategory();
+    state.subCategories = [...subCategoriesSet];
   }, [])
 
-  return (
-    <View
-      justifyContent="space-evenly"
-      alignItems="start"
-      flexWrap="wrap"
-      flexDirection="row"
-      marginTop="4"
-    >
-      <Heading marginBottom="2rem" marginTop="1rem" color="black" bold>
-        {message}
-      </Heading>
-     
-      <ScrollView w="full" h="80vh">
-      {localSubCategories.map((subCategory) => (
-        <View key={subCategory || 'Other'}>
-          <Heading size="sm" marginBottom="2rem" marginTop="1rem" color="black" bold>
-            { subCategory || 'Other'}
-          </Heading>
-          <HStack justifyContent={"space-evenly"} flexWrap="wrap">
-          {localProducts.map((product) => {
-            if (product.subCategory === subCategory)
+  return [
+    <Center><Heading marginBottom="2rem" marginTop="1rem" color="black" bold> {message} </Heading></Center>,
+
+    state.subCategories.map((subCategory) => (
+      <View key={subCategory || 'Other'}>
+        <Heading size="sm" marginBottom="2rem" marginTop="1rem" color="black" bold>
+          {subCategory || 'Other'}
+        </Heading>
+        <HStack justifyContent={"space-evenly"} flexWrap="wrap">
+          {state.products.map((product) => {
+            if (product.subCategory === subCategory && product.category === category)
               return (
                 <Product
                   key={product._id}
@@ -71,13 +50,10 @@ const Products = () => {
                 />
               );
           })}
-          </HStack>
-        </View>
-      ))}
-      </ScrollView>
-
-    </View>
-  );
+        </HStack>
+      </View>
+    ))
+  ];
 };
 
 export default Products;

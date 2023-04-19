@@ -14,16 +14,15 @@ const hstate = hookstate({
     orders: [],
 
     cart: [],
+    totalProducts: 0,
     cartTotal: 0,
 
     tabTotal: 0,
 
-    products: [],
     categories: [],
     category: null,
 
     subCategories: [],
-    selectedCategories: [],
 
     viewCartOrTabButton: "",
 
@@ -36,19 +35,6 @@ const hstate = hookstate({
     developerMode: true
 });
 
-const crossRefCartAndMenu = (cart, products) => {
-    if (!cart.length) return;
-
-    cart.every((cartProduct) => {
-        products = products.map((menuProduct) => {
-            if (menuProduct._id === cartProduct._id) {
-                menuProduct.qty = cartProduct.qty;
-            }
-            return menuProduct;
-        });
-        return true;
-    });
-};
 
 const extractCategoriesAndSubCategories = (products) => {
     const categories = new Set();
@@ -62,14 +48,6 @@ const extractCategoriesAndSubCategories = (products) => {
 
     return { categories: Array.from(categories), subCategories: Array.from(subCategories) };
 };
-
-// const cleanMenu = (products) => {
-//     return products.map((product) => {
-//         product.qty.set(none);
-//         product.totalPrice.set(none);
-//         return product;
-//     });
-// };
 
 export function globalState() {
     const ustate = useHookstate(hstate);
@@ -90,44 +68,33 @@ export function globalState() {
             return ustate.cart.get();
         },
 
+        get totalProducts() {
+            return ustate.totalProducts.get();
+        },
+
         cartFunctions: {
+
             add(item) {
-                const mutableItem = JSON.parse(JSON.stringify(item));
                 const cart = ustate.cart.get();
 
-                const existingItemIndex = cart.findIndex((i) => i._id === mutableItem._id);
-                if (existingItemIndex !== -1) {
-                    //RTFM: hookstate update syntax
-                    ustate.cart[existingItemIndex].qty.set(qty => qty + 1);
-                    ustate.cart[existingItemIndex].totalPrice.set(tp => tp + mutableItem.price);
-                } else {
-                    mutableItem.qty = 1;
-                    mutableItem.totalPrice = mutableItem.price;
-                    //RTFM: hookstate merge syntax
-                    ustate.cart.merge([mutableItem]);
-                }
+                const itemIndex = cart.findIndex((i) => i._id === item._id);
+                ustate.cart[itemIndex].qty.set(qty => qty + 1);
+                ustate.cart[itemIndex].totalPrice.set(tp => tp + item.price);
 
-                ustate.cartTotal.set(ct => ct + mutableItem.price);
-                crossRefCartAndMenu(ustate.cart, ustate.products);
+                ustate.cartTotal.set(ct => ct + item.price);
+                ustate.totalProducts.set(ustate.cart.get().reduce((acc, item) => acc + item.qty, 0));
             },
 
             remove(item) {
-                const mutableItem = JSON.parse(JSON.stringify(item));
                 const cart = ustate.cart.get();
 
-                const existingItemIndex = cart.findIndex((i) => i._id === mutableItem._id);
-                if (existingItemIndex !== -1) {
-                    if (cart[existingItemIndex].qty > 1) {
-                        ustate.cart[existingItemIndex].qty.set(qty => qty - 1);
-                        ustate.cart[existingItemIndex].totalPrice.set(tp => tp - item.price);
-                    } else {
-                        //RTFM: hookstate delete syntax
-                        ustate.cart[existingItemIndex].set(none);
-                        ustate.cartTotal.set(ct => ct - mutableItem.price);
-                    }
+                const itemIndex = cart.findIndex((i) => i._id === item._id);
+                if (ustate.cart[itemIndex].qty.get() > 0) {
+                    ustate.cart[itemIndex].qty.set(qty => qty - 1);
+                    ustate.cart[itemIndex].totalPrice.set(tp => tp - item.price);
+                    ustate.cartTotal.set(ct => ct - item.price);
                 }
-                ustate.cartTotal.set(ct => ct - mutableItem.price);
-                crossRefCartAndMenu(ustate.cart, ustate.products);
+                ustate.totalProducts.set(ustate.cart.get().reduce((acc, item) => acc + item.qty, 0));
             },
 
             get getTotal() {
@@ -137,15 +104,20 @@ export function globalState() {
             async send() {
                 const api = ustate.api.get();
                 const cart = ustate.cart.get();
-                const tableInfo = JSON.parse(JSON.stringify(ustate.tableInfo.get()));
-                const products = ustate.products.get();
+                const tableId = ustate.tableId.get();
+                const tableInfo = ustate.tableInfo.get();
 
-                await api.sendOrder(cart, tableInfo);
-                ustate.cart.set([]);
+                const cartWithQty = cart.filter((item) => item.qty > 0);
+                await api.sendOrder(cartWithQty, tableInfo.currentTab._id);
+
+                ustate.cart.forEach((item) => {
+                    item.qty.set(0);
+                    item.totalPrice.set(0);
+                });
                 ustate.cartTotal.set(0);
-                ustate.tableInfo.set(await api.getTableInfo(tableInfo._id));
-                console.log(products);
-            }
+                ustate.totalProducts.set(ustate.cart.get().reduce((acc, item) => acc + item.qty, 0));
+                ustate.tableInfo.set(await api.getTableInfo(tableId));
+            },
         },
 
         get tabTotal() {
@@ -153,13 +125,22 @@ export function globalState() {
         },
 
         get products() {
-            return ustate.products.get();
+            return ustate.cart.get();
         },
 
         set products(products) {
             const { categories, subCategories } = extractCategoriesAndSubCategories(products);
-            crossRefCartAndMenu(ustate.cart.get(), products);
-            ustate.products.set(products);
+            products = products.map((product) => {
+                if (!product.qty) {
+                    product.qty = 0;
+                }
+                if (!product.totalPrice) {
+                    product.totalPrice = 0;
+                }
+                return product;
+            });
+
+            ustate.cart.set(products);
             ustate.categories.set(categories);
             ustate.subCategories.set(subCategories);
         },
@@ -167,12 +148,8 @@ export function globalState() {
         get subCategories() {
             return ustate.subCategories.get();
         },
-
-        get selectedCategories() {
-            return ustate.selectedCategories.get();
-        },
-        set selectedCategories(selectedCategories) {
-            ustate.selectedCategories.set(selectedCategories);
+        set subCategories(subCategories) {
+            ustate.subCategories.set(subCategories);
         },
 
         get category() {
@@ -229,7 +206,7 @@ export function globalState() {
             return ustate.viewHistory.get().slice(-1)[0];
         },
         set currentView(viewName) {
-            if(ustate.viewHistory.get().slice(-1)[0] !== viewName){
+            if (ustate.viewHistory.get().slice(-1)[0] !== viewName) {
                 ustate.viewHistory.merge([viewName]);
             }
         },

@@ -7,19 +7,16 @@ import { baseUrl } from '../../settings';
 
 const Owner = () => {
   const state = globalState();
-  const { openOrders, restaurantId } = state;
+  const { restaurantId } = state;
 
   useEffect(() => {
     (async () => {
-      const data = await (await fetch(`${baseUrl}/orders/active/${restaurantId}`)).json();
-      state.openOrders = data;
-      console.log(data);
-      console.log(openOrders);
+      state.openOrders = await (await fetch(`${baseUrl}/orders/active/${restaurantId}`)).json();
     })();
   }, [])
 
   return (
-      <Orders/>
+      <OpenOrders/>
   );
 }
 

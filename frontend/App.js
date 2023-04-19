@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import { globalState } from "./state";
 import { Api } from "./api";
 
-import { View, NativeBaseProvider, VStack, useDisclose, Button } from "native-base";
+import { View, NativeBaseProvider, VStack, useDisclose, Button, ScrollView, Container } from "native-base";
 
 import { theme } from "./theme";
 
@@ -34,22 +34,25 @@ export default function App() {
 
   return (
     <NativeBaseProvider theme={theme}>
-      <VStack flex={1} space={2} alignItems="center" bg="brand.800">
+      <Container flex={1}>
+        <VStack flex={1} space={2} alignItems="center" bg="brand.800" width="100vw">
+          <Navbar onOpen={onOpen} />
+          <ScrollView w="full" overflow="scroll" height="80vh" padding="5vw" borderRadius={25} zIndex={1} top="-4vh" background="paper.medium" >
 
-        <Navbar onOpen={onOpen}/>
+            {/* <View flex={1} padding="3vw" borderTopRadius={25} zIndex={1} top="-4vh" background="paper.medium"> */}
+            {currentView === "scan" && user == "customer" && <QrScan />}
+            {currentView === "categories" && user == "customer" && <Categories />}
+            {currentView === "products" && user == "customer" && <Products />}
+            {currentView === "table" && user == "customer" && <Table />}
 
-        <View flex={1} minWidth="full" padding="3vw" borderTopRadius={25} zIndex={1} top="-4vh" background="paper.medium">
-          {currentView === "scan"  && user == "customer" && <QrScan />}
-          {currentView === "categories"  && user == "customer" && <Categories/>}
-          {currentView === "products"  && user == "customer" && <Products/>}
-          {currentView === "table" && user == "customer" && <Table/>}
+            <ActionView isOpen={isOpen} onClose={onClose} />
 
-          <ActionView isOpen={isOpen} onClose={onClose} />
-
-          {user == "owner" && <Owner />}
-          {user == "customer" && <Button onPress={() => state.user = "owner"}> Owner view </Button>}
-        </View>
-      </VStack>
+            {user == "owner" && <Owner />}
+            {user == "customer" && <Button onPress={() => state.user = "owner"}> Owner view </Button>}
+            {/* </View> */}
+          </ScrollView>
+        </VStack>
+      </Container>
     </NativeBaseProvider>
   );
 }

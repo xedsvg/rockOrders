@@ -1,24 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { View, Text, Image, Button, Box, Icon, Divider, Modal, Pressable, FormControl, Select, CheckIcon, WarningOutlineIcon, Center } from "native-base";
 import { Ionicons } from "@expo/vector-icons";
 
 const Product = ({ product, addToCart, removeFromCart }) => {
-  const [qty, setQty] = useState(0);
   const [showModal, setShowModal] = useState(false);
 
-  useEffect(() => {
-    product.qty ? setQty(product.qty) : null;
-  }, []);
 
   const decrement = async () => {
     await removeFromCart(product);
-    setQty(qty - 1);
   };
-  const add = async () => {
+  const increment = async () => {
     await addToCart(product);
-    setQty(qty + 1);
   };
-  const increment = add;
+
   const {
     id = 0,
     name = "Unavailable",
@@ -28,6 +22,7 @@ const Product = ({ product, addToCart, removeFromCart }) => {
     volume = "",
     description = "",
     variation = [],
+    qty = 0,
     image = "https://rocknrolla.ro/images/rnr-placeholder.jpg",
   } = product;
 
@@ -89,7 +84,7 @@ const Product = ({ product, addToCart, removeFromCart }) => {
           {!qty ? (
             <Button
               borderRadius="full"
-              onPress={add}
+              onPress={increment}
               paddingTop="1"
               paddingBottom="1"
             >

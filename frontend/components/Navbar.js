@@ -1,7 +1,7 @@
 import React from "react";
 import { globalState } from "../state";
 
-import { View, Center, Text, Icon, HStack } from "native-base";
+import { Center, Text, IconButton, HStack, Badge, VStack } from "native-base";
 
 import { MaterialIcons } from "@expo/vector-icons";
 
@@ -14,27 +14,50 @@ const Navbar = ({ onOpen }) => {
       bg="brand.800"
       minH="10vh"
       w="full"
-      space={3}
       justifyContent="center"
       marginBottom="3vh"
       zIndex={0}
+
+      space={4}
+      alignItems="center"
     >
 
       {(user == "customer" && currentView != "scan") ? (
-        <View>
-          <Center w="20" key="back">
-            <Icon as={<MaterialIcons name="chevron-left" />} size={5} onPress={state.viewGoBack} color="blueGray.200" />
-            <Text color="blueGray.200">Back</Text>
+        [
+          <Center key="back" >
+            <VStack>
+              <IconButton
+                onPress={state.viewGoBack}
+                _icon={{ as: MaterialIcons, name: "chevron-left", color: 'paper.medium' }} size="md"
+              />
+            </VStack>
+          </Center>,
+
+          <Center key="menu" >
+            <VStack>
+              <IconButton
+                onPress={() => { state.currentView = 'categories' }}
+                _icon={{ as: MaterialIcons, name: "list-alt", color: 'paper.medium' }} size="md"
+              />
+            </VStack>
+          </Center>,
+
+          <Center key="cart" >
+            <VStack>
+              {state.totalProducts ? <Badge
+                bg="red.400" rounded="full" mb={-4} mr={-4} zIndex={1} variant="solid" alignSelf="flex-end" _text={{
+                  fontSize: 12
+                }}>
+                {state.totalProducts}
+              </Badge> : null}
+              <IconButton
+                onPress={onOpen}
+                _icon={{ as: MaterialIcons, name: state.totalProducts ? "shopping-cart" : "receipt", color: 'paper.medium' }} size="md"
+              >
+              </IconButton>
+            </VStack>
           </Center>
-          <Center w="20" key="menu" >
-            <Icon as={<MaterialIcons name="event-note" />} onPress={() => { state.currentView = 'categories' }} size={5} color="blueGray.200" />
-            <Text color="blueGray.200">Menu</Text>
-          </Center>
-          <Center w="20" key="cart">
-            <Icon as={<MaterialIcons name={cartOrTab.includes("Order") ? "shopping-cart" : "list-alt"} />} onPress={onOpen} size={5} color="blueGray.200" />
-            <Text color="blueGray.200">{cartOrTab}</Text>
-          </Center>
-        </View>
+        ]
       ) : (
         <Center w="20" rounded="md" >
           <Text color="gray.100">{restaurantName}</Text>
@@ -45,3 +68,14 @@ const Navbar = ({ onOpen }) => {
 }
 
 export default Navbar;
+{/* <VStack>
+        
+        <Button mx={{
+        base: "auto",
+        md: 0
+      }} p="2" bg="cyan.500" _text={{
+        fontSize: 14
+      }}>
+          Notifications
+        </Button>
+      </VStack> */}

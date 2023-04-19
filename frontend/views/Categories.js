@@ -13,11 +13,14 @@ import { globalState } from "../state";
 const Categories = () => {
   const state = globalState();
 
-  return (
-    <View flexDirection="row" justifyContent="space-between" flexWrap="wrap">
+  return [
+    <Center>
       <Heading marginBottom="2rem" marginTop="1rem" color="black" bold>
         What would you like to serve?
       </Heading>
+    </Center>
+    ,
+    <View flexDirection="row" justifyContent="space-between" flexWrap="wrap">
       {state.categories.map((category) => (
         <Pressable
           onPress={() => {
@@ -53,7 +56,7 @@ const Categories = () => {
         </Pressable>
       ))}
     </View>
-  );
+  ];
 };
 
 export default Categories;

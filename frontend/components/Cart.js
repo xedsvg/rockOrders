@@ -1,6 +1,6 @@
 import React from "react";
 import { globalState } from "../state";
-import { none } from "@hookstate/core";
+
 import {
   Box,
   Pressable,
