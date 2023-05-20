@@ -7,7 +7,7 @@ import { Button } from "native-base";
 import { baseUrl } from '../../settings';
 
 const changeStatusHandler = async (orderId, status) => {
-  const data = await fetch(`${baseUrl}/orders/update/${orderId}`, {
+  const data = await fetch(`${baseUrl}/owner/orders/update/${orderId}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'

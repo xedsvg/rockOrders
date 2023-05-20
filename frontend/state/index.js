@@ -1,4 +1,4 @@
-import { hookstate, useHookstate, none } from '@hookstate/core';
+import { hookstate, useHookstate } from '@hookstate/core';
 
 const hstate = hookstate({
     restaurantId: null,

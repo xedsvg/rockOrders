@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { Restaurants, Tables, Products, Waiters } = require("./db/models");
+const { Restaurants, Tables, Products } = require("./app/db/models");
 
 const dummyProducts = [{
   "name": "Tuborg",

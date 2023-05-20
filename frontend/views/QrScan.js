@@ -18,7 +18,7 @@ const QrScan = () => {
   };
 
   const dev_getRandomTable = async () => {
-    const response = await fetch(`${baseUrl}/getRandomTable/${restaurantId}`);
+    const response = await fetch(`${baseUrl}/user/getRandomTable/${restaurantId}`);
     const { _id } = await response.json();
     state.tableId = _id;
     goToTableHandler();

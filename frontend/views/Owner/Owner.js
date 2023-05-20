@@ -11,7 +11,7 @@ const Owner = () => {
 
   useEffect(() => {
     (async () => {
-      state.openOrders = await (await fetch(`${baseUrl}/orders/active/${restaurantId}`)).json();
+      state.openOrders = await (await fetch(`${baseUrl}/owner/orders/active/${restaurantId}`)).json();
     })();
   }, [])
 

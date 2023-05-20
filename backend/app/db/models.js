@@ -4,7 +4,8 @@ const { model, Schema } = mongoose;
 
 const restaurantSchema = Schema({
     name: String,
-    OwnerName: String,
+    ownerName: String,
+    maxInstances: Number, // max ws listeners
     //open hours - todo for last order before!
 });
 
@@ -21,6 +22,8 @@ const tableSchema = Schema({
         type: ObjectId,
         ref: 'Tabs'
     }],
+    locked: Boolean,
+    pin: String,
     lastUpdated: Date
 });
 

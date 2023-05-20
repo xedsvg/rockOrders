@@ -29,20 +29,20 @@ export class Api {
     }
 
     async sendOrder(cart, tabId) {
-        await this.post(`/orders/new/${tabId}`, { cartProducts: cart });
+        await this.post(`/user/orders/new/${tabId}`, { cartProducts: cart });
         this.notify("Order sent!");
     }
     
     async getSettings() {
-        return await this.get("/settings");
+        return await this.get("/app/settings");
     }
 
     async getTableInfo(tableId) {
-        return await this.get(`/tables/${tableId}`);
+        return await this.get(`/user/tables/${tableId}`);
     }
 
     async getMenu(restaurantId) {
-        return await this.get(`/menus/${restaurantId}`);
+        return await this.get(`/user/menus/${restaurantId}`);
     }
     
 }
