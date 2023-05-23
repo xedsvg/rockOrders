@@ -14,13 +14,13 @@ const Categories = () => {
   const state = globalState();
 
   return [
-    <Center>
+    <Center key={'messageKey'}>
       <Heading marginBottom="2rem" marginTop="1rem" color="black" bold>
         What would you like to serve?
       </Heading>
     </Center>
     ,
-    <View flexDirection="row" justifyContent="space-between" flexWrap="wrap">
+    <View key={'categoriesKey'} flexDirection="row" justifyContent="space-between" flexWrap="wrap">
       {state.categories.map((category) => (
         <Pressable
           onPress={() => {

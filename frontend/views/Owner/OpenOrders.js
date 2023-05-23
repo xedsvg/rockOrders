@@ -1,20 +1,28 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 import { globalState } from '../../state';
+import { toastEmitter } from '../../components/Toast';
 
-import { StyleSheet, Text, View, Animated } from "react-native";
-import { Button } from "native-base";
+import { Text, View, Button, ZStack, Pressable, Box } from "native-base";
+import { StyleSheet } from "react-native";
+
 import { baseUrl } from '../../settings';
 
+
 const changeStatusHandler = async (orderId, status) => {
-  const data = await fetch(`${baseUrl}/owner/orders/update/${orderId}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ status: status })
-  });
-  alert("Order status changed to " + status + ' ' + data.status);
+    const data = await fetch(`${baseUrl}/owner/orders/update/${orderId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status: status })
+    });
+
+    toastEmitter.emit('showToast', {
+        id: orderId + status, // Unique ID to prevent duplicates
+        title: 'Order status:',
+        description: `Order is now ${status}`,
+    });
 };
 
 const getItemsWithQuantities = (items) => {
@@ -33,51 +41,7 @@ const getItemsWithQuantities = (items) => {
 
 const OpenOrders = () => {
     const state = globalState();
-    const { openOrders } = state;
-    
-    //Animations for flashing orders should not be moved to global state but maybe use hookState for consistency? meh
-    const [opacityValue] = useState(new Animated.Value(1));
-    const [flashingOrders, setFlashingOrders] = useState([]);
-    const [flashing, setFlashing] = useState(false);
-        
-    useEffect(() => {
-        const intervalId = setInterval(() => {
-            const flashingOrders = [];
-            const now = new Date();
-
-            openOrders.forEach((order) => {
-                const lastUpdated = new Date(order.lastUpdated);
-                const diffMs = now - lastUpdated;
-                const diffMin = diffMs / 1000 / 60;
-                if (diffMin >= 5) {
-                    flashingOrders.push(order._id);
-                }
-            });
-
-            setFlashingOrders(flashingOrders);
-            if (flashingOrders.length > 0 && flashing) {
-                Animated.loop(
-                    Animated.sequence([
-                        Animated.timing(opacityValue, {
-                            toValue: 0.5,
-                            duration: 500,
-                            useNativeDriver: true,
-                        }),
-                        Animated.timing(opacityValue, {
-                            toValue: 1,
-                            duration: 500,
-                            useNativeDriver: true,
-                        }),
-                    ])
-                ).start();
-            } else {
-                opacityValue.setValue(1);
-            }
-
-        }, 5000);
-
-        return () => clearInterval(intervalId);
-    }, [openOrders, opacityValue, flashing]);
+    const { openOrders, selectedTable } = state;
 
     const groupedOrders = {};
 
@@ -94,99 +58,116 @@ const OpenOrders = () => {
         orders.sort((a, b) => a.tabId.tableId._id.localeCompare(b.tabId.tableId._id))
     );
 
-    const flashColor = opacityValue.interpolate({
-        inputRange: [0, 1],
-        outputRange: ['rgba(255, 0, 0, 1)', 'rgba(255, 255, 255, 1)']
-    });
-
     return (
         <View>
-            {!sortedOrders.length && <Text style={styles.title}>
+            {/* {!sortedOrders.length && <Text style={styles.title}>
                 No orders
-            </Text>}
+            </Text>} */}
 
-            <Button style={styles.button} onPress={() => {
-                setFlashing(!flashing);
-            }}>
-                {flashing ? "Disable Flashing" : "Enable Flashing"}
-            </Button>
-
-            {sortedOrders.length > 0 &&
-                <View style={styles.orders}>
-                    {sortedOrders.map((item) => {
-                        const items = getItemsWithQuantities(item.items);
-                        const isFlashing = flashingOrders.includes(item._id);
-
-                        return (
-                            <Animated.View
-                                style={[
-                                    styles.container,
-                                    { backgroundColor: isFlashing ? flashColor : "white" }
-                                ]}
-                                key={item._id}
-                            >
-                                <View>
-                                    <Text style={styles.tableNo}>
-                                        Table #{item.tabId.tableId.tableNo}
-                                    </Text>
-                                    <View style={styles.separator} />
-                                    <Text style={styles.lastUpdated}> {item.status} </Text>
-                                    <Text style={styles.lastUpdated}> {item.lastUpdated.substring(11, 16)} </Text>
-                                </View>
-
-                                <View style={styles.items}>
-                                    {items.map(({ name, quantity }) => (
-                                        <Text key={name} style={styles.product}>
-                                            {quantity}x {name}
-                                        </Text>
-                                    ))}
-                                </View>
-
-                                <View>
-                                    <View style={styles.total}>
-                                        <Text style={styles.label}>Total:</Text>
-                                        <Text style={styles.totalAmount}>{item.totalAmount}</Text>
-                                    </View>
-                                    <Button
-                                        isDisabled={item.status !== "recieved"}
-                                        variant="subtle"
-                                        colorScheme={"green"}
-                                        style={[styles.button, item.status !== "recieved" && styles.buttonDisabled]}
-                                        onPress={async () => {
-                                            changeStatusHandler(item._id, "inProgress");
-                                        }}
-                                    >
-                                        Prepare order 🍽
-                                    </Button>
-                                    <Button
-                                        isDisabled={item.status !== "inProgress"}
-                                        variant="subtle"
-                                        colorScheme={"blue"}
-                                        style={[styles.button, item.status !== "inProgress" && styles.buttonDisabled]}
-                                        onPress={async () => {
-                                            changeStatusHandler(item._id, "done");
-                                        }}
-                                    >
-                                        Take order to table 🚚
-                                    </Button>
-                                    
-                                    <Button
-                                        style={styles.button}
-                                        backgroundColor={"#222222"}
-                                        onPress={async () => {
-                                            changeStatusHandler(item._id, "canceled");
-                                        }}
-                                    >
-                                        Cancel order ❌
-                                    </Button>
-                                </View>
-
-                            </Animated.View>
-                        );
-                    })}
-                </View>
-            }
+            {/* {selectedTable && (
+                <Button onPress={() => setSelectedTable(null)}>
+                    Exit table view
+                </Button>
+            )} */}
+            {selectedTable
+                ? (
+                    <View style={styles.orders}>
+                        {sortedOrders.map((item, index) => renderOrder(item, index, state))}
+                    </View>
+                ) : (
+                    <ZStack style={styles.orders}>
+                        {sortedOrders.map((item, index) => renderOrder(item, index, state))}
+                    </ZStack>
+                )}
         </View>
+    );
+}
+
+const renderOrder = (item, index, state) => {
+    const items = getItemsWithQuantities(item.items);
+    
+    return (
+        <Pressable
+            key={item._id}
+            onLongPress={() => { 
+                state.selectedTable = item.tabId.tableId._id;
+                toastEmitter.emit('showToast', {
+                    title: 'View mode changed',
+                    description: `If you want to exit table view, press the order again.`,
+                });
+            }}
+            onPress={() => {
+                state.selectedTable = null;
+                toastEmitter.emit('showToast', {
+                    title: 'View mode changed',
+                    description: `If you want to view all the orders from the table, long press the order.`,
+                });
+            }}
+        >
+            <View
+                style={[
+                    styles.container,
+                    { marginTop: !state.selectedTable ? index * 10 : 0 },
+                ]}
+            >
+                <View>
+                    <Text style={styles.tableNo}>
+                        Table #{item.tabId.tableId.tableNo}
+                    </Text>
+                    <View style={styles.separator} />
+                    <Text style={styles.lastUpdated}> {item.status} </Text>
+                    <Text style={styles.lastUpdated}> {item.lastUpdated.substring(11, 16)} </Text>
+                </View>
+
+                <View style={styles.items}>
+                    {items.map(({ name, quantity }) => (
+                        <Text key={name} style={styles.product}>
+                            {quantity}x {name}
+                        </Text>
+                    ))}
+                </View>
+
+                <View>
+                    <View style={styles.total}>
+                        <Text style={styles.label}>Total:</Text>
+                        <Text style={styles.totalAmount}>{item.totalAmount}</Text>
+                    </View>
+
+                    <Button
+                        isDisabled={item.status !== "recieved"}
+                        variant="subtle"
+                        colorScheme={"green"}
+                        style={[styles.button, item.status !== "recieved" && styles.buttonDisabled]}
+                        onPress={async () => {
+                            changeStatusHandler(item._id, "inProgress");
+                        }}
+                    >
+                        Prepare order 🍽
+                    </Button>
+                    <Button
+                        isDisabled={item.status !== "inProgress"}
+                        variant="subtle"
+                        colorScheme={"blue"}
+                        style={[styles.button, item.status !== "inProgress" && styles.buttonDisabled]}
+                        onPress={async () => {
+                            changeStatusHandler(item._id, "done");
+                        }}
+                    >
+                        Take order to table 🚚
+                    </Button>
+                    <Button
+                        style={styles.button}
+                        backgroundColor={"#222222"}
+                        onPress={async () => {
+                            changeStatusHandler(item._id, "canceled");
+                        }}
+                    >
+                        Cancel order ❌
+                    </Button>
+                </View>
+
+            </View>
+        </Pressable>
     );
 }
 
@@ -212,6 +193,9 @@ const styles = StyleSheet.create({
         backgroundColor: "#fff",
         borderRadius: 10,
         marginBottom: 20,
+        borderWidth: 1,
+        borderColor: "black",
+
         display: 'flex',
         justifyContent: 'space-between',
     },

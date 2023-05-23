@@ -34,7 +34,7 @@ const ActionView = ({ isOpen, onClose }) => {
                                 </HStack>
                             </VStack>
                             <Divider bg="white" thickness="5" />
-                            <Button onPress={state.cartFunctions.send} my="2">Send order!</Button>
+                            <Button onPress={()=> {state.cartFunctions.send(); onClose();}} my="2">Send order!</Button>
                         </Box>
                     </Actionsheet.Content>
                 </Actionsheet>
@@ -54,9 +54,9 @@ const ActionView = ({ isOpen, onClose }) => {
                                 <Text color="emerald.600">{state.tabTotal} RON</Text>
                             </HStack>
                         </VStack>
-                        <Button my="2">Pay cash</Button>
-                        <Button my="2">Pay card</Button>
-                        <Button my="2">Request waiter</Button>
+                        <Button onPress={async ()=> {await state.payCash(); onClose();}} my="2">Pay cash</Button>
+                        <Button onPress={async ()=> {await state.payCard(); onClose();}} my="2">Pay card</Button>
+                        <Button onPress={async ()=> {await state.callWaiter(); onClose();}} my="2">Request waiter</Button>
                     </Box>
                 </Actionsheet.Content>
             </Actionsheet>

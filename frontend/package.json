@@ -30,7 +30,8 @@
     "react-native-svg": "13.4.0",
     "react-native-web": "~0.18.7",
     "rn-fetch-blob": "^0.12.0",
-    "rn-qr-generator": "^1.1.5"
+    "rn-qr-generator": "^1.1.5",
+    "socket.io-client": "^4.6.1"
   },
   "devDependencies": {
     "@babel/core": "^7.19.3"

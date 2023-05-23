@@ -44,7 +44,7 @@ const Order = ({ order, orderNr }) => {
               >
                 <HStack alignItems="center">
                   <Badge
-                    colorScheme={order.status === 'recieved' ? "success" : "warning"}
+                    colorScheme={order.status === 'recieved' ? "info" : order.status === "canceled" ? "error" : "success"}
                     _text={{
                       color: "white",
                     }}

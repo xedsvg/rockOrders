@@ -1,4 +1,5 @@
 import { baseUrl } from "../settings";
+import { Socket } from "../api";
 
 import React from "react";
 
@@ -11,8 +12,23 @@ const QrScan = () => {
 
   const { developerMode, restaurantId, api } = state;
 
-  const goToTableHandler = async () => {
+  const goToTableHandler = async () => {    
     state.tableInfo = await api.getTableInfo(state.tableId);
+
+    const socket = new Socket(null, restaurantId, false, state.tableInfo.currentTab._id);
+    // move this shit into api-socket something
+    
+    socket.on("order:new", (data) => {
+      console.log('new order on tab');
+      state.addOrder(data.order);
+    });
+
+    socket.on("order:update", (data) => {
+      console.log('update order on tab');
+      state.updateOrderStatus(data.id, data.status);
+    });
+    
+    state.socketIo = socket;
     state.currentView = 'table';
 
   };

@@ -12,7 +12,7 @@ const Table = () => {
   const state = globalState();
 
   return [
-    <Center> <TableStatus /> </Center>,
+    <Center key={'tStatusUniqueKey'}> <TableStatus /> </Center>,
     state.totalProducts ? <Cart /> : null,
     state.orders.length ? state.orders.map((order, orderNr) => { return (<Order key={order._id} orderNr={orderNr} order={order} />) }) : null,
     (!state.orders.length && !state.totalProducts) ? <MockOrder /> : null

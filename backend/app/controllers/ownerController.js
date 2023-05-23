@@ -1,4 +1,4 @@
-const { Restaurants, Orders } = require("../db/models");
+const { Restaurants, Orders, Tabs } = require("../db/models");
 
 const updateOrder = async (req, res) => {
   const { body: { status }, params: { orderId } } = req;
@@ -46,7 +46,29 @@ const getActiveOrders = async (req, res) => {
   }
 };
 
+const clearCallWaiter = async (req, res) => {
+  const { params: { tabId } } = req;
+  if (!tabId) {
+    res.sendStatus(404);
+  } else {
+    try {
+      const tab = await Tabs.findById(tabId);
+      if (!tab) {
+        res.sendStatus(404);
+      }
+      tab.callWaiter = null;
+      await tab.save();
+      res.send({ message: "Cleared call waiter" });
+    } catch (e) {
+      console.log(e);
+      res.sendStatus(500);
+    }
+  }
+};
+
+
 module.exports = {
   updateOrder,
-  getActiveOrders
+  getActiveOrders,
+  clearCallWaiter
 };

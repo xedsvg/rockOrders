@@ -15,16 +15,18 @@ import Categories from "./views/Categories";
 import Products from "./views/Products";
 
 import Owner from "./views/Owner/Owner";
+import { ToastManager, toastEmitter } from "./components/Toast";
+import { SlideManager } from "./components/Slider";
 
 export default function App() {
   const state = globalState();
   const { user, currentView } = state;
   const { isOpen, onOpen, onClose } = useDisclose();
 
-
   useEffect(() => {
     (async () => {
-      state.api = new Api();
+
+      state.api = new Api((msg) => toastEmitter.emit('showToast', msg));
       const { restaurantId, restaurantName } = await state.api.getSettings();
       state.products = await state.api.getMenu(restaurantId);
       state.restaurantId = restaurantId;
@@ -49,10 +51,13 @@ export default function App() {
 
             {user == "owner" && <Owner />}
             {user == "customer" && <Button onPress={() => state.user = "owner"}> Owner view </Button>}
+
             {/* </View> */}
           </ScrollView>
         </VStack>
       </Container>
+      <ToastManager />
+      <SlideManager />
     </NativeBaseProvider>
   );
 }

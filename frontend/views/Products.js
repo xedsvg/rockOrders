@@ -31,7 +31,7 @@ const Products = () => {
   }, [])
 
   return [
-    <Center><Heading marginBottom="2rem" marginTop="1rem" color="black" bold> {message} </Heading></Center>,
+    <Center key={'messageKey'}><Heading marginBottom="2rem" marginTop="1rem" color="black" bold> {message} </Heading></Center>,
 
     state.subCategories.map((subCategory) => (
       <View key={subCategory || 'Other'}>

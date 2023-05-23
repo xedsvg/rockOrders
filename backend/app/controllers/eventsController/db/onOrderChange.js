@@ -1,14 +1,38 @@
-module.exports = (mongoEvent, io) => {
-    console.log("Orders collection:", mongoEvent.operationType, mongoEvent.fullDocument);
+const { Orders } = require("../../../db/models");
+
+module.exports = async (mongoEvent, io) => {
     if (mongoEvent.operationType === "insert") {
-        const roomName = `${mongoEvent.fullDocument.restaurantId}:owner`;
-        console.log(roomName);
-        io.to(roomName).emit("orders:new", { message: "A new order has been created" });
+        const ownerRoomName = `${mongoEvent.fullDocument.restaurantId}:owner`;
+        const tabRoomName = `${mongoEvent.fullDocument.restaurantId}:${mongoEvent.fullDocument.tabId}`;
+        //todo remove duplicate code from here. make a function that returns 
+        //the order and use it here and in controllers
+        const order = await Orders.findById(mongoEvent.fullDocument._id)
+        .populate('items')
+        .populate({
+          path: 'tabId',
+          populate: {
+            path: 'tableId'
+          }
+        }).exec();
+
+        io.to(ownerRoomName).emit("order:new", { order });
+        console.log(`New order sent in room: "${ownerRoomName}"`);
+
+        io.to(tabRoomName).emit("order:new", { order });
+        console.log(`New order sent in room: "${tabRoomName}"`);
     }
+
     if (mongoEvent.operationType === "update") {
-        console.log(mongoEvent);
-        const roomName = `${mongoEvent.fullDocument.restaurantId}:client`;
-        // console.log(roomName);
-        // io.to(roomName).emit("orders:update", { message: mongoEvent.fullDocument.status });
+        const order = await Orders.findById(mongoEvent.documentKey._id);
+        const ownerRoomName = `${order.restaurantId}:owner`;
+        const tabRoomName = `${order.restaurantId}:${order.tabId}`;
+        
+        io.to(ownerRoomName).emit("order:update", { id: order._id, status: order.status });
+        console.log(`New order update sent in room: "${ownerRoomName}"`);
+
+        io.to(tabRoomName).emit("order:update", { id: order._id, status: order.status });
+        console.log(`New order update sent in room: "${tabRoomName}"`);
+        
+
     }
 };

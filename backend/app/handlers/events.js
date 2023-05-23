@@ -3,19 +3,23 @@ const { dbUrl } = require("../db/connection");
 
 const onConnection = require("../controllers/eventsController/socket/onConnect");
 const onDisconnect = require("../controllers/eventsController/socket/onDisconnect");
-const onSendPin = require("../controllers/eventsController/socket/onSendPin");
 
 const onOrderChange = require("../controllers/eventsController/db/onOrderChange");
+const onTabChange = require("../controllers/eventsController/db/onTabChange");
 
 const createCollectionWatcher = async (io) => {
     const mongoEvents = new CollectionWatcher();
     await mongoEvents.init(dbUrl);
     mongoEvents.subscribeToCollection("orders");
+    mongoEvents.subscribeToCollection("tabs");
     
     mongoEvents.on("orders:change", (mongoEvent) => {
         onOrderChange(mongoEvent, io);
     });
     
+    mongoEvents.on("tabs:change", (mongoEvent) => {
+        onTabChange(mongoEvent, io);
+    });
 };
 
 const socketIOEventsHandler = (io) => {
@@ -25,11 +29,6 @@ const socketIOEventsHandler = (io) => {
         socket.on("disconnect", () => {
             onDisconnect(socket);
         });
-
-        socket.on("sendPin", (data) => {
-            onSendPin(socket, data);
-        });
-
     });
 };
 

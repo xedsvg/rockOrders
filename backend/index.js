@@ -5,7 +5,10 @@ const { createApp, createCollectionWatcher, createSocketHandler } = require("./a
 
 const app = createApp();
 const server = http.createServer(app);
-const io = socketIo(server);
+const io = socketIo(server, {
+  cors: {
+      origin: "*"
+  }});
 createSocketHandler(io);
 
 const PORT = process.env.PORT || 3000;

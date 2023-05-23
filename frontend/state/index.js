@@ -1,4 +1,4 @@
-import { hookstate, useHookstate } from '@hookstate/core';
+import { hookstate, useHookstate, none } from '@hookstate/core';
 
 const hstate = hookstate({
     restaurantId: null,
@@ -10,6 +10,7 @@ const hstate = hookstate({
     tableInfo: null,
     tableId: null,
     tableNr: null,
+    selectedTable: null,
 
     orders: [],
 
@@ -29,6 +30,7 @@ const hstate = hookstate({
     ActionView: 'tab',
 
     api: null,
+    socketIo: null,
 
     developerMode: true
 });
@@ -55,11 +57,40 @@ export function globalState() {
             return ustate.developerMode.get();
         },
 
+        get selectedTable() {
+            return ustate.selectedTable.get();
+        },
+        set selectedTable(table) {
+            ustate.selectedTable.set(table);
+        },
+        
+        get socketio() {
+            return ustate.socketio.get();
+        },
+        set socketIo(socketIo) {
+            ustate.socketIo.set(socketIo);
+        },
+
         get api() {
             return ustate.api.get();
         },
         set api(api) {
             ustate.api.set(api);
+        },
+
+        async callWaiter() {
+            const api = ustate.api.get();
+            await api.callWaiter(ustate.tableInfo.get().currentTab._id);
+        },
+
+        async payCash() {
+            const api = ustate.api.get();
+            await api.payCash(ustate.tableInfo.get().currentTab._id);
+        },
+
+        async payCard() {
+            const api = ustate.api.get();
+            await api.payCard(ustate.tableInfo.get().currentTab._id);
         },
 
         get cart() {
@@ -106,6 +137,7 @@ export function globalState() {
                 const tableInfo = ustate.tableInfo.get();
 
                 const cartWithQty = cart.filter((item) => item.qty > 0);
+                //todo: add error handling
                 await api.sendOrder(cartWithQty, tableInfo.currentTab._id);
 
                 ustate.cart.forEach((item) => {
@@ -114,7 +146,7 @@ export function globalState() {
                 });
                 ustate.cartTotal.set(0);
                 ustate.totalProducts.set(ustate.cart.get().reduce((acc, item) => acc + item.qty, 0));
-                ustate.tableInfo.set(await api.getTableInfo(tableId));
+
             },
         },
 
@@ -182,14 +214,27 @@ export function globalState() {
         get orders() {
             return ustate.orders.get();
         },
-
+        addOrder(order) {
+            ustate.orders.set((prev) => [order, ...prev]);
+        },
+        updateOrderStatus(orderId, status) {
+            const orders = ustate.orders.get();
+            const orderIndex = orders.findIndex((order) => order._id === orderId);
+            ustate.orders[orderIndex].status.set(status);
+        },
+        
         get tableInfo() {
             return ustate.tableInfo.get();
         },
         set tableInfo(info) {
             ustate.tableNr.set(info.tableNo);
             ustate.orders.set(info.currentTab.orders);
-            ustate.tabTotal.set(info.currentTab.orders.reduce((acc, order) => acc + order.totalAmount, 0));
+            
+            ustate.tabTotal.set(info.currentTab.orders.reduce((acc, order) => { 
+                if (order.status !=='canceled') return acc + order.totalAmount;
+                else return acc;
+            }, 0));
+            
             ustate.tableInfo.set(info);
         },
 
@@ -212,6 +257,20 @@ export function globalState() {
         },
         set openOrders(orders) {
             ustate.openOrders.set(orders);
+        },
+        pushNewOrder(order) {
+            ustate.openOrders.set((prev) => [order, ...prev]);
+        },
+        updateOpenOrderStatus(orderId, status) {
+            const openOrders = ustate.openOrders.get();
+            const openOrderIndex = openOrders.findIndex((order) => order._id === orderId);
+            if (status === 'canceled') {
+                // Remove the canceled order from the openOrders array
+                ustate.openOrders[openOrderIndex].set(none);
+            } else {
+                // If the status is not 'canceled', just update the status
+                ustate.openOrders[openOrderIndex].status.set(status);
+            }
         },
 
         get restaurantId() {

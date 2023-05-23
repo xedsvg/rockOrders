@@ -1,0 +1,27 @@
+name: (RELEASE) Upload to Cluster
+
+on:
+  push:
+    branches:
+    - release
+
+jobs:  
+  test-build:  
+    name: Test docker-compose build  
+    runs-on: ubuntu-latest  
+    steps:  
+    - name: Checkout code  
+      uses: actions/checkout@v2  
+
+    - name: Build Docker Compose  
+      run: docker-compose build --no-cache  
+
+    - name: Copy files via SCP
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        passphrase: ${{ secrets.SSH_PASSPHRASE }}
+        source: "frontend/"
+        target: "/home/ubuntu/frontend"
