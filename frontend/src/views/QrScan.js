@@ -28,6 +28,11 @@ const QrScan = () => {
       state.updateOrderStatus(data.id, data.status);
     });
     
+    socket.on("tab:closed", (data) => {
+      console.log('tab: closed');
+      
+    })
+
     state.socketIo = socket;
     state.currentView = 'table';
 
@@ -50,7 +55,7 @@ const QrScan = () => {
           marginBottom: 30,
         }}
         alt="qr"
-        source={require("../assets/images/qr_code.gif")}
+        source={require("../../assets/images/qr_code.gif")}
       />
 
       <Button

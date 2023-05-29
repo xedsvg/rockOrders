@@ -16,7 +16,12 @@ const getRandomTable = async (req, res) => {
 
     const randomTable = await Tables.findOne({ restaurantId });
     const { _id = null } = randomTable || {};
-    res.send({ _id });
+    getTable(
+      {
+        ...req,
+        params: { tableId: _id }
+      },
+      res);
   }
 };
 
@@ -33,12 +38,12 @@ const getTable = async (req, res) => {
       await table.save();
     }
 
-    if (table.locked && table.pin !== pin) {
-      res.sendStatus(403);
-    } else {
-      const populatedTable = await populateTableData(table);
-      res.send(populatedTable);
-    }
+    // if (table.locked && table.pin !== pin) {
+    //   res.sendStatus(403);
+    // } else {
+    const populatedTable = await populateTableData(table);
+    res.send(populatedTable);
+    // }
   } catch (e) {
     console.log(e);
     if (e.message === 'Table not found') {
@@ -88,6 +93,8 @@ const newOrder = async (req, res) => {
       const tab = await Tabs.findById(tabId);
       if (!tab) {
         res.sendStatus(404);
+      } else if (tab.status === 'closed') {
+        res.sendStatus(403);
       } else {
         const totalAmount = cartProducts.reduce((total, cartProduct) => total + parseInt(cartProduct.qty) * parseFloat(cartProduct.price.toFixed(2)), 0);
         const items = cartProducts.flatMap(({ qty, _id }) => Array(qty).fill(_id));

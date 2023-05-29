@@ -57,11 +57,11 @@ const Cart = () => {
                     Not sent
                   </Badge>
                   <Spacer />
-                  <Text fontSize={10} color="coolGray.800">
+                  <Text color="text.light" fontSize={10} color="coolGray.800">
                     now
                   </Text>
                 </HStack>
-                <Text
+                <Text color="text.light"
                   color="coolGray.800"
                   mt="3"
                   fontWeight="medium"
@@ -71,11 +71,11 @@ const Cart = () => {
                 </Text>
                 {cart.map((cartItem) => (
                   <View flexDirection="row" justifyContent="space-between" key={cartItem._id}>
-                    <Text mt="2" fontSize="sm" color="coolGray.700">
+                    <Text color="text.light" mt="2" fontSize="sm" color="coolGray.700">
                       {cartItem.qty} x {cartItem.name}
                     </Text>
 
-                    <Text mt="2" fontSize="sm" color="coolGray.700">
+                    <Text color="text.light" mt="2" fontSize="sm" color="coolGray.700">
                       {cartItem.price * cartItem.qty} RON
                     </Text>
                   </View>
@@ -83,11 +83,11 @@ const Cart = () => {
                 <Divider bg="transparent" thickness="10" />
                 <Divider bg="black" thickness="1" />
                 <View flexDirection="row" justifyContent="space-between" key="total">
-                  <Text mt="2" fontSize="sm" color="coolGray.700">
+                  <Text color="text.light" mt="2" fontSize="sm" color="coolGray.700">
                     Total:
                   </Text>
 
-                  <Text mt="2" fontSize="sm" color="coolGray.700">
+                  <Text color="text.light" mt="2" fontSize="sm" color="coolGray.700">
                     {cartTotal} RON
                   </Text>
                 </View>

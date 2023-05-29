@@ -37,10 +37,10 @@ export const ToastManager = () => {
           render: () => (<Alert maxWidth="100%" alignSelf="center" flexDirection="row" status="success" variant="left-accent" mr={5}>
             <VStack space={1} flexShrink={1} w="100%" alignItems="center">
               ✋
-              <Text fontSize="md" fontWeight="medium" flexShrink={1} color="darkText">
+              <Text color="text.light" fontSize="md" fontWeight="medium" flexShrink={1} color="darkText">
                 {title}
               </Text>
-              <Text px="6" color="darkText">
+              <Text color="text.light" px="6" color="darkText">
                 {description}
               </Text>
               <Divider bg="transparent" thickness="2" mx="2" />

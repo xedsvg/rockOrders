@@ -51,11 +51,11 @@ const MockOrder = () => {
                                         Done!
                                     </Badge>
                                     <Spacer />
-                                    <Text fontSize={10} color="coolGray.800">
+                                    <Text color="text.light" fontSize={10} color="coolGray.800">
                                         1 minute ago
                                     </Text>
                                 </HStack>
-                                <Text
+                                <Text color="text.light"
                                     color="coolGray.800"
                                     mt="3"
                                     fontWeight="medium"
@@ -63,7 +63,7 @@ const MockOrder = () => {
                                 >
                                     Order #0
                                 </Text>
-                                <Text mt="2" fontSize="sm" color="coolGray.700">
+                                <Text color="text.light" mt="2" fontSize="sm" color="coolGray.700">
                                     Your orders will appear like this!
                                 </Text>
                             </Box>

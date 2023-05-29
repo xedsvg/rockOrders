@@ -60,6 +60,14 @@ export class Api {
         return await this.get("/app/settings");
     }
 
+    async getTables(restaurantId) {
+        return await this.get(`/owner/tables/${restaurantId}`);
+    }
+
+    async getTable(tableId) {
+        return await this.get(`/owner/table/${tableId}`);
+    }
+
     async getTableInfo(tableId) {
         return await this.get(`/user/tables/${tableId}`);
     }
@@ -89,5 +97,10 @@ export class Api {
     async payCard(tabId) {
         await this.get(`/user/actions/payCard/${tabId}`);
         this.notify({ title: "Requested the tab to be paid by card!", duration: 3000 });
+    }
+
+    async closeTable(tableId) {
+        await this.get(`/owner/table/close/${tableId}`);
+        this.notify({ title: "Closed the table!", duration: 3000 });
     }
 }

@@ -7,6 +7,9 @@ const hstate = hookstate({
     user: "customer",
     viewHistory: ['scan'],
 
+    ownerView: 'tables',
+    ownerActionViewIsOpen: false,
+
     tableInfo: null,
     tableId: null,
     tableNr: null,
@@ -26,6 +29,7 @@ const hstate = hookstate({
     subCategories: [],
 
     openOrders: [],
+    tables: [],
 
     ActionView: 'tab',
 
@@ -76,6 +80,43 @@ export function globalState() {
         },
         set api(api) {
             ustate.api.set(api);
+        },
+
+        get ownerActionViewIsOpen() {
+            return ustate.ownerActionViewIsOpen.get();
+        },
+
+        set ownerActionViewIsOpen(isOpen) {
+            ustate.ownerActionViewIsOpen.set(isOpen);
+        },
+        
+        get ownerView() {
+            return ustate.ownerView.get();
+        },
+
+        set ownerView(view) {
+            ustate.ownerView.set(view);
+        },
+
+        get tables() {
+            return ustate.tables.get();
+        },
+
+        set tables(tables) {
+            ustate.tables.set(tables);
+        },
+
+        setActiveTable(table) {
+            const tables = ustate.tables.get();
+            const tableIndex = tables.findIndex((t) => t._id === table._id);
+            ustate.tables[tableIndex].set(table);
+        },
+
+        removeActiveTable(tableId) {
+            const tables = ustate.tables.get();
+            const tableIndex = tables.findIndex((t) => t._id === tableId);
+            ustate.tables[tableIndex].currentTab.set(null);
+            ustate.tables[tableIndex].tabOpen.set(false);
         },
 
         async callWaiter() {

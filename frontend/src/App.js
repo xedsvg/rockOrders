@@ -25,12 +25,12 @@ export default function App() {
 
   useEffect(() => {
     (async () => {
-
       state.api = new Api((msg) => toastEmitter.emit('showToast', msg));
       const { restaurantId, restaurantName } = await state.api.getSettings();
       state.products = await state.api.getMenu(restaurantId);
       state.restaurantId = restaurantId;
       state.restaurantName = restaurantName;
+      // state.user = "owner"
     })();
   }, []);
 
@@ -39,7 +39,7 @@ export default function App() {
       <Container flex={1}>
         <VStack flex={1} space={2} alignItems="center" bg="brand.800" width="100vw">
           <Navbar onOpen={onOpen} />
-          <ScrollView w="full" overflow="scroll" height="80vh" padding="5vw" borderRadius={25} zIndex={1} top="-4vh" background="paper.medium" >
+          <ScrollView w="full" overflow="scroll" height="80vh" paddingX="5vw" borderRadius={25} zIndex={1} top="-4vh" bg="paper.medium" >
 
             {/* <View flex={1} padding="3vw" borderTopRadius={25} zIndex={1} top="-4vh" background="paper.medium"> */}
             {currentView === "scan" && user == "customer" && <QrScan />}

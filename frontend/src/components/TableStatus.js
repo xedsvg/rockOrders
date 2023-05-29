@@ -2,7 +2,7 @@ import React from "react";
 import { globalState } from "../state";
 import { Box, HStack, Avatar, VStack, Text } from "native-base";
 
-import waiter from "../assets/icons/waiter.svg";
+import waiter from "../../assets/icons/waiter.svg";
 
 const TableStatus = () => {
   const { tableNr } = globalState();
@@ -12,10 +12,10 @@ const TableStatus = () => {
       <HStack alignItems="center" space={3}>
         <Avatar size="48px" source={{ uri: waiter }} />
         <VStack>
-          <Text color="coolGray.800" _dark={{ color: "warmGray.50" }} bold>
+          <Text color="text.light" color="coolGray.800" _dark={{ color: "warmGray.50" }} bold>
             You are seated at table #{tableNr}
           </Text>
-          <Text color="coolGray.600" _dark={{ color: "warmGray.200" }}>
+          <Text color="text.light" color="coolGray.600" _dark={{ color: "warmGray.200" }}>
             Serving you: Ioana
           </Text>
         </VStack>

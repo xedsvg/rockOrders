@@ -48,7 +48,7 @@ const Categories = () => {
                   </Heading>
                 </Circle>
                 <Center>
-                  <Text color="gray.500">{category}</Text>
+                  <Text color="text.light" color="gray.500">{category}</Text>
                 </Center>
               </VStack>
             );

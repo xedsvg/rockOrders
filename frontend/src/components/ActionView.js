@@ -21,7 +21,7 @@ const ActionView = ({ isOpen, onClose }) => {
                                     if (cartItem.qty > 0) {
                                         return (
                                             <HStack key={cartItem._id} alignItems="center" justifyContent="space-between">
-                                                <Text fontWeight="medium">{cartItem.qty} x {cartItem.name}</Text>
+                                                <Text color="text.light" fontWeight="medium">{cartItem.qty} x {cartItem.name}</Text>
                                                 <Text color="blueGray.400">{cartItem.qty * cartItem.price} RON</Text>
                                             </HStack>
                                         )
@@ -29,7 +29,7 @@ const ActionView = ({ isOpen, onClose }) => {
                                 })}
                                 <Divider bg="black" thickness="1" />
                                 <HStack alignItems="center" justifyContent="space-between">
-                                    <Text fontWeight="medium">Total Order Amount</Text>
+                                    <Text color="text.light" fontWeight="medium">Total Order Amount</Text>
                                     <Text color="emerald.600">{state.cartFunctions.getTotal} RON</Text>
                                 </HStack>
                             </VStack>
@@ -50,7 +50,7 @@ const ActionView = ({ isOpen, onClose }) => {
                                 <Heading>Your Tab</Heading>
                             </HStack>
                             <HStack alignItems="center" justifyContent="space-between">
-                                <Text fontWeight="medium">Total Amount</Text>
+                                <Text color="text.light" fontWeight="medium">Total Amount</Text>
                                 <Text color="emerald.600">{state.tabTotal} RON</Text>
                             </HStack>
                         </VStack>

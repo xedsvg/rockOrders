@@ -54,11 +54,11 @@ const Order = ({ order, orderNr }) => {
                     {order.status}
                   </Badge>
                   <Spacer />
-                  <Text fontSize={10} color="coolGray.800">
+                  <Text color="text.light" fontSize={10} color="coolGray.800">
                     {order.lastUpdated}
                   </Text>
                 </HStack>
-                <Text
+                <Text color="text.light"
                   color="coolGray.800"
                   mt="3"
                   fontWeight="medium"
@@ -77,11 +77,11 @@ const Order = ({ order, orderNr }) => {
                   }
                 }, []).map((orderedItem) => (
                   <View flexDirection="row" justifyContent="space-between" key={orderedItem._id}>
-                  <Text mt="2" fontSize="sm" color="coolGray.700">
+                  <Text color="text.light" mt="2" fontSize="sm" color="coolGray.700">
                     {orderedItem.qty} x {orderedItem.name}
                   </Text>
 
-                  <Text mt="2" fontSize="sm" color="coolGray.700">
+                  <Text color="text.light" mt="2" fontSize="sm" color="coolGray.700">
                     {orderedItem.price * orderedItem.qty} RON
                   </Text>
                 </View>
@@ -90,11 +90,11 @@ const Order = ({ order, orderNr }) => {
                 <Divider bg="transparent" thickness="10" />
                 <Divider bg="black" thickness="1" />
                 <View flexDirection="row" justifyContent="space-between" key="total">
-                  <Text mt="2" fontSize="sm" color="coolGray.700">
+                  <Text color="text.light" mt="2" fontSize="sm" color="coolGray.700">
                     Total:
                   </Text>
 
-                  <Text mt="2" fontSize="sm" color="coolGray.700">
+                  <Text color="text.light" mt="2" fontSize="sm" color="coolGray.700">
                     {order.totalAmount} RON
                   </Text>
                 </View>

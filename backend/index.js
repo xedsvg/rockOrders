@@ -15,6 +15,7 @@ const PORT = process.env.PORT || 3000;
 
 server.listen(PORT, async () => {
   try {
+    console.log("Connecting to MongoDB...");
     await connectToDatabase();
     await createCollectionWatcher(io);
     console.log("Connection established to MongoDB...");

@@ -55,7 +55,7 @@ const Product = ({ product, addToCart, removeFromCart }) => {
             width: "100%",
           }}
         >
-          <Text
+          <Text color="text.light"
             style={{
               whiteSpace: "pre-wrap",
               overflow: "hidden"
@@ -63,8 +63,8 @@ const Product = ({ product, addToCart, removeFromCart }) => {
           >{name}</Text>
         </View>
 
-        <Text fontSize="xs">{alcoholContent}</Text>
-        <Text fontSize="xs" bold>
+        <Text color="text.light" fontSize="xs">{alcoholContent}</Text>
+        <Text color="text.light" fontSize="xs" bold>
           {volume}
         </Text>
 
@@ -88,7 +88,7 @@ const Product = ({ product, addToCart, removeFromCart }) => {
               paddingTop="1"
               paddingBottom="1"
             >
-              <Text bold fontSize="xs" lineHeight="sm" color="white">
+              <Text color="text.light" bold fontSize="xs" lineHeight="sm" color="white">
                 ADD
               </Text>
             </Button>
@@ -112,7 +112,7 @@ const Product = ({ product, addToCart, removeFromCart }) => {
             ></Button>
           ) : null}
 
-          {qty ? <Text>{qty}</Text> : null}
+          {qty ? <Text color="text.light">{qty}</Text> : null}
 
           {qty ? (
             <Button
@@ -125,7 +125,7 @@ const Product = ({ product, addToCart, removeFromCart }) => {
               }
             ></Button>
           ) : null}
-          <Text bold>{price} RON</Text>
+          <Text color="text.light" bold>{price} RON</Text>
         </View>
       </View>
       <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
@@ -144,7 +144,7 @@ const Product = ({ product, addToCart, removeFromCart }) => {
 
               <View>
                 <Center>
-                  <Text
+                  <Text color="text.light"
                     bold
                     fontSize="2xl"
                     style={{
@@ -155,8 +155,8 @@ const Product = ({ product, addToCart, removeFromCart }) => {
                 </Center>
 
                 <Divider></Divider>
-                <Text>What's this: {description}</Text>
-                <Text>What's inside: {contains}</Text>
+                <Text color="text.light">What's this: {description}</Text>
+                <Text color="text.light">What's inside: {contains}</Text>
 
                 {variation.length ? (<FormControl w="3/4" maxW="300" isRequired isInvalid>
                   <Select minWidth="200" accessibilityLabel="Choose Variant" placeholder={variation.reduce((final, variation) => `${final.name || final} or ${variation.name}`)} _selectedItem={{
@@ -170,8 +170,8 @@ const Product = ({ product, addToCart, removeFromCart }) => {
                   </FormControl.ErrorMessage>
                 </FormControl>) : null}
 
-                <Text>Alcohol Content: {alcoholContent}</Text>
-                <Text>Volume: {volume}ml</Text>
+                <Text color="text.light">Alcohol Content: {alcoholContent}</Text>
+                <Text color="text.light">Volume: {volume}ml</Text>
 
               </View>
 

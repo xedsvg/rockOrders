@@ -15,7 +15,7 @@ const Table = () => {
     <Center key={'tStatusUniqueKey'}> <TableStatus /> </Center>,
     state.totalProducts ? <Cart /> : null,
     state.orders.length ? state.orders.map((order, orderNr) => { return (<Order key={order._id} orderNr={orderNr} order={order} />) }) : null,
-    (!state.orders.length && !state.totalProducts) ? <MockOrder /> : null
+    (!state.orders.length && !state.totalProducts) ? <MockOrder key="abracadabra" /> : null
   ]
     ;
 }
