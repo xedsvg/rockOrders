@@ -1,74 +1,107 @@
-const { Restaurants, Orders, Tabs } = require("../db/models");
+const { closeTableAndTab, clearWaiter, getTableById, getTableByRestaurantId, getActiveOrders, updateOrder } = require('../datamodels');
 
-const updateOrder = async (req, res) => {
+const updateOrderStatus = async (req, res) => {
   const { body: { status }, params: { orderId } } = req;
   if (!status || !orderId) {
-    res.sendStatus(400);
-  } else if (!["received", "inProgress", "done", 'canceled'].some((msg) => msg === status)) {
-    res.sendStatus(422);
+    return res.status(404).send({ message: "Status and order id are required" });
   } else {
     try {
-      const order = await Orders.findById(orderId);
-      if (!order) {
-        res.sendStatus(404);
-      } else {
-        order.status = status;
-        await order.save();
-        res.send(order);
-      }
-    } catch (e) {
-      res.send(500);
+      const result = await updateOrder(orderId, status);
+      res.send(result);
+    } catch (error) {
+      console.log(error);
+      res.status(500).send({ message: error.message });
     }
   }
 };
 
-const getActiveOrders = async (req, res) => {
+const returnActiveOrders = async (req, res) => {
   const { params: { restaurantId } } = req;
+
   if (!restaurantId) {
-    res.sendStatus(400);
-  } else {
-    try {
-      const orders = await Orders.find({
-        restaurantId,
-        status: { $in: ["recieved", "inProgress"] }
-      })
-        .populate('items')
-        .populate({
-          path: 'tabId',
-          populate: {
-            path: 'tableId'
-          }
-        }).exec();
-      res.send(orders);
-    } catch (e) {
-      res.sendStatus(500);
-    }
+    return res.status(404).send({ message: "Restaurant id is required" });
+  }
+
+  try {
+    const result = await getActiveOrders(restaurantId);
+    res.send(result);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ message: error.message });
   }
 };
+
+const getTables = async (req, res) => {
+  const { params: { restaurantId } } = req;
+
+  if (!restaurantId) {
+    return res.status(404).send({ message: "Restaurant id is required" });
+  }
+
+  try {
+    const result = await getTableByRestaurantId(restaurantId);
+    res.send(result);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ message: error.message });
+  }
+};
+
+const getTable = async (req, res) => {
+  const { params: { tableId } } = req;
+
+  if (!tableId) {
+    return res.status(404).send({ message: "Table id is required" });
+  }
+
+  try {
+    const result = await getTableById(tableId);
+    res.send(result);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ message: error.message });
+  }
+};
+
+const closeTable = async (req, res) => {
+  const { params: { tableId } } = req;
+
+  if (!tableId) {
+    return res.status(404).send({ message: "Table id is required" });
+  }
+
+  try {
+    const result = await closeTableAndTab(tableId);
+    res.send(result);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ message: error.message });
+  }
+}
 
 const clearCallWaiter = async (req, res) => {
   const { params: { tabId } } = req;
+
   if (!tabId) {
-    res.sendStatus(404);
-  } else {
-    try {
-      const tab = await Tabs.findById(tabId);
-      if (!tab) {
-        res.sendStatus(404);
-      }
-      tab.callWaiter = null;
-      await tab.save();
-      res.send({ message: "Cleared call waiter" });
-    } catch (e) {
-      console.log(e);
-      res.sendStatus(500);
-    }
+    return res.status(404).send({ message: "Tab id is required" });
   }
+
+  try {
+    const result = await clearWaiter(tabId);
+    res.send(result);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ message: error.message });
+  }
+
 };
 
 
 module.exports = {
-  updateOrder,
-  getActiveOrders,
-  clearCallWaiter
+  updateOrder: updateOrderStatus,
+  getActiveOrders: returnActiveOrders,
+  getTable,
+  getTables,
+  clearCallWaiter,
+  closeTable,
 };
