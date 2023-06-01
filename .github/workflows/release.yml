@@ -1,4 +1,4 @@
-name: (RELEASE) Upload to Cluster
+name: (RELEASE)
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:  
   test-build:  
-    name: Test docker-compose build  
+    name: Upload to Cluster
     runs-on: ubuntu-latest  
     steps:  
     - name: Checkout code  
@@ -15,7 +15,7 @@ jobs:
     - name: Copy frontend files
       uses: appleboy/scp-action@master
       with:
-        host: ${{ secrets.HOST }}
+        host: ${{ secrets.HOSTNAME }}
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         passphrase: ${{ secrets.SSH_PASSPHRASE }}
