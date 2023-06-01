@@ -6,8 +6,27 @@ const helmet = require("helmet");
 const createApp = (dependencies = {}) => {
   const app = express();
 
+  let origins = [];
+  setInterval(() => {
+    try{
+      delete require.cache[require.resolve("../../cors.json")];
+      origins = require("../../cors.json").origins;
+    } catch(e) {
+      console.log("Error reading cors.json file");
+    }
+    }, 60000);
+
   app.use(compression({ filter: (req, res) => true, level: 6, algorithms: ['br', 'gzip', 'deflate'] }));
-  app.use(cors());
+  app.use(cors({
+    origin: function (origin, callback) {
+      if (origins.indexOf(origin) !== -1) {
+        callback(null, true)
+      } else {
+        console.log("Blocked by CORS: " + origin);
+        callback(new Error('Not allowed by CORS'))
+      }
+    }
+  }));
   app.use(express.json());
   app.use(helmet());
 
