@@ -1,22 +1,23 @@
-import React from "react";
-import { globalState } from "../state";
 import { Box, HStack, Avatar, VStack, Text } from "native-base";
+import React from "react";
 
-import waiter from "../../assets/icons/waiter.svg";
+import WelcomeMessage from "./WelcomeMessage";
+import { globalState } from "../state";
 
-const TableStatus = () => {
+const waiter =
+  "https://previews.123rf.com/images/soponpotsit/soponpotsit1605/soponpotsit160500016/56991666-modern-flat-business-qr-code-icons-with-long-shadow-effect.jpg";
+
+function TableStatus() {
   const { tableNr } = globalState();
 
   return (
     <Box pl="4" pr="5" py="2">
       <HStack alignItems="center" space={3}>
-        <Avatar size="48px" source={{ uri: waiter }} />
+        <Avatar size="md" source={{ uri: waiter }} />
         <VStack>
-          <Text color="text.light" color="coolGray.800" _dark={{ color: "warmGray.50" }} bold>
-            You are seated at table #{tableNr}
-          </Text>
-          <Text color="text.light" color="coolGray.600" _dark={{ color: "warmGray.200" }}>
-            Serving you: Ioana
+          <WelcomeMessage color="text.light" />
+          <Text color="text.light" bold>
+            You are seated at Table #{tableNr}
           </Text>
         </VStack>
       </HStack>

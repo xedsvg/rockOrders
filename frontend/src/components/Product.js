@@ -1,198 +1,78 @@
-import React, { useState } from "react";
-import { View, Text, Image, Button, Box, Icon, Divider, Modal, Pressable, FormControl, Select, CheckIcon, WarningOutlineIcon, Center } from "native-base";
-import { Ionicons } from "@expo/vector-icons";
+/* eslint-disable react/prop-types */
+import {
+  Pressable,
+  Box,
+  HStack,
+  Avatar,
+  VStack,
+  Text,
+  Spacer,
+} from "native-base";
+import React from "react";
 
-const Product = ({ product, addToCart, removeFromCart }) => {
-  const [showModal, setShowModal] = useState(false);
+import { globalState } from "../state";
 
-
-  const decrement = async () => {
-    await removeFromCart(product);
-  };
-  const increment = async () => {
-    await addToCart(product);
-  };
-
-  const {
-    id = 0,
-    name = "Unavailable",
-    price = "0",
-    alcoholContent = "",
-    contains = "",
-    volume = "",
-    description = "",
-    variation = [],
-    qty = 0,
-    image = "https://rocknrolla.ro/images/rnr-placeholder.jpg",
-  } = product;
-
-  const extraDetails = alcoholContent || volume ? true : false;
-
+function Product({ product }) {
+  const state = globalState();
   return (
-    <Box
-      borderWidth={1}
-      borderColor="gray.300"
-      borderRadius="md"
-      overflow="hidden"
-      maxWidth="43%"
-      marginBottom="2.5"
-    >
-      <View style={{ flexDirection: "column", flexGrow: "1", padding: 10 }}>
-        <Pressable
-          onPress={() => setShowModal(true)}
-        >
-          <Image
-            source={{ uri: image }}
-            style={{ width: 150, height: 150 }}
-            alt={product.name}
-          />
-        </Pressable>
-        <View
-          paddingTop="1.5"
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            width: "100%",
-          }}
-        >
-          <Text color="text.light"
-            style={{
-              whiteSpace: "pre-wrap",
-              overflow: "hidden"
+    <Pressable onPress={() => (state.currentProduct = product)}>
+      <Box
+        borderBottomWidth="1"
+        borderColor="muted.800"
+        pl={["0", "4"]}
+        pr={["0", "5"]}
+        py="2"
+      >
+        <HStack space={[2, 3]} justifyContent="space-between">
+          <Avatar
+            size="lg"
+            source={{
+              uri:
+                product.image ||
+                "https://media.tenor.com/Zg8rULojSnoAAAAC/sharpening-knife.gif",
             }}
-          >{name}</Text>
-        </View>
-
-        <Text color="text.light" fontSize="xs">{alcoholContent}</Text>
-        <Text color="text.light" fontSize="xs" bold>
-          {volume}
-        </Text>
-
-        <Divider style={{
-          backgroundColor: "transparent",
-          flexGrow: 1
-        }}> </Divider>
-
-        <View
-          paddingTop="1.5"
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            width: "100%",
-          }}
-        >
-          {!qty ? (
-            <Button
-              borderRadius="full"
-              onPress={increment}
-              paddingTop="1"
-              paddingBottom="1"
+          />
+          <VStack maxWidth="59%">
+            <Text
+              color="text.light"
+              bold
+              style={{ whiteSpace: "nowrap", textOverflow: "ellipsis" }}
+              overflow="hidden"
             >
-              <Text color="text.light" bold fontSize="xs" lineHeight="sm" color="white">
-                ADD
+              {product.name}
+            </Text>
+            {product.alcoholContent ? (
+              <Text color="text.light">{product.alcoholContent}</Text>
+            ) : null}
+
+            {product.description ? (
+              <Text
+                color="text.light"
+                fontSize="xs"
+                style={{ whiteSpace: "nowrap", textOverflow: "ellipsis" }}
+                overflow="hidden"
+              >
+                {product.description}
               </Text>
-            </Button>
-          ) : null}
-
-          {qty ? (
-            <Button
-              borderRadius="full"
-              colorScheme="danger"
-              variant="outline"
-              onPress={decrement}
-              leftIcon={
-                <Icon
-                  as={Ionicons}
-                  name="remove"
-                  lineHeight="sm"
-                  size="xs"
-                  colorScheme="danger"
-                />
-              }
-            ></Button>
-          ) : null}
-
-          {qty ? <Text color="text.light">{qty}</Text> : null}
-
-          {qty ? (
-            <Button
-              borderRadius="full"
-              colorScheme="danger"
-              variant="outline"
-              onPress={increment}
-              leftIcon={
-                <Icon as={Ionicons} name="add" lineHeight="xs" size="sm" colorScheme="danger" />
-              }
-            ></Button>
-          ) : null}
-          <Text color="text.light" bold>{price} RON</Text>
-        </View>
-      </View>
-      <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
-        <Modal.Content maxWidth="80%">
-          <Modal.Body>
-            <View>
-              <Image
-                source={{ uri: image }}
-                style={{
-                  width: "100%",
-                  minHeight: "30vh",
-                  objectFit: "contain"
-                }}
-                alt={product.name}
-              />
-
-              <View>
-                <Center>
-                  <Text color="text.light"
-                    bold
-                    fontSize="2xl"
-                    style={{
-                      whiteSpace: "pre-wrap"
-                    }}>
-                    {[product.name]}
-                  </Text>
-                </Center>
-
-                <Divider></Divider>
-                <Text color="text.light">What's this: {description}</Text>
-                <Text color="text.light">What's inside: {contains}</Text>
-
-                {variation.length ? (<FormControl w="3/4" maxW="300" isRequired isInvalid>
-                  <Select minWidth="200" accessibilityLabel="Choose Variant" placeholder={variation.reduce((final, variation) => `${final.name || final} or ${variation.name}`)} _selectedItem={{
-                    bg: "teal.600",
-                    endIcon: <CheckIcon size={5} />
-                  }} mt="1">
-                    {variation.map((variant) => (<Select.Item key={variant.name} label={variant.name} value={variant.name} />))}
-                  </Select>
-                  <FormControl.ErrorMessage leftIcon={<WarningOutlineIcon size="xs" />}>
-                    Select which variant you want!
-                  </FormControl.ErrorMessage>
-                </FormControl>) : null}
-
-                <Text color="text.light">Alcohol Content: {alcoholContent}</Text>
-                <Text color="text.light">Volume: {volume}ml</Text>
-
-              </View>
-
-            </View>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button.Group space={2}>
-              <Button onPress={() => {
-                setShowModal(false);
-              }}>
-                Add to order
-              </Button>
-              <Button variant="ghost" disabled="true" colorScheme="blueGray" >
-                {price} RON
-              </Button>
-            </Button.Group>
-          </Modal.Footer>
-        </Modal.Content>
-      </Modal>
-    </Box>
+            ) : null}
+          </VStack>
+          <Spacer />
+          <VStack>
+            <Text fontSize="xs" color="text.light" alignSelf="flex-start">
+              {product.type === "product"
+                ? `${product.price} ${product.currency}`
+                : `${product.recipe[0].price} ${product.recipe[0].currency}`}
+            </Text>
+            <Text fontSize="xs" color="text.light" alignSelf="flex-end">
+              {product.type === "product"
+                ? `${product.qty} ${product.measureUnit}`
+                : `${product.recipe[0].qty} ${product.recipe[0].measureUnit}`}
+            </Text>
+          </VStack>
+        </HStack>
+      </Box>
+    </Pressable>
   );
-};
+}
 
 export default Product;

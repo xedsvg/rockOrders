@@ -3,112 +3,170 @@ const { Restaurants, Tables, Products } = require("./app/db/models");
 
 const dummyProducts = [{
   "name": "Tuborg",
+  "currency": "RON",
   "price": "10",
   "imgUrl": "",
-  "stock": 1,
+  "stock": 1000,
+  "active": true,
+  "type": "product",
   "category": "bere",
   "subCategory": "Bottled"
 }, {
   "name": "vin",
+  "currency": "RON",
   "price": "10",
   "imgUrl": "",
-  "stock": 1,
-  "category": "vin"
+  "stock": 1000,
+  "active": true,
+  "type": "product",
+  "category": "Vin"
 }, {
-  "name": "alune",
+  "name": "Alune",
+  "currency": "RON",
   "price": "7.5",
   "imgUrl": "",
-  "stock": 1,
-  "category": "rontaieli"
+  "stock": 1000,
+  "active": true,
+  "type": "product",
+  "category": "Rontaieli"
 }, {
-  "name": "chipsuri",
+  "name": "Chipsuri",
+  "currency": "RON",
   "price": "7.5",
   "imgUrl": "",
-  "stock": 1,
-  "category": "rontaieli"
+  "stock": 1000,
+  "active": true,
+  "type": "product",
+  "category": "Rontaieli"
 }, {
-  "name": "granini",
+  "name": "Granini",
+  "currency": "RON",
   "price": "10",
   "imgUrl": "",
-  "stock": 1,
-  "category": "suc"
+  "stock": 1000,
+  "active": true,
+  "type": "product",
+  "category": "Suc"
 },
 {
   "name": "RockNRolla",
+  "currency": "RON",
   "price": "25",
   "imgUrl": "",
-  "contains": "rom alb, cointreau, rodie, suc lamaie, sirop de zahar condimentat",
-  "stock": 1,
-  "category": "cocktails"
+  
+  "stock": 1000,
+  "active": true,
+  "type": "product",
+  "category": "Cocktails"
 },
 {
   "name": "Ceai RockNRolla",
-  "volume": "200",
-  "contains": "ceai infuzie, sirop infuzat cu condimente, suc lamaie, portocala, ananas, cireasa maraschino",
   "description": "Un ceai care te mangaie cu sabia pe suflet",
-  "variation": [
-    {
-      "name": "rom"
-    },
-    {
-      "name": "vodka"
-    }
-  ],
+  "imgUrl": "",
+  recipe: [],
+  "stock": 1000,
+  "active": true,
+  "alcoholContent": "6% vol",
+  "type": "variation",
+  "category": "Ceai"
+},
+{
+  "name": "Ceai Negru",
+  "qty": "200",
+  "measureUnit": "ml",
+  "currency": "RON",
   "price": "18",
   "imgUrl": "",
-  "stock": 1,
-  "category": "ceai"
+  "stock": 1000,
+  "active": true,
+  "alcoholContent": "6% vol",
+  "type": "recipeProduct",
+},
+{
+  "name": "Ceai Verde",
+  "qty": "200",
+  "measureUnit": "ml",
+  "currency": "RON",
+  "price": "18",
+  "imgUrl": "",
+  "stock": 1000,
+  "active": true,
+  "alcoholContent": "6% vol",
+  "type": "recipeProduct",
 },
 {
   "name": "B69",
+  "currency": "RON",
   "price": "13",
   "imgUrl": "",
-  "stock": 1,
-  "category": "shots"
+  "stock": 1000,
+  "active": true,
+  "alcoholContent": "70% vol",
+  "type": "product",
+  "category": "Shots"
 }, {
   "name": "Guinness",
+  "currency": "RON",
   "price": "14",
   "imgUrl": "",
-  "stock": 1,
-  "category": "bere",
+  "stock": 1000,
+  "active": true,
+  "alcoholContent": "8% vol",
+  "type": "product",
+  "category": "Bere",
   "subCategory": "Draught"
 }, {
   "name": "Tuborg",
+  "currency": "RON",
   "price": "11",
   "imgUrl": "",
-  "stock": 1,
-  "category": "bere",
+  "stock": 1000,
+  "active": true,
+  "alcoholContent": "5.4% vol",
+  "type": "product",
+  "category": "Bere",
   "subCategory": "Bottled"
 }, {
   "name": "Holsten Wheat",
+  "currency": "RON",
   "price": "80",
   "imgUrl": "",
-  "stock": 1,
-  "category": "bere",
+  "stock": 1000,
+  "active": true,
+  "type": "product",
+  "alcoholContent": "5.4% vol",
+  "alcoholContent": "true",
+  "qty": "500",
+  "measureUnit": "ml",
+  "category": "Bere",
   "subCategory": "3L Tower"
 }, {
   "name": "Weihenstephaner Hefe Weissbier",
+  "currency": "RON",
   "price": "10",
-  "category": "bere",
+  "category": "Bere",
   "imgUrl": "",
-  "stock": 1,
+  "stock": 1000,
+  "active": true,
+  "type": "product",
   "alcoholContent": "5.4% vol",
-  "volume": "500 ml",
+  "qty": "500",
+  "measureUnit": "ml",
   "subCategory": "Bottled"
 }];
 
 const restaurant = new Restaurants({
   _id: '641ef47dd6a1260012acd8c7',
   name: "NotRocknRolla",
-  OwnerName: "Pablo e Sobar"
+  ownerName: "Pablo e Sobar"
 });
 
 (async () => {
   try {
 
-    await mongoose.connect(`mongodb://${process.env.MONGODB_HOST || 'localhost'}/rockandrolla?retryWrites=true&w=majority`, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
+    await mongoose.connect(`mongodb://${process.env.MONGODB_HOST || 'localhost'}/tabley?retryWrites=true&w=majority`, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
     });
 
     const restaurantDetails = await restaurant.save();

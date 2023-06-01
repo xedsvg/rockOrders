@@ -3,9 +3,14 @@ const { Tables, Products, Orders, Tabs } = require("../db/models");
 const getMenu = async (req, res) => {
   const id = req.params.id;
 
-  const menu_card = await Products.find({ restaurantId: id });
-
-  res.send(menu_card);
+  const products = await Products.find(
+    {
+      restaurantId: id,
+      type: {
+        $in: ['product', 'variation']
+      }
+    }).populate('recipe').exec();
+  res.send(products);
 };
 
 const getRandomTable = async (req, res) => {

@@ -1,17 +1,14 @@
-import React, { useEffect } from 'react';
-import { View, Button, HStack, useDisclose } from 'native-base';
+import { View, Button, HStack, useDisclose } from "native-base";
+import React, { useEffect } from "react";
 
-import { globalState } from '../../state';
-
-import OpenOrders from './OpenOrders'
-import Tables from './Tables';
-
-import OwnerActionView from './components/OwnerActionView';
-
+import OpenOrders from "./OpenOrders";
+import Tables from "./Tables";
+import OwnerActionView from "./components/OwnerActionView";
 import { Socket } from "../../api";
-import { toastEmitter } from '../../components/Toast';
+import { toastEmitter } from "../../components/Toast";
+import { globalState } from "../../state";
 
-const Owner = () => {
+function Owner() {
   const state = globalState();
   const { restaurantId, api, ownerView } = state;
   const { isOpen, onOpen, onClose } = useDisclose();
@@ -36,46 +33,49 @@ const Owner = () => {
       socket.on("waiter:notification", (data) => {
         const { tableNo, tabId } = data;
 
-        toastEmitter.emit('showToastWithDismiss', {
+        toastEmitter.emit("showToastWithDismiss", {
           id: tabId,
           title: `Table ${tableNo} called for a waiter`,
           dismissCallback: async () => {
             await api.clearCallWaiter(tabId);
-          }
+          },
         });
       });
 
       socket.on("tab:closed", (data) => {
-        console.log('tab: closed');
+        console.log("tab: closed");
         state.removeActiveTable(data.tableId);
-      })
+      });
 
       socket.on("tab:open", async (data) => {
-        console.log('tab: open');
+        console.log("tab: open");
         const table = await api.getTable(data.tableId);
         state.setActiveTable(table);
-      })
+      });
 
       state.socketIo = socket;
     })();
-  }, [])
+  }, []);
 
   return (
-    <View bg='paper.medium'>
+    <View bg="paper.medium">
       <HStack
         space={2}
         alignItems="center"
         justifyContent="center"
         width="100%"
       >
-        <Button onPress={() => state.ownerView = 'tables'}> Tables </Button>
-        <Button onPress={() => state.ownerView = 'orders'}> Orders </Button>
-        <Button onPress={() => state.ownerActionViewIsOpen = true}> Settings </Button>
+        <Button onPress={() => (state.ownerView = "tables")}> Tables </Button>
+        <Button onPress={() => (state.ownerView = "orders")}> Orders </Button>
+        <Button onPress={() => (state.ownerActionViewIsOpen = true)}>
+          {" "}
+          Settings{" "}
+        </Button>
       </HStack>
 
-      { ownerView === 'orders' && <OpenOrders />}
-      { ownerView === 'tables' && <Tables />}
-      
+      {ownerView === "orders" && <OpenOrders />}
+      {ownerView === "tables" && <Tables />}
+
       <OwnerActionView isOpen={isOpen} onClose={onClose} />
     </View>
   );

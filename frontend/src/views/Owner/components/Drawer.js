@@ -1,22 +1,28 @@
-import React, { useEffect } from 'react';
+import React, { useEffect } from "react";
 
-const Drawer = ({...props}) => {
+function Drawer({ ...props }) {
+  useEffect(() => {}, []);
 
-    useEffect(() => {
-    }, [])
-
-    return (
-        <div {...props}>
-            <nav id="drawer">
-                <ul>
-                    <li><a href="#">Menu Item</a></li>
-                    <li><a href="#">Menu Item</a></li>
-                    <li><a href="#">Menu Item</a></li>
-                    <li><a href="#">Menu Item</a></li>
-                </ul>
-            </nav>
-        </div >
-    );
+  return (
+    <div {...props}>
+      <nav id="drawer">
+        <ul>
+          <li>
+            <a href="#">Menu Item</a>
+          </li>
+          <li>
+            <a href="#">Menu Item</a>
+          </li>
+          <li>
+            <a href="#">Menu Item</a>
+          </li>
+          <li>
+            <a href="#">Menu Item</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  );
 }
 
 export default Drawer;

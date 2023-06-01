@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import moment from 'moment';
+import moment from "moment";
+import React, { useState, useEffect } from "react";
 
-const OccupiedTime = ({ timestamp }) => {
-  const [occupiedTime, setOccupiedTime] = useState('');
+function OccupiedTime({ timestamp }) {
+  const [occupiedTime, setOccupiedTime] = useState("");
 
   useEffect(() => {
     const calculateOccupiedTime = () => {
@@ -13,14 +13,16 @@ const OccupiedTime = ({ timestamp }) => {
       const minutes = Math.floor(duration.asMinutes());
       const hours = Math.floor(duration.asHours());
 
-      let formattedTime = '';
+      let formattedTime = "";
 
       if (minutes < 60) {
         formattedTime = `${minutes} min ago`;
       } else if (hours < 24) {
-        formattedTime = `${hours} hour${hours > 1 ? 's' : ''} ago`;
+        formattedTime = `${hours} hour${hours > 1 ? "s" : ""} ago`;
       } else {
-        formattedTime = `${Math.floor(hours / 24)} day${Math.floor(hours / 24) > 1 ? 's' : ''} ago`;
+        formattedTime = `${Math.floor(hours / 24)} day${
+          Math.floor(hours / 24) > 1 ? "s" : ""
+        } ago`;
       }
 
       setOccupiedTime(`Occupied about ${formattedTime}`);
@@ -36,6 +38,6 @@ const OccupiedTime = ({ timestamp }) => {
   }, [timestamp]);
 
   return <div>{occupiedTime}</div>;
-};
+}
 
 export default OccupiedTime;

@@ -1,45 +1,51 @@
-import { baseUrl } from "../settings";
-import { Socket } from "../api";
-
+/* eslint-disable camelcase */
+/* eslint-disable no-console */
+import { Button, Image, VStack } from "native-base";
 import React from "react";
 
-import { Button, Image, VStack } from "native-base";
+import QR from "../../assets/images/qr_code.gif";
+import { Socket } from "../api";
+import { baseUrl } from "../settings";
 import { globalState } from "../state";
 
-
-const QrScan = () => {
+function QrScan() {
   const state = globalState();
 
   const { developerMode, restaurantId, api } = state;
 
-  const goToTableHandler = async () => {    
+  const goToTableHandler = async () => {
     state.tableInfo = await api.getTableInfo(state.tableId);
 
-    const socket = new Socket(null, restaurantId, false, state.tableInfo.currentTab._id);
+    const socket = new Socket(
+      null,
+      restaurantId,
+      false,
+      state.tableInfo.currentTab._id
+    );
     // move this shit into api-socket something
-    
+
     socket.on("order:new", (data) => {
-      console.log('new order on tab');
+      console.log("new order on tab");
       state.addOrder(data.order);
     });
 
     socket.on("order:update", (data) => {
-      console.log('update order on tab');
+      console.log("update order on tab");
       state.updateOrderStatus(data.id, data.status);
     });
-    
+
     socket.on("tab:closed", (data) => {
-      console.log('tab: closed');
-      
-    })
+      console.log("tab: closed");
+    });
 
     state.socketIo = socket;
-    state.currentView = 'table';
-
+    state.currentView = "table";
   };
 
   const dev_getRandomTable = async () => {
-    const response = await fetch(`${baseUrl}/user/getRandomTable/${restaurantId}`);
+    const response = await fetch(
+      `${baseUrl}/user/getRandomTable/${restaurantId}`
+    );
     const { _id } = await response.json();
     state.tableId = _id;
     goToTableHandler();
@@ -55,11 +61,13 @@ const QrScan = () => {
           marginBottom: 30,
         }}
         alt="qr"
-        source={require("../../assets/images/qr_code.gif")}
+        source={QR}
       />
 
       <Button
-        onPress={() => { alert("Not implemented!"); }}
+        onPress={() => {
+          alert("Not implemented!");
+        }}
       >
         Scan QR code
       </Button>

@@ -29,22 +29,37 @@ const tableSchema = Schema({
 
 const productSchema = Schema({
     restaurantId: {
-        type: ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'Restaurants'
     },
+
     name: String,
-    price: Number,
-    stock: Number,
-    alcoholContent: String,
-    contains: String,
-    description: String,
-    variation: Array,
-    volume: String,
-    subCategory: String,
-    quantity: Number,
-    restaurantId: String,
-    category: String,
     imgUrl: String,
+
+    type: String, //product, reciepieProduct, variation
+
+    price: Number,
+    currency: String,
+
+    description: String,
+
+    stock: Number,
+    active: Boolean,
+
+    alcoholContent: String,
+    
+    measureUnit: String,
+    qty: Number,
+
+    recipe: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Products'
+    }],
+    
+    category: String,    
+    subCategory: String,
+
+    stock: Number,
 });
 
 const tabSchema = Schema({

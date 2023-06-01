@@ -1,11 +1,10 @@
+import { MaterialIcons } from "@expo/vector-icons";
+import { Center, Text, IconButton, HStack, Badge, VStack } from "native-base";
 import React from "react";
+
 import { globalState } from "../state";
 
-import { Center, Text, IconButton, HStack, Badge, VStack } from "native-base";
-
-import { MaterialIcons } from "@expo/vector-icons";
-
-const Navbar = ({ onOpen }) => {
+function Navbar({ onOpen }) {
   const state = globalState();
   const { restaurantName, user, currentView } = state;
 
@@ -17,50 +16,74 @@ const Navbar = ({ onOpen }) => {
       justifyContent="center"
       marginBottom="3vh"
       zIndex={0}
-
       space={4}
       alignItems="center"
     >
-
-      {(user == "customer" && currentView != "scan") ? (
+      {user == "customer" && currentView != "scan" ? (
         [
-          <Center key="back" >
+          <Center key="back">
             <VStack>
               <IconButton
                 onPress={state.viewGoBack}
-                _icon={{ as: MaterialIcons, name: "chevron-left", color: 'paper.medium' }} size="md"
+                _icon={{
+                  as: MaterialIcons,
+                  name: "chevron-left",
+                  color: "text.light",
+                }}
+                size="md"
               />
             </VStack>
           </Center>,
 
-          <Center key="menu" >
+          <Center key="menu">
             <VStack>
               <IconButton
-                onPress={() => { state.currentView = 'categories' }}
-                _icon={{ as: MaterialIcons, name: "list-alt", color: 'paper.medium' }} size="md"
+                onPress={() => {
+                  state.currentView = "categories";
+                }}
+                _icon={{
+                  as: MaterialIcons,
+                  name: "list-alt",
+                  color: "text.light",
+                }}
+                size="md"
               />
             </VStack>
           </Center>,
 
-          <Center key="cart" >
+          <Center key="cart">
             <VStack>
-              {state.totalProducts ? <Badge
-                bg="red.400" rounded="full" mb={-4} mr={-4} zIndex={1} variant="solid" alignSelf="flex-end" _text={{
-                  fontSize: 12
-                }}>
-                {state.totalProducts}
-              </Badge> : null}
+              {state.totalProducts ? (
+                <Badge
+                  bg="red.400"
+                  rounded="full"
+                  mb={-4}
+                  mr={-4}
+                  zIndex={1}
+                  variant="solid"
+                  alignSelf="flex-end"
+                  _text={{
+                    fontSize: 12,
+                  }}
+                >
+                  {state.totalProducts}
+                </Badge>
+              ) : null}
               <IconButton
                 onPress={onOpen}
-                _icon={{ as: MaterialIcons, name: state.totalProducts ? "shopping-cart" : "receipt", color: 'paper.medium' }} size="md"
-              >
-              </IconButton>
+                _icon={{
+                  as: MaterialIcons,
+                  name: state.totalProducts ? "shopping-cart" : "receipt",
+                  color: "text.light",
+                }}
+                size="md"
+              />
             </VStack>
-          </Center>
+          </Center>,
         ]
       ) : (
-        <Center w="20" rounded="md" >
-          <Text color="text.light" color="gray.100">{restaurantName}</Text>
+        <Center w="20" rounded="md">
+          <Text color="text.light">{restaurantName}</Text>
         </Center>
       )}
     </HStack>
@@ -68,8 +91,9 @@ const Navbar = ({ onOpen }) => {
 }
 
 export default Navbar;
-{/* <VStack>
-        
+{
+  /* <VStack>
+
         <Button mx={{
         base: "auto",
         md: 0
@@ -78,4 +102,5 @@ export default Navbar;
       }}>
           Notifications
         </Button>
-      </VStack> */}
+      </VStack> */
+}
