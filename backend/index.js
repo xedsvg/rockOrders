@@ -1,3 +1,4 @@
+const fs = require("fs");
 const https = require("https");
 const http = require("http");
 
@@ -23,10 +24,10 @@ if (PROD) {
 let origins = [];
 setInterval(() => {
   try {
-    delete require.cache[require.resolve("../../cors.json")];
-    origins = require("../../cors.json").origins;
+    delete require.cache[require.resolve("./cors.json")];
+    origins = require("./cors.json").origins;
   } catch (e) {
-    console.log("Error reading cors.json file");
+    console.log("Socket.io: Error reading cors.json file");
   }
 }, 60000);
 
@@ -34,11 +35,12 @@ const server = PROD ? https.createServer(options, app) : http.createServer(app);
 const io = socketIo(server, {
   cors: {
     origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
       if (origins.indexOf(origin) !== -1) {
         callback(null, true);
       } else {
         console.log("Socket.io: Blocked by CORS: " + origin);
-        callback(new Error("Not allowed by CORS"));
+        callback('Not allowed by CORS');
       }
     }
   }
