@@ -1,7 +1,21 @@
+/* eslint-disable no-use-before-define */
+/* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable camelcase */
 /* eslint-disable no-console */
-import { Button, Image, VStack } from "native-base";
-import React from "react";
+
+import { BarCodeScanner } from "expo-barcode-scanner";
+import { Camera, CameraType } from "expo-camera";
+import {
+  Button,
+  Image,
+  VStack,
+  Text,
+  View,
+  Heading,
+  Pressable,
+} from "native-base";
+import React, { useEffect, useState } from "react";
+import { StyleSheet } from "react-native";
 
 import QR from "../../assets/images/qr_code.gif";
 import { Socket } from "../api";
@@ -9,9 +23,26 @@ import { baseUrl } from "../settings";
 import { globalState } from "../state";
 
 function QrScan() {
+  const [type, setType] = useState(CameraType.back);
+  const [hasPermission, setHasPermission] = useState(null);
+  const [scanned, setScanned] = useState(false);
+  const [cameraView, setCameraView] = useState(null);
+
   const state = globalState();
 
   const { developerMode, restaurantId, api } = state;
+
+  useEffect(() => {
+    (async () => {
+      const { status } = await BarCodeScanner.requestPermissionsAsync();
+      setHasPermission(status === "granted");
+    })();
+  }, []);
+
+  const handleBarCodeScanned = ({ type, data }) => {
+    setScanned(true);
+    alert(`Bar code with type ${type} and data ${data} has been scanned!`);
+  };
 
   const goToTableHandler = async () => {
     state.tableInfo = await api.getTableInfo(state.tableId);
@@ -52,25 +83,51 @@ function QrScan() {
   };
 
   return (
-    <VStack space={3}>
-      <Image
-        style={{
-          width: 270,
-          height: 270,
-          alignSelf: "center",
-          marginBottom: 30,
-        }}
-        alt="qr"
-        source={QR}
-      />
-
-      <Button
-        onPress={() => {
-          alert("Not implemented!");
-        }}
+    <VStack space={3} flex={1} alignItems="center">
+      <VStack
+        marginTop="12vh"
+        alignItems="center"
+        paddingX="20vw"
+        textAlign="center"
+        marginBottom="5vh"
       >
-        Scan QR code
-      </Button>
+        <Heading bold color="text.light" lineHeight="2.25em">
+          TAP TO SCAN
+        </Heading>
+        <Text color="text.light">
+          The app will require access to your camera
+        </Text>
+      </VStack>
+      {!cameraView ? (
+        <Pressable onPress={() => setCameraView(true)}>
+          <Image
+            style={{
+              width: 270,
+              height: 270,
+            }}
+            alt="qr"
+            source={QR}
+          />
+        </Pressable>
+      ) : (
+        <View style={styles.container}>
+          <Camera
+            style={[StyleSheet.absoluteFillObject, , styles.container]}
+            onBarCodeScanned={handleBarCodeScanned}
+            barCodeScannerSettings={{
+              barCodeTypes: [BarCodeScanner.Constants.BarCodeType.qr],
+            }}
+          />
+        </View>
+      )}
+
+      {/* <Button onPress={() => setCameraView(true)}>Scan QR code</Button> */}
+
+      {hasPermission === null ? (
+        <Text>Requesting for camera permission</Text>
+      ) : null}
+
+      {hasPermission === false ? <Text>No access to camera</Text> : null}
 
       {developerMode && (
         <Button
@@ -87,5 +144,16 @@ function QrScan() {
     </VStack>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: "red",
+    flex: 1,
+    flexDirection: "column",
+    minWidth: 270,
+    minHeight: 270,
+    alignSelf: "center",
+  },
+});
 
 export default QrScan;
