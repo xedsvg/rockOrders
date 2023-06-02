@@ -32,7 +32,14 @@ const createApp = (dependencies = {}) => {
     }
   }));
   app.use(express.json());
-  app.use(helmet());
+  app.use(helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'"],
+      },
+    },
+  }));
 
   app.use("/api/user", dependencies.userRoutes || require("../routes/userRoutes"));
   app.use("/api/owner", dependencies.ownerRoutes || require("../routes/ownerRoutes"));

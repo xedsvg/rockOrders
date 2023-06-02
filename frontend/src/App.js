@@ -24,7 +24,7 @@ import Table from "./views/Table";
 
 export default function App() {
   const state = globalState();
-  const { user, currentView } = state;
+  const { user, currentView, developerMode } = state;
 
   const {
     isOpen: cartIsOpen,
@@ -75,7 +75,7 @@ export default function App() {
             <CartActionView isOpen={cartIsOpen} onClose={cartOnClose} />
 
             {user === "owner" && <Owner />}
-            {user === "customer" && (
+            {developerMode && user === "customer" && (
               <Button onPress={() => (state.user = "owner")}>Owner view</Button>
             )}
 

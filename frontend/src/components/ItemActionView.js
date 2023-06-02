@@ -151,13 +151,6 @@ function ItemActionView() {
               {product?.active ? (
                 <Divider bg="transparent" thickness={2} />
               ) : null}
-              {product?.active ? (
-                <Input
-                  variant="rounded"
-                  color="text.light"
-                  placeholder="Do you want to say anything to the bartender?"
-                />
-              ) : null}
             </VStack>
             <HStack space={2} px={5} py={3}>
               <Button

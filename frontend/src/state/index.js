@@ -45,7 +45,7 @@ const hstate = hookstate(
     api: null,
     socketIo: null,
 
-    developerMode: true,
+    developerMode: false,
   },
   devtools({ key: "globalState" })
 );
