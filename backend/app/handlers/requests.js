@@ -9,7 +9,7 @@ const frontendFilesPath = path.join(__dirname, '../../../frontend/web-build');
 const createApp = (dependencies = {}) => {
   const app = express();
 
-  let origins = [];
+  let origins = require("../../cors.json").origins;
   setInterval(() => {
     try{
       delete require.cache[require.resolve("../../cors.json")];

@@ -1,4 +1,5 @@
 const { Tables, Products, Orders, Tabs } = require("../db/models");
+const { createNewOrder } = require('../datamodels');
 
 const getMenu = async (req, res) => {
   const id = req.params.id;
@@ -76,48 +77,14 @@ const getTab = async (req, res) => {
   }
 };
 
-// const openTab = async (req, res) => {
-//   const { body: { restaurantId } } = req;
-//   if(!restaurantId) {
-//     res.sendStatus(400);
-//   } else {
-//     try {
-//     const order = await Orders.find(orderId);
-//     res.send(order);
-//   } catch (e) {
-//     res.send(500);
-//   }}
-// };
-
 const newOrder = async (req, res) => {
   const { body: { cartProducts }, params: { tabId } } = req;
-  if (!cartProducts || !tabId) {
-    res.sendStatus(400);
-  } else {
-    try {
-      const tab = await Tabs.findById(tabId);
-      if (!tab) {
-        res.sendStatus(404);
-      } else if (tab.status === 'closed') {
-        res.sendStatus(403);
-      } else {
-        const totalAmount = cartProducts.reduce((total, cartProduct) => total + parseInt(cartProduct.qty) * parseFloat(cartProduct.price.toFixed(2)), 0);
-        const items = cartProducts.flatMap(({ qty, _id }) => Array(qty).fill(_id));
-        // const variations = cartProducts.flatMap(({id, variation}) => Array(qty).fill({id, variation}));
-        const order = new Orders({
-          tabId: tab._id,
-          restaurantId: tab.restaurantId,
-          totalAmount,
-          items
-        });
-        tab.orders.push(order._id);
-
-        await Promise.all([order.save(), tab.save()]);
-        res.send(order);
-      }
+  try {
+      await createNewOrder(cartProducts, tabId);
+      res.sendStatus(200);
     } catch (e) {
+      console.log(e);
       res.sendStatus(500);
-    }
   }
 };
 

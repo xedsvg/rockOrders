@@ -106,3 +106,4 @@ dist
 .expo
 web-build
 .dccache
+.DS_Store

@@ -21,7 +21,7 @@ if (PROD) {
     options.cert = fs.readFileSync(process.env.CERT);
   }
 }
-let origins = [];
+let origins = require("./cors.json").origins;
 setInterval(() => {
   try {
     delete require.cache[require.resolve("./cors.json")];

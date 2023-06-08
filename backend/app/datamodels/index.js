@@ -1,7 +1,7 @@
 const { closeTableAndTab } = require('./tablesAndTabs');
 const { clearWaiter } = require('./tabs');
 const { getTableByRestaurantId, getTableById } = require('./tables');
-const { getActiveOrders, updateOrder } = require('./orders');
+const { getActiveOrders, updateOrder, createNewOrder } = require('./orders');
 
 module.exports = {
     closeTableAndTab,
@@ -10,4 +10,5 @@ module.exports = {
     getTableById,
     getActiveOrders,
     updateOrder,
+    createNewOrder,
 }

@@ -3,13 +3,13 @@ import { extendTheme } from "native-base";
 const colorTheme = {
   brand: {
     900: "#8287af",
-    800: "#000",
+    // 800: "#3B20C9",
+    800: "#352A57",
     700: "#2E2E2E",
   },
-
   paper: {
     primary: "#00BFFF",
-    medium: "#1A1A1A",
+    medium: "#040719",
     dark: "#e5e6ed",
   },
   text: {
@@ -34,7 +34,7 @@ const components = {
   ActionsheetContent: {
     baseStyle: (...props) => ({
       ...props,
-      borderTopColor: "hsl(19.1, 80%, 53.1%)",
+      borderTopColor: "#856adb",
       borderTopWidth: 2,
       bg: "paper.medium",
       _dragIndicator: {
@@ -86,13 +86,13 @@ const components = {
     variants: {
       solid: (props) => ({
         ...props,
-        bg: "hsl(19.1, 80%, 53.1%)",
+        bg: "#856adb",
         borderRadius: "56px",
         _hover: {
-          bg: "hsl(19.1, 80%, 43.1%)",
+          bg: "#9D87E2",
         },
         _pressed: {
-          bg: "hsl(19.1, 80%, 63.1%)",
+          bg: "#6A54AF",
         },
       }),
       outline: (props) => ({
@@ -101,16 +101,18 @@ const components = {
           color: "text.light",
         },
         borderWidth: "2px",
-        borderColor: "hsl(19.1, 80%, 73.1%)",
+        borderColor: "#856adb",
         borderRadius: "56px",
         _hover: {
-          borderColor: "hsl(19.1, 80%, 53.1%)",
+          borderColor: "#9D87E2",
         },
         _pressed: {
-          borderColor: "hsl(19.1, 80%, 43.1%)",
+          borderColor: "#6A54AF",
         },
       }),
     },
   },
 };
 export const theme = extendTheme({ components, colors: colorTheme });
+
+export const version = "0.0.1";

@@ -25,6 +25,7 @@ const Categories = () => {
       flexDirection="row"
       justifyContent="space-between"
       flexWrap="wrap"
+      paddingX="1rem"
     >
       {state.categories.map((category) => (
         <Pressable

@@ -11,7 +11,7 @@ function TableStatus() {
   const { tableNr } = globalState();
 
   return (
-    <Box pl="4" pr="5" py="2">
+    <Box marginBottom="2rem" marginTop="2rem">
       <HStack alignItems="center" space={3}>
         <Avatar size="md" source={{ uri: waiter }} />
         <VStack>
