@@ -11,6 +11,7 @@ import React, { useEffect } from "react";
 import { Api } from "./api";
 import CartActionView from "./components/CartActionView";
 import ItemActionView from "./components/ItemActionView";
+import Logo from "./components/Logo";
 import Navbar from "./components/Navbar";
 import { SlideManager } from "./components/Slider";
 import { ToastManager, toastEmitter } from "./components/Toast";
@@ -45,25 +46,18 @@ export default function App() {
   return (
     <NativeBaseProvider theme={theme}>
       <Container flex={1}>
-        <VStack
-          flex={1}
-          space={2}
-          alignItems="center"
-          bg="brand.800"
-          width="100vw"
-        >
-          <Navbar onOpen={cartOnOpen} />
+        <VStack flex={1} alignItems="center" bg="brand.800" width="100vw">
+          <Logo />
           <ScrollView
             w="full"
             overflow="scroll"
             height="80vh"
-            paddingX="5vw"
-            borderRadius={25}
+            borderTopRadius={25}
+            borderTopColor="#352A57"
+            borderTopWidth={6}
             zIndex={1}
-            top="-4vh"
             bg="paper.medium"
           >
-            {/* <View flex={1} padding="3vw" borderTopRadius={25} zIndex={1} top="-4vh" background="paper.medium"> */}
             {currentView === "scan" && user === "customer" && <QrScan />}
             {currentView === "categories" && user === "customer" && (
               <Categories />
@@ -72,15 +66,16 @@ export default function App() {
             {currentView === "table" && user === "customer" && <Table />}
 
             {state.currentProduct ? <ItemActionView /> : null}
-            <CartActionView isOpen={cartIsOpen} onClose={cartOnClose} />
+            {cartIsOpen && (
+              <CartActionView isOpen={cartIsOpen} onClose={cartOnClose} />
+            )}
 
             {user === "owner" && <Owner />}
             {developerMode && user === "customer" && (
               <Button onPress={() => (state.user = "owner")}>Owner view</Button>
             )}
-
-            {/* </View> */}
           </ScrollView>
+          <Navbar onOpen={cartOnOpen} />
         </VStack>
       </Container>
       <ToastManager />

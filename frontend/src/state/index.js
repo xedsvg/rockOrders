@@ -46,6 +46,7 @@ const hstate = hookstate(
     socketIo: null,
 
     developerMode: false,
+    riveHooks: null,
   },
   devtools({ key: "globalState" })
 );
@@ -70,6 +71,13 @@ export function globalState() {
   const ustate = useHookstate(hstate);
 
   return {
+    get riveHooks() {
+      return ustate.riveHooks.get();
+    },
+    set riveHooks(riveHooks) {
+      ustate.riveHooks.set(riveHooks);
+    },
+
     get developerMode() {
       return ustate.developerMode.get();
     },
@@ -172,21 +180,20 @@ export function globalState() {
         const item = ustate.currentProduct.get();
         const { type } = item;
 
-        // Search for item in cart, add it if not found with defaults, else update quantity
-        let itemIndex = cart.findIndex((i) => i._id === item._id);
-
-        if (itemIndex === -1) {
-          // Add item to cart
-          ustate.currentProduct.cartQty.set(qty);
-          ustate.cart[cart.length].set(JSON.parse(JSON.stringify(item)));
-        } else {
-          ustate.cart[itemIndex].cartQty.set((cartQty) => cartQty + qty);
-        }
-
-        itemIndex = cart.findIndex((i) => i._id === item._id);
-
-        // Handle products
         if (type === "product") {
+          // search for item in cart
+          let itemIndex = cart.findIndex((i) => i._id === item._id);
+
+          if (itemIndex === -1) {
+            // Add item to cart
+            ustate.currentProduct.cartQty.set(qty);
+            ustate.cart[cart.length].set(JSON.parse(JSON.stringify(item)));
+            // Update item index
+            itemIndex = cart.findIndex((i) => i._id === item._id);
+          } else {
+            ustate.cart[itemIndex].cartQty.set((cartQty) => cartQty + qty);
+          }
+
           // Update total price for product
           ustate.cart[itemIndex].totalPrice.set(
             (tp) => (tp || 0) + item.price * qty
@@ -194,25 +201,51 @@ export function globalState() {
 
           // Update total price for cart
           ustate.cartTotal.set((ct) => ct + item.price * qty);
-          // Handle variations
-        } else if (type === "variation" && variationIndex) {
-          // Remove all other variations
-          ustate.currentProduct.recipe.set((oldRecipe) => {
-            const newRecipe = [...oldRecipe];
-            newRecipe.splice(0, variationIndex);
-            newRecipe.splice(1);
-            return newRecipe;
-          });
-
-          ustate.cart[itemIndex].totalPrice.set(
-            (tp) => (tp || 0) + item.recipe[0].price * qty
+          // Update total products for cart icon
+          ustate.totalProducts.set((totalProducts) => totalProducts + qty);
+        } else if (type === "variation") {
+          console.log("trying to add variation to cart");
+          // search for variation in cart with same recipe
+          const itemIndex = cart.findIndex(
+            (i) =>
+              i._id === item._id &&
+              JSON.stringify(i.recipe[0]) ===
+                JSON.stringify(item.recipe[variationIndex])
           );
 
-          ustate.cartTotal.set((ct) => ct + item.recipe[0].price * qty);
-        }
+          if (itemIndex === -1) {
+            console.log("item not found in cart");
+            // Add variation to cart
+            ustate.currentProduct.cartQty.set(qty);
+            ustate.cart[cart.length].set(JSON.parse(JSON.stringify(item)));
+            // Remove all variations that are not selected
+            console.log(ustate.cart[cart.length - 1]);
+            console.log("removed all variations that are not selected");
+            ustate.cart[cart.length - 1].recipe.set((oldRecipe) => {
+              const newRecipe = [...oldRecipe];
+              newRecipe.splice(0, variationIndex);
+              newRecipe.splice(1);
+              console.log("variation selected", variationIndex);
+              console.log(newRecipe);
+              return newRecipe;
+            });
 
-        // Update total products for cart icon
-        ustate.totalProducts.set((totalProducts) => totalProducts + qty);
+            ustate.cart[cart.length - 1].totalPrice.set(
+              (tp) => (tp || 0) + item.recipe[0].price * qty
+            );
+          } else {
+            console.log("item found in cart updating only qty");
+            ustate.cart[itemIndex].cartQty.set((cartQty) => cartQty + qty);
+
+            ustate.cart[itemIndex].totalPrice.set(
+              (tp) => (tp || 0) + item.recipe[0].price * qty
+            );
+          }
+
+          ustate.cartTotal.set((ct) => ct + item.recipe[0].price * qty);
+          // Update total products for cart icon
+          ustate.totalProducts.set((totalProducts) => totalProducts + qty);
+        }
       },
 
       update(qty) {
@@ -222,36 +255,53 @@ export function globalState() {
 
         // Substract old item qty from cart total and total nr of products
         ustate.cartTotal.set((ct) => ct - item.totalPrice);
+
         ustate.totalProducts.set(
           (totalProducts) => totalProducts - item.cartQty
         );
 
         // Search for item in cart
-        const itemIndex = cart.findIndex((i) => i._id === item._id);
-        // Delete item from cart - lazy way
-        ustate.cart[itemIndex].set(none);
+        let itemIndex = cart.findIndex((i) => i._id === item._id);
 
-        // Add it back only if it's at least 1
-        if (qty > 0) {
-          ustate.currentProduct.cartQty.set(qty);
+        if (item.type === "product") {
+          // Delete item from cart - lazy way
+          ustate.cart[itemIndex].set(none);
 
-          if (item.type === "product") {
+          // Add it back only if it's at least 1
+          if (qty > 0) {
+            ustate.currentProduct.cartQty.set(qty);
+
             ustate.currentProduct.totalPrice.set(item.price * qty);
-          } else if (item.type === "variation") {
-            ustate.currentProduct.totalPrice.set(item.recipe[0].price * qty);
+
+            ustate.cartTotal.set(
+              (ct) => ct + ustate.currentProduct.totalPrice.value
+            );
+            ustate.totalProducts.set(
+              (totalProducts) =>
+                totalProducts + ustate.currentProduct.cartQty.value
+            );
+
+            ustate.cart[itemIndex].set(
+              JSON.parse(JSON.stringify(ustate.currentProduct.value))
+            );
           }
+        } else if (item.type === "variation") {
+          // search for the exact item in cart. The first itemIndex does not guarantee the same recipe
+          itemIndex = cart.findIndex(
+            (i) =>
+              i._id === item._id &&
+              JSON.stringify(i.recipe[0]) === JSON.stringify(item.recipe[0])
+          );
 
-          ustate.cartTotal.set(
-            (ct) => ct + ustate.currentProduct.totalPrice.value
-          );
-          ustate.totalProducts.set(
-            (totalProducts) =>
-              totalProducts + ustate.currentProduct.cartQty.value
-          );
-
-          ustate.cart[itemIndex].set(
-            JSON.parse(JSON.stringify(ustate.currentProduct.value))
-          );
+          if (qty === 0) {
+            ustate.cart[itemIndex].set(none);
+          } else {
+            ustate.cart[itemIndex].cartQty.set(qty);
+            ustate.cart[itemIndex].totalPrice.set(item.recipe[0].price * qty);
+            ustate.cartTotal.set((ct) => ct + item.recipe[0].price * qty);
+            ustate.totalProducts.set((totalProducts) => totalProducts + qty);
+          }
+          ustate.currentProduct.totalPrice.set(item.recipe[0].price * qty);
         }
       },
 
@@ -260,23 +310,19 @@ export function globalState() {
       },
 
       async send() {
-        alert("disabled");
-        // const api = ustate.api.get();
-        // const cart = ustate.cart.get();
-        // const tableInfo = ustate.tableInfo.get();
+        const api = ustate.api.get();
+        const cart = ustate.cart.get();
+        const tableInfo = ustate.tableInfo.get();
 
-        // const cartWithQty = cart.filter((item) => item.qty > 0);
-        // // todo: add error handling
-        // await api.sendOrder(cartWithQty, tableInfo.currentTab._id);
-
-        // ustate.cart.forEach((item) => {
-        //   item.qty.set(0);
-        //   item.totalPrice.set(0);
-        // });
-        // ustate.cartTotal.set(0);
-        // ustate.totalProducts.set(
-        //   ustate.cart.get().reduce((acc, item) => acc + item.qty, 0)
-        // );
+        try {
+          await api.sendOrder(cart, tableInfo.currentTab._id);
+          ustate.cart.set(none);
+          ustate.cart.merge([]);
+          ustate.cartTotal.set(0);
+          ustate.totalProducts.set(0);
+        } catch (err) {
+          console.log(err);
+        }
       },
     },
 

@@ -100,7 +100,7 @@ const orderSchema = Schema({
         type: ObjectId,
         ref: 'Products'
     }],
-    // variations: [],
+    variations: [],
     totalAmount: Number,
     createdAt: {
         type: Date,

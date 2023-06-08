@@ -1,23 +1,18 @@
+/* eslint-disable jsx-a11y/media-has-caption */
+/* eslint-disable no-shadow */
 /* eslint-disable no-use-before-define */
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable camelcase */
 /* eslint-disable no-console */
 
+import Rive from "@rive-app/react-canvas";
 import { BarCodeScanner } from "expo-barcode-scanner";
 import { Camera, CameraType } from "expo-camera";
-import {
-  Button,
-  Image,
-  VStack,
-  Text,
-  View,
-  Heading,
-  Pressable,
-} from "native-base";
+import { Button, VStack, Text, View, Heading, Pressable } from "native-base";
 import React, { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
 
-import QR from "../../assets/images/qr_code.gif";
+import Animation from "../../assets/images/tabley.riv";
 import { Socket } from "../api";
 import { baseUrl } from "../settings";
 import { globalState } from "../state";
@@ -41,6 +36,7 @@ function QrScan() {
 
   const handleBarCodeScanned = ({ type, data }) => {
     setScanned(true);
+    setCameraView(false);
     alert(`Bar code with type ${type} and data ${data} has been scanned!`);
   };
 
@@ -99,20 +95,20 @@ function QrScan() {
         </Text>
       </VStack>
       {!cameraView ? (
-        <Pressable onPress={() => setCameraView(true)}>
-          <Image
+        <Pressable onPress={() => dev_getRandomTable()}>
+          <Rive
+            src={Animation}
+            autoPlay
             style={{
               width: 270,
               height: 270,
             }}
-            alt="qr"
-            source={QR}
           />
         </Pressable>
       ) : (
         <View style={styles.container}>
           <Camera
-            style={[StyleSheet.absoluteFillObject, , styles.container]}
+            style={[StyleSheet.absoluteFillObject, styles.container]}
             onBarCodeScanned={handleBarCodeScanned}
             barCodeScannerSettings={{
               barCodeTypes: [BarCodeScanner.Constants.BarCodeType.qr],
@@ -147,7 +143,7 @@ function QrScan() {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "red",
+    backgroundColor: "black",
     flex: 1,
     flexDirection: "column",
     minWidth: 270,

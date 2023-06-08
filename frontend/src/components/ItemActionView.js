@@ -5,7 +5,6 @@ import {
   Radio,
   IconButton,
   Image,
-  Input,
   Actionsheet,
   Box,
   Button,
@@ -119,6 +118,7 @@ function ItemActionView() {
               {product?.type === "variation" ? (
                 <Radio.Group
                   w="100%"
+                  accessibilityLabel="select variation"
                   value={value}
                   onChange={(nextValue) => {
                     setValue(nextValue);
@@ -139,7 +139,7 @@ function ItemActionView() {
                         justifyContent="space-between"
                         w="100%"
                       >
-                        <Text color="text.light"> {recipeItem.name} </Text>
+                        <Text color="text.light">{recipeItem.name}</Text>
                         <Text color="text.light">
                           {recipeItem.price} {recipeItem.currency}
                         </Text>

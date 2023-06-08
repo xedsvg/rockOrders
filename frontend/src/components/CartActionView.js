@@ -32,7 +32,11 @@ function CartActionView({ isOpen, onClose }) {
 
                 {state.cart.map((cartItem) => (
                   <HStack
-                    key={cartItem._id}
+                    key={
+                      cartItem.type === "variation"
+                        ? cartItem.recipe[0]._id
+                        : cartItem._id
+                    }
                     alignItems="center"
                     justifyContent="space-between"
                   >

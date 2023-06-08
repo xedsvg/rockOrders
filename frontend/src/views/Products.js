@@ -39,7 +39,7 @@ const Products = () => {
     </Center>,
 
     state.subCategories.map((subCategory) => (
-      <View key={subCategory || "Other"} maxW="95%">
+      <View key={subCategory || "Other"} maxW="95%" paddingX="1rem">
         <Heading
           size="sm"
           marginBottom=".5rem"
