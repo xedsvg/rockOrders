@@ -57,6 +57,7 @@ const components = {
       }),
     },
   },
+
   Alert: {
     baseStyle: {
       borderRadius: "26px",
@@ -69,13 +70,15 @@ const components = {
       }),
       active: (...props) => ({
         ...props,
-        bgImg:
-          "linear-gradient(201.52deg, hsl(19.1, 80%, 53.1%) 0px, hsl(19.1, 79.4%, 28.6%) 100%)",
+        borderLeftWidth: 2,
+        borderLeftColor: "#FF7F50",
+        bg: "rgba(53, 42, 87, 1)",
       }),
       open: (...props) => ({
         ...props,
         borderLeftWidth: 2,
-        borderLeftColor: "#FF7F50",
+        // #FF7F50
+        borderLeftColor: "#50ff73",
         bgImg:
           "linear-gradient(201.52deg, rgba(15, 92, 134, 0.1) 0px, rgba(10, 108, 160, 0.1) 100%)",
       }),

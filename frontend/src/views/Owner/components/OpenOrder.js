@@ -1,3 +1,6 @@
+/* eslint-disable no-plusplus */
+/* eslint-disable react/jsx-props-no-spreading */
+/* eslint-disable react/prop-types */
 import {
   Pressable,
   View,
@@ -6,6 +9,7 @@ import {
   Divider,
   Alert,
   VStack,
+  HStack,
 } from "native-base";
 import React from "react";
 
@@ -29,17 +33,17 @@ const getItemsWithQuantities = (items) => {
   }));
 };
 
-function OpenOrder({ item, index, ...props }) {
+function OpenOrder({ order, index, ...props }) {
   const state = globalState();
 
-  const items = getItemsWithQuantities(item.items);
+  const items = getItemsWithQuantities(order.items);
 
   return (
     <Pressable
       {...props}
-      key={item._id}
+      key={order._id}
       onLongPress={() => {
-        state.selectedTable = item.tabId.tableId._id;
+        state.selectedTable = order.tabId.tableId._id;
         toastEmitter.emit("showToast", {
           title: "View mode changed",
           description: "If you want to exit table view, press the order again.",
@@ -60,36 +64,42 @@ function OpenOrder({ item, index, ...props }) {
         bg="brand.700"
         variant="active"
         mr={5}
+        p="1rem"
       >
         <VStack space={1} flexShrink={1} w="100%">
           {/* Card header */}
-          <Text
-            color="text.light"
-            fontSize="md"
-            fontWeight="medium"
-            flexShrink={1}
-          >
-            Table #{item.tabId.tableId.tableNo}
-          </Text>
-          <Text color="text.light" fontSize="xs">
-            {item.status}
-          </Text>
-          <Text color="text.light" fontSize="xs">
-            {item.lastUpdated.substring(11, 16)}
-          </Text>
+          <HStack justifyContent="space-between">
+            <Text
+              color="text.light"
+              fontSize="md"
+              fontWeight="medium"
+              flexShrink={1}
+            >
+              Table #{order.tabId.tableId.tableNo}
+            </Text>
+            <VStack alignItems="flex-end">
+              <Text color="text.light" fontSize="xs">
+                {order.status}
+              </Text>
+              <Text color="text.light" fontSize="xs">
+                {order.lastUpdated.substring(11, 16)}
+              </Text>
+            </VStack>
+          </HStack>
 
           {/* Card body */}
-          <View>
-            {items.map(({ name, quantity }) => (
-              <Text color="text.light" key={name}>
-                {quantity}x{name}
-              </Text>
-            ))}
-          </View>
 
-          <View>
+          {items.map(({ name, quantity }) => (
+            <View flexDir="row" justifyContent="space-between" key={name}>
+              <Text color="text.light">
+                {quantity}x {name}
+              </Text>
+            </View>
+          ))}
+
+          <View flexDir="row" justifyContent="space-between">
             <Text color="text.light">Total:</Text>
-            <Text color="text.light">{item.totalAmount}</Text>
+            <Text color="text.light">{order.totalAmount}</Text>
           </View>
 
           <Divider bg="transparent" thickness="6" />

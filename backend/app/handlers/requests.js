@@ -10,6 +10,7 @@ const createApp = (dependencies = {}) => {
   const app = express();
 
   let origins = require("../../cors.json").origins;
+  console.log(origins);
   setInterval(() => {
     try{
       delete require.cache[require.resolve("../../cors.json")];
@@ -35,8 +36,8 @@ const createApp = (dependencies = {}) => {
   app.use(helmet({
     contentSecurityPolicy: {
       directives: {
-        defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'"],
+        defaultSrc: ["'self'", "https://unpkg.com", "'unsafe-inline'", "https://123rf.com"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "'wasm-unsafe-eval'"],
       },
     },
   }));

@@ -10,24 +10,32 @@ export class Api {
 
   async post(path, body) {
     try {
-      return await fetch(`${baseUrl}${path}`, {
+      const response = await fetch(`${baseUrl}${path}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(body),
       });
+      // Check if the request was successful
+      if (response.ok) {
+        const responseBody = await response.json();
+        return responseBody;
+      }
+      this.notify(`Network response was not ok.`);
     } catch (error) {
       this.notify(`Error: ${error}`);
+      return null;
     }
   }
 
   async get(path) {
     try {
       const data = await fetch(`${baseUrl}${path}`);
-      return await data.json();
+      return data.json();
     } catch (error) {
       this.notify(`Error: ${error}`);
+      return null;
     }
   }
 
@@ -36,8 +44,16 @@ export class Api {
     this.notify({ title: "Order sent!", duration: 3000, type: "success" });
   }
 
-  async getSettings() {
-    return this.get("/app/settings");
+  async getRestaurantByHostname(hostname) {
+    return this.post(`/app/hostnameCheck`, { hostname });
+  }
+
+  async getRestaurantByName(restaurantName) {
+    return this.get(`/app/restaurantName/${restaurantName}`);
+  }
+
+  async getRestaurantById(restaurantId) {
+    return this.get(`/app/restaurantId/${restaurantId}`);
   }
 
   async getTables(restaurantId) {

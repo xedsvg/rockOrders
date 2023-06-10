@@ -6,7 +6,12 @@ const getActiveOrders = async (restaurantId) => {
         restaurantId,
         status: { $in: ["recieved", "inProgress"] }
     })
-        .populate('items')
+        .populate({ 
+            path:'items',
+            populate: {
+                path: 'recipe',
+            }
+        })
         .populate({
             path: 'tabId',
             populate: {

@@ -1,5 +1,5 @@
 import { View, HStack, Text } from "native-base";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import OpenOrder from "./components/OpenOrder";
 import { toastEmitter } from "../../components/Toast";
@@ -23,53 +23,55 @@ const changeStatusHandler = async (orderId, status) => {
 };
 
 function OpenOrders() {
+  const [groupedOrders, setGroupedOrders] = useState({});
+
   const state = globalState();
   const { openOrders, selectedTable } = state;
 
-  const groupedOrders = {};
+  // openOrders.forEach((order) => {
+  //   const tableId = order.tabId.tableId._id;
+  //   const localGroupedOrders = {};
+  //   if (groupedOrders[tableId]) {
+  //     localGroupedOrders[tableId].push(order);
+  //   } else {
+  //     localGroupedOrders[tableId] = [order];
+  //   }
+  //   setGroupedOrders({ ...groupedOrders, ...localGroupedOrders });
+  // });
 
-  openOrders.forEach((order) => {
-    const tableId = order.tabId.tableId._id;
-    if (groupedOrders[tableId]) {
-      groupedOrders[tableId].push(order);
-    } else {
-      groupedOrders[tableId] = [order];
+  // const sortedOrders = Object.values(groupedOrders).flatMap((orders) =>
+  //   orders.sort((a, b) =>
+  //     a.tabId.tableId._id.localeCompare(b.tabId.tableId._id)
+  //   )
+  // );
+
+  useEffect(() => {
+    if (selectedTable) {
+      openOrders.filter(
+        (order) => order.tabId.tableId._id === selectedTable._id
+      );
     }
-  });
-
-  const sortedOrders = Object.values(groupedOrders).flatMap((orders) =>
-    orders.sort((a, b) =>
-      a.tabId.tableId._id.localeCompare(b.tabId.tableId._id)
-    )
-  );
+  }, [selectedTable]);
 
   return (
     <View>
       <Text color="text.light" fontSize="xl" fontWeight="bold" mb={3}>
-        Open Orders
+        Open Orders {selectedTable && `for Table #${selectedTable.tableNo}`}
       </Text>
-      {/* {selectedTable
-                ? ( */}
       <HStack flexWrap="wrap" width="100%">
-        {sortedOrders.map((item, index) => (
+        {openOrders.map((order, index) => (
           <OpenOrder
             mb={3}
-            item={item}
+            key={order._id}
+            order={order}
             index={index}
             style={{
-              flexBasis: `${100 / Math.min(sortedOrders.length, 5)}%`,
+              flexBasis: `20%`,
+              flexShrink: 1,
             }}
           />
         ))}
       </HStack>
-      {/* ) : (
-                    <ZStack style={{
-                        ...styles.orders,
-                        flexBasis: `${100 / Math.min(sortedOrders.length, 5)}%`,
-                    }} >
-                        {sortedOrders.map((item, index) => renderOrder(item, index, state))}
-                    </ZStack>
-                )} */}
     </View>
   );
 }
