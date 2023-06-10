@@ -36,10 +36,49 @@ export default function App() {
   useEffect(() => {
     (async () => {
       state.api = new Api((msg) => toastEmitter.emit("showToast", msg));
-      const { restaurantId, restaurantName } = await state.api.getSettings();
-      state.products = await state.api.getMenu(restaurantId);
-      state.restaurantId = restaurantId;
-      state.restaurantName = restaurantName;
+      try {
+        const url = new URL(window.location);
+        if (url.hostname === "localhost") state.developerMode = true;
+        if (url.hostname === "tabley.app" || url.hostname === "localhost") {
+          if (!url.pathname.startsWith("/@")) {
+            alert(
+              "1. Sorry but you can't access this page directly. Please scan a QR code or use the link provided by the restaurant."
+            );
+          } else {
+            const restaurantName = url.pathname.replace("/@", "").toLowerCase();
+
+            const restaurant = await state.api.getRestaurantByName(
+              restaurantName
+            );
+            if (restaurant) {
+              state.restaurantId = restaurant.restaurantId;
+              state.restaurantName = restaurant.restaurantName;
+              state.products = await state.api.getMenu(restaurant.restaurantId);
+            } else {
+              alert(
+                "2. Sorry but the url is not valid. Please scan a QR code or use the link provided by the restaurant."
+              );
+            }
+          }
+        } else {
+          const restaurant = await state.api.getRestaurantByHostname(
+            url.hostname
+          );
+          if (restaurant) {
+            state.restaurantId = restaurant.restaurantId;
+            state.restaurantName = restaurant.restaurantName;
+            state.products = await state.api.getMenu(restaurant.restaurantId);
+          } else {
+            alert(
+              "3. Sorry but the url is not valid. Please scan a QR code or use the link provided by the restaurant."
+            );
+          }
+        }
+      } catch (e) {
+        alert(
+          "4: Sorry but you can't access this page directly. Please scan a QR code or use the link provided by the restaurant."
+        );
+      }
     })();
   }, []);
 
@@ -75,7 +114,7 @@ export default function App() {
               <Button onPress={() => (state.user = "owner")}>Owner view</Button>
             )}
           </ScrollView>
-          <Navbar onOpen={cartOnOpen} />
+          {user !== "owner" && <Navbar onOpen={cartOnOpen} />}
         </VStack>
       </Container>
       <ToastManager />

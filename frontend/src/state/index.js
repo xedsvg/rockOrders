@@ -7,7 +7,7 @@ import { devtools } from "@hookstate/devtools";
 const hstate = hookstate(
   {
     restaurantId: null,
-    restaurantName: "default",
+    restaurantName: "Welcome to Tabley!",
 
     user: "customer",
     viewHistory: ["scan"],
@@ -46,7 +46,6 @@ const hstate = hookstate(
     socketIo: null,
 
     developerMode: false,
-    riveHooks: null,
   },
   devtools({ key: "globalState" })
 );
@@ -71,15 +70,12 @@ export function globalState() {
   const ustate = useHookstate(hstate);
 
   return {
-    get riveHooks() {
-      return ustate.riveHooks.get();
-    },
-    set riveHooks(riveHooks) {
-      ustate.riveHooks.set(riveHooks);
-    },
-
     get developerMode() {
       return ustate.developerMode.get();
+    },
+
+    set developerMode(bool) {
+      ustate.developerMode.set(bool);
     },
 
     get selectedTable() {

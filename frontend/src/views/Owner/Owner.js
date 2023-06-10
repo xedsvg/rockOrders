@@ -58,7 +58,7 @@ function Owner() {
   }, []);
 
   return (
-    <View bg="paper.medium">
+    <View bg="paper.medium" p="1rem">
       <HStack
         space={2}
         alignItems="center"
@@ -67,9 +67,12 @@ function Owner() {
       >
         <Button onPress={() => (state.ownerView = "tables")}> Tables </Button>
         <Button onPress={() => (state.ownerView = "orders")}> Orders </Button>
-        <Button onPress={() => (state.ownerActionViewIsOpen = true)}>
-          {" "}
-          Settings{" "}
+        <Button
+          disabled
+          bg="rgb(46, 46, 46)"
+          onPress={() => (state.ownerActionViewIsOpen = true)}
+        >
+          Settings
         </Button>
       </HStack>
 

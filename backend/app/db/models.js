@@ -5,6 +5,7 @@ const { model, Schema } = mongoose;
 const restaurantSchema = Schema({
     name: String,
     ownerName: String,
+    externalHostnames: Array,
     maxInstances: Number, // max ws listeners
     //open hours - todo for last order before!
 });

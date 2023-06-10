@@ -28,7 +28,10 @@ const getTableById = async (tableId) => {
         populate: {
             path: 'orders',
             populate: {
-                path: 'items'
+                path: 'items',
+                populate: {
+                    path: 'recipe'
+                }
             }
         }
     }).exec();
@@ -46,7 +49,10 @@ const getTableByRestaurantId = async (restaurantId) => {
         populate: {
             path: 'orders',
             populate: {
-                path: 'items'
+                path: 'items',
+                populate: {
+                    path: 'recipe'
+                }
             }
         }
     }).exec();

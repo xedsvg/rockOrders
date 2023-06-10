@@ -8,7 +8,15 @@
 import Rive from "@rive-app/react-canvas";
 import { BarCodeScanner } from "expo-barcode-scanner";
 import { Camera, CameraType } from "expo-camera";
-import { Button, VStack, Text, View, Heading, Pressable } from "native-base";
+import {
+  Button,
+  VStack,
+  Text,
+  View,
+  Heading,
+  Pressable,
+  Center,
+} from "native-base";
 import React, { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
 
@@ -34,15 +42,42 @@ function QrScan() {
     })();
   }, []);
 
-  const handleBarCodeScanned = ({ type, data }) => {
+  const handleBarCodeScanned = async ({ type, data }) => {
     setScanned(true);
     setCameraView(false);
-    alert(`Bar code with type ${type} and data ${data} has been scanned!`);
+    // alert(`Bar code with type ${type} and data ${data} has been scanned!`);
+    try {
+      const url = new URL(data);
+      if (!url.pathname.startsWith("/join/")) {
+        alert(
+          "We're surprised as you! It looks there is something wrong with that QR code!"
+        );
+      } else {
+        const tableId = url.pathname.replace("/join/", "").toLowerCase();
+
+        const tableData = await api.getTableInfo(tableId);
+        if (tableData) {
+          state.tableId = tableId;
+          state.tableInfo = tableData;
+          goToTableHandler();
+        } else {
+          alert(
+            "Hmm, spooky! It looks like the QR code is not valid. Please try again or ask the restaurant for help."
+          );
+        }
+      }
+    } catch (e) {
+      console.log("Not a url, trying to parse as table");
+      const tableData = await api.getTableInfo(data);
+      if (tableData) {
+        state.tableId = data;
+        state.tableInfo = tableData;
+        goToTableHandler();
+      }
+    }
   };
 
   const goToTableHandler = async () => {
-    state.tableInfo = await api.getTableInfo(state.tableId);
-
     const socket = new Socket(
       null,
       restaurantId,
@@ -95,7 +130,7 @@ function QrScan() {
         </Text>
       </VStack>
       {!cameraView ? (
-        <Pressable onPress={() => dev_getRandomTable()}>
+        <Pressable onPress={() => setCameraView(true)}>
           <Rive
             src={Animation}
             autoPlay
@@ -117,13 +152,15 @@ function QrScan() {
         </View>
       )}
 
-      {/* <Button onPress={() => setCameraView(true)}>Scan QR code</Button> */}
-
       {hasPermission === null ? (
-        <Text>Requesting for camera permission</Text>
+        <Text color="text.light">
+          Can we pwease get some pixels from your camera?
+        </Text>
       ) : null}
 
-      {hasPermission === false ? <Text>No access to camera</Text> : null}
+      {hasPermission === false ? (
+        <Text color="text.light">We need access to your camera :(</Text>
+      ) : null}
 
       {developerMode && (
         <Button

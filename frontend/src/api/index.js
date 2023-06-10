@@ -2,11 +2,13 @@
 import { io } from "socket.io-client";
 
 import { Api } from "./api";
+import { baseUrl } from "../settings";
 
 export class Socket {
   constructor(notificationCallback, restaurantId, owner, tabId) {
     this.notify = notificationCallback || console.log;
-    this.socket = io.connect("http://localhost:3000", {
+    const url = new URL(baseUrl);
+    this.socket = io.connect(`${url.protocol}//${url.hostname}`, {
       query: {
         restaurantId,
         owner,
