@@ -1,4 +1,3 @@
-const fs = require("fs");
 const https = require("https");
 const http = require("http");
 
@@ -9,18 +8,13 @@ const { createApp, createCollectionWatcher, createSocketHandler } = require("./a
 const app = createApp();
 
 const PROD = process.env.NODE_ENV === "production";
-const options = {};
 
-if (PROD) {
-  if (!process.env.KEY || !process.env.CERT) {
-    console.error("Missing KEY or CERT environment variables");
-    console.error("Exiting...");
-    process.exit(1);
-  } else {
-    options.key = fs.readFileSync(process.env.KEY);
-    options.cert = fs.readFileSync(process.env.CERT);
-  }
+if (PROD && (!process.env.KEY || !process.env.CERT)) {
+  console.error("Missing KEY or CERT environment variables");
+  console.error("Exiting...");
+  process.exit(1);
 }
+
 let origins = require("./cors.json").origins;
 setInterval(() => {
   try {
@@ -31,7 +25,19 @@ setInterval(() => {
   }
 }, 60000);
 
-const server = PROD ? https.createServer(options, app) : http.createServer(app);
+const server = PROD ? https.createServer(app) : http.createServer(app);
+
+if (PROD) {
+  server.addContext('tabley.app', {
+          key: fs.readFileSync(process.env.KEY),
+          cert: fs.readFileSync(process.env.CERT)
+  });
+
+  server.addContext('order.rocknrolla.ro', {
+          key: fs.readFileSync(process.env.ROCKKEY),
+          cert: fs.readFileSync(process.env.ROCKCERT)
+  });
+}
 const io = socketIo(server, {
   cors: {
     origin: function (origin, callback) {

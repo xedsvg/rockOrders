@@ -2,30 +2,30 @@ const MongoClient = require('mongodb').MongoClient;
 const EventEmitter = require('events');
 
 class CollectionWatcher extends EventEmitter {
-  constructor() {
-    super();
-    this.collections = [];
-  }
+	constructor() {
+		super();
+		this.collections = [];
+	}
 
-  async init(clientUrl) {
-    this.client = await MongoClient.connect(clientUrl);
-  }
-  subscribeToCollection(collection) {
-    const mongoCollection = this.client.db('rockandrolla').collection(collection);
-    const collectionStream = mongoCollection.watch();
+	async init(clientUrl) {
+		this.client = await MongoClient.connect(clientUrl);
+	}
+	subscribeToCollection(collection) {
+		const mongoCollection = this.client.db('rockandrolla').collection(collection);
+		const collectionStream = mongoCollection.watch();
     
-    this.collections.push(
-      {
-       [collection]: collectionStream
-      });
+		this.collections.push(
+			{
+				[collection]: collectionStream
+			});
     
-    collectionStream.on('change', (change) => {
-      this.emit(`${collection}:change`, change);
-    });
-  }
+		collectionStream.on('change', (change) => {
+			this.emit(`${collection}:change`, change);
+		});
+	}
 
 }
 
 module.exports = {
-  CollectionWatcher
-}
+	CollectionWatcher
+};

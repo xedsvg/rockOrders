@@ -1,4 +1,4 @@
 module.exports = (socket) => {
-    console.log("Client disconnected");
-  };
+	console.log('Client disconnected');
+};
   
