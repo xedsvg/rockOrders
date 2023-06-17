@@ -3,10 +3,9 @@ const propagationDelay = 1000;
 
 module.exports = async (mongoEvent, io) => {
 	if (mongoEvent.operationType === 'insert') {
+		console.log('Tab inserted');
 		// Give some time for the document to be created and propagated
 		setTimeout(() => {
-			console.log('  ');
-            
 			const tab = mongoEvent.fullDocument;
 			const ownerRoomName = `${tab.restaurantId}:owner`;
 

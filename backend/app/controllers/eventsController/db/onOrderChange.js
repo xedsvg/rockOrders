@@ -7,7 +7,12 @@ module.exports = async (mongoEvent, io) => {
 		//todo remove duplicate code from here. make a function that returns 
 		//the order and use it here and in controllers
 		const order = await Orders.findById(mongoEvent.fullDocument._id)
-			.populate('items')
+			.populate({
+				path: 'items',
+				populate: {
+					path: 'recipe'
+				}
+			})
 			.populate({
 				path: 'tabId',
 				populate: {

@@ -25,6 +25,7 @@
     "mongoose": "^5.11.14",
     "morgan": "^1.10.0",
     "prettier": "^2.8.8",
+    "prometheus-remote-write": "^0.3.0",
     "sinon": "^15.0.3",
     "socket.io": "^4.6.1",
     "supertest": "^6.3.3"

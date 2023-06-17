@@ -11,7 +11,7 @@ class CollectionWatcher extends EventEmitter {
 		this.client = await MongoClient.connect(clientUrl);
 	}
 	subscribeToCollection(collection) {
-		const mongoCollection = this.client.db('rockandrolla').collection(collection);
+		const mongoCollection = this.client.db('tabley').collection(collection);
 		const collectionStream = mongoCollection.watch();
     
 		this.collections.push(

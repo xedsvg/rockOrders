@@ -110,7 +110,7 @@ export default function App() {
             )}
 
             {user === "owner" && <Owner />}
-            {developerMode && user === "customer" && (
+            {developerMode && user === "customer" && currentView === "scan" && (
               <Button onPress={() => (state.user = "owner")}>Owner view</Button>
             )}
           </ScrollView>

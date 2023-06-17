@@ -1,8 +1,8 @@
-const { createApp } = require("./handlers/requests");
-const { createCollectionWatcher, createSocketHandler } = require("./handlers/events");
+const { createApp } = require('./handlers/requests');
+const { createCollectionWatcher, createSocketHandler } = require('./handlers/events');
 
 module.exports = {
-  createApp,
-  createCollectionWatcher,
-  createSocketHandler
+	createApp,
+	createCollectionWatcher,
+	createSocketHandler
 };

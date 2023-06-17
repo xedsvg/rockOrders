@@ -1,5 +1,5 @@
 const { Tables } = require('../db/models');
-const { createNewTab } = require('./');
+const { newTab } = require('./tabs');
 
 const getRandomTable = async (restaurantId) => {
 	const randomTable = await Tables.findOne({ restaurantId });
@@ -23,8 +23,8 @@ const getTable = async (tableId, pin) => {
 	}
 
 	if (!table.tabOpen) {
-		const newTab = await createNewTab(table);
-		table.currentTab = newTab._id;
+		const currentNewTab = await newTab(table);
+		table.currentTab = currentNewTab._id;
 		table.tabOpen = true;
 		await table.save();
 	}
@@ -118,7 +118,10 @@ const populateTableData = async (table) => {
 			path: 'orders',
 			options: { sort: { createdAt: -1 } },
 			populate: {
-				path: 'items'
+				path: 'items',
+				populate: {
+					path: 'recipe'
+				}
 			}
 		}
 	}).execPopulate();

@@ -90,6 +90,7 @@ function QrScan() {
         }
       }
     } catch (e) {
+      console.log(e);
       console.log("Not a url, trying to parse as table");
       const tableData = await api.getTableInfo(data);
       if (tableData) {
@@ -111,6 +112,7 @@ function QrScan() {
 
     socket.on("order:new", (data) => {
       console.log("new order on tab");
+      console.log(data.order);
       state.addOrder(data.order);
     });
 

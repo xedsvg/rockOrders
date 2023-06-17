@@ -1,3 +1,5 @@
+/* eslint-disable no-plusplus */
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable react/prop-types */
 import {
@@ -15,8 +17,56 @@ import React from "react";
 
 import Time from "./Time";
 
+const composeItemsFromVariations = (stateOrder) => {
+  const order = JSON.parse(JSON.stringify(stateOrder));
+  const { items, variations } = order;
+  const updatedItems = [];
+
+  // Iterate over the variations
+  for (const variant of variations) {
+    // Iterate over the quantity
+    while (variant.qty > 0) {
+      const item = items.find((i) => i._id === variant.id);
+      const newItem = JSON.parse(JSON.stringify(item));
+      // Move the item so we don't loop over it again
+      const itemIndex = items.indexOf(item);
+      order.items.splice(itemIndex, 1);
+
+      // Update the recipe and quantity
+      newItem.recipe = newItem.recipe.filter(
+        (recipe) => recipe._id === variant.recipe
+      );
+      newItem.cartQty = 1;
+      variant.qty -= 1;
+
+      // Add the updated item to the result
+      updatedItems.push(newItem);
+    }
+  }
+
+  // Add the new items to the order
+  order.items.push(...updatedItems);
+
+  order.items = order.items.reduce((acc, item) => {
+    const existingItem = acc.find((i) =>
+      i.type === "product"
+        ? i._id === item._id
+        : i._id === item._id && i.recipe[0]._id === item.recipe[0]._id
+    );
+    if (existingItem) {
+      existingItem.cartQty += 1;
+      return acc;
+    }
+    // eslint-disable-next-line no-param-reassign
+    item.cartQty = 1;
+    return acc.concat(item);
+  }, []);
+
+  return order;
+};
+
 function Order({ order, orderNr }) {
-  const mutableItems = JSON.parse(JSON.stringify(order.items));
+  const mutableItems = composeItemsFromVariations(order).items;
 
   return (
     <VStack space={4} alignItems="center" marginBottom="2.5" px="1rem">
@@ -55,34 +105,68 @@ function Order({ order, orderNr }) {
             <Text color="text.light" mt="3" fontWeight="medium" fontSize="xl">
               {`Order #${orderNr}`}
             </Text>
-            {mutableItems
-              .reduce((acc, item) => {
-                const existingItem = acc.find((i) => i._id === item._id);
-                if (existingItem) {
-                  existingItem.qty += 1;
-                  return acc;
-                }
-                // eslint-disable-next-line no-param-reassign
-                item.qty = 1;
-                return acc.concat(item);
-              }, [])
-              .map((orderedItem) =>
-                orderedItem.type === "product" ? (
+            {mutableItems.map((orderedItem) =>
+              orderedItem.type === "product" ? (
+                <View
+                  flexDirection="row"
+                  justifyContent="space-between"
+                  key={orderedItem._id}
+                >
+                  <Text color="text.light" mt="2" fontSize="sm">
+                    {orderedItem.cartQty}x{" "}
+                  </Text>
+                  <Text color="text.light" mt="2" fontSize="sm">
+                    {orderedItem.name}
+                  </Text>
+                  <Text
+                    color="text.light"
+                    mt="2"
+                    fontSize="sm"
+                    flexGrow={1}
+                    textAlign="end"
+                    style={{ whiteSpace: "nowrap" }}
+                  >
+                    {orderedItem.price * orderedItem.cartQty} RON
+                  </Text>
+                </View>
+              ) : (
+                <View
+                  flexDirection="row"
+                  justifyContent="space-between"
+                  key={`${orderedItem._id}_${orderedItem.recipe[0].name}`}
+                >
+                  <Text color="text.light" mt="2" fontSize="sm">
+                    {orderedItem.cartQty}x{" "}
+                  </Text>
                   <View
-                    flexDirection="row"
+                    flexDirection="column"
                     justifyContent="space-between"
-                    key={orderedItem._id}
+                    flexGrow={1}
                   >
                     <Text color="text.light" mt="2" fontSize="sm">
-                      {orderedItem.qty}x {orderedItem.name}
+                      {orderedItem.name}
                     </Text>
 
-                    <Text color="text.light" mt="2" fontSize="sm">
-                      {orderedItem.price * orderedItem.qty} RON
+                    <Text
+                      color="text.light"
+                      mt="2"
+                      fontSize="xs"
+                      marginTop="0.2rem"
+                    >
+                      -{orderedItem.recipe[0].name}
                     </Text>
                   </View>
-                ) : null
-              )}
+                  <Text
+                    color="text.light"
+                    mt="2"
+                    fontSize="sm"
+                    style={{ whiteSpace: "nowrap" }}
+                  >
+                    {orderedItem.recipe[0].price * orderedItem.cartQty} RON
+                  </Text>
+                </View>
+              )
+            )}
 
             <Divider bg="transparent" thickness="10" />
             <Divider bg="black" thickness="1" />

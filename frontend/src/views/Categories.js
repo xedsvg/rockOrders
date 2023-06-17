@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import {
   View,
   VStack,
@@ -13,6 +14,20 @@ import { globalState } from "../state";
 
 const Categories = () => {
   const state = globalState();
+  const { categories } = state;
+
+  const sortedCategories = JSON.parse(JSON.stringify(categories)).sort(
+    (a, b) => {
+      if (a.name < b.name) {
+        return -1;
+      }
+      if (a.name > b.name) {
+        return 1;
+      }
+
+      return 0;
+    }
+  );
 
   return [
     <Center key="messageKey">
@@ -27,7 +42,7 @@ const Categories = () => {
       flexWrap="wrap"
       paddingX="1rem"
     >
-      {state.categories.map((category) => (
+      {sortedCategories.map((category) => (
         <Pressable
           onPress={() => {
             state.category = category;
