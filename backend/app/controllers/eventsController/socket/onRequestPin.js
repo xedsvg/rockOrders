@@ -1,3 +1,3 @@
 module.exports = (socket) => {
-    console.log("Request pin");
+	console.log('Request pin');
 };

@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable no-else-return */
 /* eslint-disable no-param-reassign */
 /* eslint-disable react/jsx-props-no-spreading */
@@ -12,80 +13,80 @@ import {
   HStack,
   Pressable,
 } from "native-base";
-import React, { useEffect, useState } from "react";
+import React, { useMemo, useState, Suspense } from "react";
 
-import OccupiedTime from "./OccupiedTime";
 import { globalState } from "../../../state";
 
-const activeOrders = (orders) =>
-  orders.reduce((accumulator, order) => {
-    if (order.status === "recieved") accumulator.push(order);
-    return accumulator;
-  }, []);
-
-const flattenOrderItems = (orders) => orders.flatMap((order) => order.items);
-const flattenVariations = (orders) =>
-  orders.flatMap((order) => order.variations);
-
-const removeRecipesBasedOnVariations = (items, variations) =>
-  items.map((item) => {
-    // loop through each variation and if item id === variation id,
-    // remove all the recipes except the one that matches the variation
-    // then substract 1 from variation.qty
-    if (item.recipe.length === 0) {
-      return item;
-    }
-
-    variations.forEach((variation) => {
-      if (variation.qty === 0) return;
-      const newRecipe = item.recipe.find((currentRecipe) => {
-        if (currentRecipe._id === variation.recipe) {
-          variation.qty -= 1;
-          return true;
-        }
-        return false;
-      });
-      if (newRecipe) item.recipe = [newRecipe];
-    });
-
-    return item;
-  });
-
-const groupItemsByIdAndRecipe = (items) =>
-  items.reduce((acc, currentItem) => {
-    // Create a key based on _id and recipe[0]._id (if it exists)
-    const key =
-      currentItem._id +
-      (currentItem.recipe[0] ? currentItem.recipe[0]._id : "");
-
-    // If the key already exists, increment qty, else create a new entry
-    if (acc[key]) {
-      acc[key].qty += 1;
-    } else {
-      acc[key] = {
-        id: currentItem._id,
-        qty: 1,
-        name: currentItem.name,
-        recipe: currentItem.recipe[0] || null,
-      };
-    }
-
-    return acc;
-  }, {});
+const OccupiedTime = React.lazy(() => import("./OccupiedTime"));
 
 function Table({ table, ...props }) {
+  const activeOrders = (orders) =>
+    orders.reduce((accumulator, order) => {
+      if (order.status === "recieved") accumulator.push(order);
+      return accumulator;
+    }, []);
+  const flattenOrderItems = (orders) => orders.flatMap((order) => order.items);
+  const flattenVariations = (orders) =>
+    orders.flatMap((order) => order.variations);
+
+  const removeRecipesBasedOnVariations = (items, variations) =>
+    items.map((item) => {
+      // loop through each variation and if item id === variation id,
+      // remove all the recipes except the one that matches the variation
+      // then substract 1 from variation.qty
+      if (item.recipe.length === 0) {
+        return item;
+      }
+
+      variations.forEach((variation) => {
+        if (variation.qty === 0) return;
+        const newRecipe = item.recipe.find((currentRecipe) => {
+          if (currentRecipe._id === variation.recipe) {
+            variation.qty -= 1;
+            return true;
+          }
+          return false;
+        });
+        if (newRecipe) item.recipe = [newRecipe];
+      });
+
+      return item;
+    });
+
+  const groupItemsByIdAndRecipe = (items) =>
+    items.reduce((acc, currentItem) => {
+      // Create a key based on _id and recipe[0]._id (if it exists)
+      const key =
+        currentItem._id +
+        (currentItem.recipe[0] ? currentItem.recipe[0]._id : "");
+
+      // If the key already exists, increment qty, else create a new entry
+      if (acc[key]) {
+        acc[key].qty += 1;
+      } else {
+        acc[key] = {
+          id: currentItem._id,
+          qty: 1,
+          name: currentItem.name,
+          recipe: currentItem.recipe[0] || null,
+        };
+      }
+
+      return acc;
+    }, {});
+
   const [tab, setTab] = useState(null);
   const [groupedItems, setGroupedItems] = useState([]);
 
   const state = globalState();
   const { tableNo, currentTab } = table;
 
-  useEffect(() => {
+  useMemo(() => {
     if (!table.currentTab) return;
     setTab(JSON.parse(JSON.stringify(table.currentTab)));
   }, [table]);
 
-  useEffect(() => {
+  useMemo(() => {
     if (!tab) return;
     const orders = activeOrders(tab.orders);
 
@@ -115,7 +116,9 @@ function Table({ table, ...props }) {
           </Text>
           <Text color="text.light" fontSize="xs">
             {currentTab ? (
-              <OccupiedTime key={tableNo} timestamp={currentTab.createdAt} />
+              <Suspense fallback={<div>Loading...</div>}>
+                <OccupiedTime key={tableNo} timestamp={currentTab.createdAt} />
+              </Suspense>
             ) : (
               "No current tab"
             )}

@@ -1,231 +1,216 @@
-const { Tables, Products, Orders, Tabs } = require("../db/models");
-const { createNewOrder } = require('../datamodels');
+const { createNewOrder, getProducts, getRandomTable, getTable, getTableStatus, getTab, getOrder, waiterRequested, paymentRequested } = require('../datamodels');
 
-const getMenu = async (req, res) => {
-  const id = req.params.id;
+const getMenuController = async (req, res) => {
+	if (!req.params.restaurantId) {
+		res.sendStatus(400);
+	} else {
+		const { params: { restaurantId } } = req;
 
-  const products = await Products.find(
-    {
-      restaurantId: id,
-      type: {
-        $in: ['product', 'variation']
-      }
-    }).populate('recipe').exec();
-  res.send(products);
+		try {
+			const products = await getProducts(restaurantId);
+			res.send(products);
+		}
+		catch (e) {
+			console.log(e);
+			res.sendStatus(404);
+		}
+	}
 };
 
-const getRandomTable = async (req, res) => {
-  if (!req.params.restaurantId) {
-    res.sendStatus(400);
-  } else {
-    const { params: { restaurantId } } = req;
+const getRandomTableController = async (req, res) => {
+	if (!req.params.restaurantId) {
+		res.sendStatus(400);
+	} else {
+		const { params: { restaurantId } } = req;
 
-    const randomTable = await Tables.findOne({ restaurantId });
-    const { _id = null } = randomTable || {};
-    getTable(
-      {
-        ...req,
-        params: { tableId: _id }
-      },
-      res);
-  }
+		try {
+			const table = await getRandomTable(restaurantId);
+			res.send(table);
+		}
+		catch (e) {
+			console.log(e);
+			res.sendStatus(404);
+		}
+	}
 };
 
-const getTable = async (req, res) => {
-  const { params: { tableId, pin } } = req;
+const getTableController = async (req, res) => {
+	const { params: { tableId, pin } } = req;
 
-  try {
-    const table = await findTable(tableId);
-
-    if (!table.tabOpen) {
-      const newTab = await createNewTab(table);
-      table.currentTab = newTab._id;
-      table.tabOpen = true;
-      await table.save();
-    }
-
-    // if (table.locked && table.pin !== pin) {
-    //   res.sendStatus(403);
-    // } else {
-    const populatedTable = await populateTableData(table);
-    res.send(populatedTable);
-    // }
-  } catch (e) {
-    console.log(e);
-    if (e.message === 'Table not found') {
-      res.sendStatus(404);
-    } else {
-      res.sendStatus(500);
-    }
-  }
+	try {
+		const table = await getTable(tableId, pin);
+		res.send(table);
+	} catch (e) {
+		console.log(e);
+		if (e.message === 'Table not found') {
+			res.sendStatus(404);
+		} else if (e.message === 'Wrong pin') {
+			res.sendStatus(401);
+		}
+		else {
+			res.sendStatus(500);
+		}
+	}
 };
 
-const getTab = async (req, res) => {
-  const { params: { tabId } } = req;
-
-  try {
-    let tab = await Tabs.findById(tabId);
-    if (!tab) {
-      res.sendStatus(404);
-    } else {
-      tab = await tab.populate('orders').execPopulate();
-      res.send(tab);
-    }
-  } catch (e) {
-    console.log(e);
-    res.sendStatus(500);
-  }
+const getTableStatusController = async (req, res) => {
+	const { params: { tableId } } = req;
+	if (!tableId) {
+		res.sendStatus(404);
+	} else {
+		try {
+			await getTableStatus(tableId);
+			res.sendStatus(200);
+		} catch (e) {
+			console.log(e);
+			if (e.message === 'Table not found') {
+				res.sendStatus(404);
+			}
+			else if (e.message === 'Table is locked') {
+				res.sendStatus(401);
+			}
+			else {
+				res.sendStatus(500);
+			}
+		}
+	}
 };
 
-const newOrder = async (req, res) => {
-  const { body: { cartProducts }, params: { tabId } } = req;
-  try {
-      await createNewOrder(cartProducts, tabId);
-      res.sendStatus(200);
-    } catch (e) {
-      console.log(e);
-      res.sendStatus(500);
-  }
+const getTabController = async (req, res) => {
+	const { params: { tabId } } = req;
+
+	try {
+		const tab = await getTab(tabId);
+		res.send(tab);
+	}
+	catch (e) {
+		console.log(e);
+		if (e.message === 'Tab not found') {
+			res.sendStatus(404);
+		}
+		else {
+			res.sendStatus(500);
+		}
+
+	}
 };
 
-const getOrder = async (req, res) => {
-  const { params: { orderId } } = req;
-  if (!orderId) {
-    res.sendStatus(400);
-  } else {
-    try {
-      const order = await Orders.findById(orderId);
-      res.send(order);
-    } catch (e) {
-      res.send(500);
-    }
-  }
+const newOrderController = async (req, res) => {
+	const { body: { cartProducts }, params: { tabId } } = req;
+	if (!cartProducts || !tabId) {
+		res.sendStatus(400);
+	} else {
+		try {
+			await createNewOrder(cartProducts, tabId);
+			res.sendStatus(200);
+		} catch (e) {
+			console.log(e);
+			if (e.message === 'Tab not found') {
+				res.sendStatus(404);
+			}
+			else if (e.message === 'Tab closed') {
+				res.sendStatus(401);
+			}
+			else {
+				res.sendStatus(500);
+			}
+		}
+	}
 };
 
-const getTableStatus = async (req, res) => {
-  const { params: { tableId } } = req;
-  if (!tableId) {
-    res.sendStatus(404);
-  } else {
-    try {
-      const table = await Tables.findById(tableId);
-      if (table.locked) {
-        res.send({
-          locked: "true",
-          nextStep: "sendPin"
-        });
-      } else {
-        res.send(table);
-      }
-    } catch (e) {
-      res.send(500);
-    }
-  }
+const getOrderController = async (req, res) => {
+	const { params: { orderId } } = req;
+	if (!orderId) {
+		res.sendStatus(400);
+	} else {
+		try {
+			const order = await getOrder(orderId);
+			res.send(order);
+		}
+		catch (e) {
+			console.log(e);
+			if (e.message === 'Order not found') {
+				res.sendStatus(404);
+			}
+			else {
+				res.sendStatus(500);
+			}
+		}
+	}
 };
 
-const findTable = async (tableId) => {
-  const table = await Tables.findById(tableId);
-  if (!table) {
-    throw new Error('Table not found');
-  }
-  return table;
+const callWaiterController = async (req, res) => {
+	const { params: { tabId } } = req;
+	if (!tabId) {
+		res.sendStatus(404);
+	} else {
+		try {
+			await waiterRequested(tabId);
+			res.sendStatus(200);
+		} catch (e) {
+			console.log(e);
+			if (e.message === 'Tab not found') {
+				res.sendStatus(404);
+			} else if (e.message === 'Tab closed') {
+				res.sendStatus(401);
+			} else if (e.message === 'Waiter already called') {
+				res.sendStatus(429);
+			} else {
+				res.sendStatus(500);
+			}
+		}
+	}
 };
 
-const createNewTab = async (table) => {
-  const newTab = await new Tabs({
-    restaurantId: table.restaurantId,
-    tableId: table._id,
-    status: "open",
-    lastUpdated: Date.now(),
-    createdAt: Date.now()
-  }).save();
-  return newTab;
+const payCardController = async (req, res) => {
+	const { params: { tabId } } = req;
+	if (!tabId) {
+		res.sendStatus(404);
+	} else {
+		try {
+			await paymentRequested(tabId, 'card');
+		} catch (e) {
+			console.log(e);
+			if (e.message === 'Tab not found') {
+				res.sendStatus(404);
+			} else if (e.message === 'Tab closed') {
+				res.sendStatus(401);
+			} else {
+				res.sendStatus(500);
+			}
+		}
+	}
 };
 
-const populateTableData = async (table) => {
-  return await table.populate({
-    path: 'currentTab',
-    populate: {
-      path: 'orders',
-      options: { sort: { createdAt: -1 } },
-      populate: {
-        path: 'items'
-      }
-    }
-  }).execPopulate();
+const payCashController = async (req, res) => {
+	const { params: { tabId } } = req;
+	if (!tabId) {
+		res.sendStatus(404);
+	} else {
+		try {
+			await paymentRequested(tabId, 'cash');
+		} catch (e) {
+			console.log(e);
+			if (e.message === 'Tab not found') {
+				res.sendStatus(404);
+			} else if (e.message === 'Tab closed') {
+				res.sendStatus(401);
+			} else {
+				res.sendStatus(500);
+			}
+		}
+	}
 };
-
-const callWaiter = async (req, res) => {
-  const { params: { tabId } } = req;
-  if (!tabId) {
-    res.sendStatus(404);
-  } else {
-    try {
-      //find table that has OpenTab === tabId
-      const tab = await Tabs.findById(tabId);
-      if (!tab) {
-        res.sendStatus(404);
-      }
-      tab.callWaiter = 'called';
-      await tab.save();
-      res.sendStatus(200);
-    } catch (e) {
-      res.sendStatus(500);
-    }
-  }
-};
-
-const payCard = async (req, res) => {
-  const { params: { tabId } } = req;
-  if (!tabId) {
-    res.sendStatus(404);
-  } else {
-    try {
-      //find table that has OpenTab === tabId
-      const table = await Tables.findOne({ currentTab: tabId });
-      if (!table) {
-        res.sendStatus(404);
-      }
-      table.waiterCalled = true;
-      await table.save();
-      res.sendStatus(200);
-    } catch (e) {
-      console.log(e);
-      res.sendStatus(500);
-    }
-  }
-};
-
-const payCash = async (req, res) => {
-  const { params: { tabId } } = req;
-  if (!tabId) {
-    res.sendStatus(404);
-  } else {
-    try {
-      const table = await Tables.findById(tableId);
-      if (!table) {
-        res.sendStatus(404);
-      } else {
-        table.waiterCalled = true;
-        await table.save();
-        res.send(table);
-      }
-    } catch (e) {
-      res.send(500);
-    }
-  }
-};
-
-
 
 module.exports = {
-  getMenu,
-  getRandomTable,
-  getTable,
-  getTab,
-  newOrder,
-  getOrder,
-  callWaiter,
-  payCard,
-  payCash
+	getMenuController,
+	getRandomTableController,
+	getTableController,
+	getTableStatusController,
+	getTabController,
+	newOrderController,
+	getOrderController,
+	callWaiterController,
+	payCardController,
+	payCashController,
 };

@@ -48,11 +48,10 @@ export function ToastManager() {
                   fontSize="md"
                   fontWeight="medium"
                   flexShrink={1}
-                  color="darkText"
                 >
                   {title}
                 </Text>
-                <Text color="text.light" px="6" color="darkText">
+                <Text color="text.light" px="6">
                   {description}
                 </Text>
                 <Divider bg="transparent" thickness="2" mx="2" />

@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable array-callback-return */
 /* eslint-disable no-param-reassign */
 /* eslint-disable react-hooks/rules-of-hooks */
@@ -8,6 +9,8 @@ const hstate = hookstate(
   {
     restaurantId: null,
     restaurantName: "Welcome to Tabley!",
+
+    isExternal: false,
 
     user: "customer",
     viewHistory: ["scan"],
@@ -38,6 +41,7 @@ const hstate = hookstate(
     subCategories: [],
 
     openOrders: [],
+    openOrdersPerTable: [],
     tables: [],
 
     ActionView: "tab",
@@ -66,10 +70,108 @@ const extractCategoriesAndSubCategories = (products) => {
   };
 };
 
+const transformOpenOrdersToOpenOrdersPerTable = (openOrders) => {
+  // these are raw orders, not hookstate objects
+  openOrders.forEach((order, oIndex) => {
+    // filter out the orders that are not 'recieved' aka open
+    if (order.status !== "recieved") {
+      openOrders.splice(oIndex, 1);
+    } else {
+      // Modify the items to only include the recipe that was ordered
+      for (const variant of order.variations) {
+        // Iterate over the quantity
+        while (variant.qty > 0) {
+          // Find the item in the order that matches the variant
+          const item = order.items.find((i) => i._id === variant.id);
+          // if the item was deleted, skip it
+          if (item) {
+            // Create a copy of the item
+            const newItem = JSON.parse(JSON.stringify(item));
+            // Delete the item from the order so we don't loop over it again
+            const itemIndex = order.items.indexOf(item);
+            order.items.splice(itemIndex, 1);
+            // Update the recipe and quantity
+            newItem.recipe = newItem.recipe.filter(
+              (recipe) => recipe._id === variant.recipe
+            );
+            newItem.cartQty = 1;
+            // Update the quantity of the variant
+            variant.qty -= 1;
+            // Add the updated item to the result
+            order.items.push(newItem);
+          }
+        }
+      }
+      // Reduce the items to only include the unique items and their quantity
+      // order.items.forEach((item, iIndex) => {
+      //   const existingItem = order.items.find((i, index) => {
+      //     if (i.type === "product") {
+      //       if (i._id === item._id) {
+      //         order.items.splice(index, 1);
+      //         return true;
+      //       }
+      //     }
+      //     if (i.type === "variation") {
+      //       if (i._id === item._id && i.recipe[0]._id === item.recipe[0]._id) {
+      //         order.items.splice(index, 1);
+      //         return true;
+      //       }
+      //     }
+      //     return false;
+      //   });
+      //   if (existingItem) {
+      //     console.log(existingItem);
+      //     if (!item.cartQty) {
+      //       item.cartQty = 1;
+      //     } else {
+      //       item.cartQty += 1;
+      //     }
+      //   }
+      // });
+
+      order.items = order.items.reduce((acc, item) => {
+        const existingItemIndex = acc.findIndex((i) => {
+          if (i.type === "product") {
+            return i._id === item._id;
+          }
+          if (i.type === "variation") {
+            return i._id === item._id && i.recipe[0]._id === item.recipe[0]._id;
+          }
+          return false;
+        });
+
+        if (existingItemIndex !== -1) {
+          if (!acc[existingItemIndex].cartQty) {
+            acc[existingItemIndex].cartQty = 1;
+          } else {
+            acc[existingItemIndex].cartQty += 1;
+          }
+        } else {
+          if (!item.cartQty) {
+            item.cartQty = 1;
+          }
+          acc.push(item);
+        }
+
+        return acc;
+      }, []);
+    }
+  });
+  console.log(openOrders);
+  return openOrders;
+};
+
 export function globalState() {
   const ustate = useHookstate(hstate);
 
   return {
+    get isExternal() {
+      return ustate.isExternal.get();
+    },
+    set isExternal(bool) {
+      ustate.isExternal.set(bool);
+    },
+
     get developerMode() {
       return ustate.developerMode.get();
     },
@@ -418,15 +520,26 @@ export function globalState() {
       ustate.viewHistory.set(viewHistory);
     },
 
+    get openOrdersPerTable() {
+      return ustate.openOrdersPerTable.get();
+    },
+
     get openOrders() {
       return ustate.openOrders.get();
     },
+
     set openOrders(orders) {
       ustate.openOrders.set(orders);
+      ustate.openOrdersPerTable.set(
+        transformOpenOrdersToOpenOrdersPerTable(orders)
+      );
     },
+
     pushNewOrder(order) {
       ustate.openOrders.set((prev) => [order, ...prev]);
+      // update openOrdersPerTable
     },
+
     updateOpenOrderStatus(orderId, status) {
       const openOrders = ustate.openOrders.get();
       const openOrderIndex = openOrders.findIndex(
@@ -439,6 +552,7 @@ export function globalState() {
         // If the status is not 'canceled', just update the status
         ustate.openOrders[openOrderIndex].status.set(status);
       }
+      // update openOrdersPerTable
     },
 
     get restaurantId() {

@@ -1,15 +1,15 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-const dbUrl = `mongodb://${process.env.MONGODB_HOST || "localhost"}/tabley`;
+const dbUrl = `mongodb://${process.env.MONGODB_HOST || 'localhost'}/tabley`;
 
 async function connectToDatabase() {
-  await mongoose.connect(dbUrl, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
+	await mongoose.connect(dbUrl, {
+		useNewUrlParser: true,
+		useUnifiedTopology: true,
+	});
 }
 
 module.exports = { 
-  connectToDatabase,
-  dbUrl 
- };
+	connectToDatabase,
+	dbUrl 
+};

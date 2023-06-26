@@ -1,10 +1,10 @@
-const express = require("express");
-const { getRestaurantById, getRestaurantByName, hostnameCheck } = require("../controllers/appController");
+const express = require('express');
+const { getRestaurantByIdController, getRestaurantByNameController, getRestaurantByHostnameController } = require('../controllers/appController');
 
 const router = express.Router();
 
-router.get("/restaurantName/:restaurantName", getRestaurantByName);
-router.get("/restaurantId/:restaurantId", getRestaurantById);
-router.post("/hostnameCheck", hostnameCheck);
+router.get('/restaurantId/:restaurantId', getRestaurantByIdController);
+router.get('/restaurantName/:restaurantName', getRestaurantByNameController);
+router.post('/hostnameCheck', getRestaurantByHostnameController);
 
 module.exports = router;
