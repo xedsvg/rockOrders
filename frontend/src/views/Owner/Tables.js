@@ -1,12 +1,19 @@
 import { HStack, View, Text, Divider } from "native-base";
-import React from "react";
+import React, { Suspense, useEffect } from "react";
 
-import Table from "./components/Table";
 import { globalState } from "../../state";
+
+const Table = React.lazy(() => import("./components/Table"));
 
 function Tables() {
   const state = globalState();
   const { tables } = state;
+
+  // useEffect(() => {
+  //   if (state.openOrdersPerTable) {
+  //     console.log(state.openOrdersPerTable);
+  //   }
+  // }, [state.openOrdersPerTable]);
 
   return (
     <View>
@@ -17,14 +24,16 @@ function Tables() {
         {tables.map(
           (table) =>
             table.currentTab && (
-              <Table
-                mb={3}
-                key={table._id}
-                table={table}
-                style={{
-                  flexBasis: `${100 / Math.min(tables.length, 5)}%`,
-                }}
-              />
+              <Suspense key={table._id} fallback={<div>Loading...</div>}>
+                <Table
+                  mb={3}
+                  key={table._id}
+                  table={table}
+                  style={{
+                    flexBasis: `${100 / Math.min(tables.length, 5)}%`,
+                  }}
+                />
+              </Suspense>
             )
         )}
       </HStack>
@@ -37,14 +46,16 @@ function Tables() {
         {tables.map(
           (table) =>
             !table.currentTab && (
-              <Table
-                mb={3}
-                key={table._id}
-                table={table}
-                style={{
-                  flexBasis: `${100 / Math.min(tables.length, 5)}%`,
-                }}
-              />
+              <Suspense key={table._id} fallback={<div>Loading...</div>}>
+                <Table
+                  mb={3}
+                  key={table._id}
+                  table={table}
+                  style={{
+                    flexBasis: `${100 / Math.min(tables.length, 5)}%`,
+                  }}
+                />
+              </Suspense>
             )
         )}
       </HStack>

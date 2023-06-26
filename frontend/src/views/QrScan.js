@@ -39,6 +39,29 @@ function QrScan() {
     (async () => {
       const { status } = await BarCodeScanner.requestPermissionsAsync();
       setHasPermission(status === "granted");
+
+      try {
+        const url = new URL(window.location);
+        if (url.pathname.startsWith("/join/")) {
+          const tableId = url.pathname.replace("/join/", "").toLowerCase();
+
+          const tableData = await state.api.getTableInfo(tableId);
+          if (tableData) {
+            state.tableId = tableId;
+            state.tableInfo = tableData;
+            goToTableHandler();
+          } else {
+            alert(
+              "1. Hmm, spooky! It looks like the QR code is not valid. Please try again or ask the restaurant for help."
+            );
+          }
+        }
+      } catch (e) {
+        console.log(e);
+        alert(
+          "2. Hmm, spooky! It looks like the QR code is not valid. Please try again or ask the restaurant for help."
+        );
+      }
     })();
   }, []);
 
@@ -67,6 +90,7 @@ function QrScan() {
         }
       }
     } catch (e) {
+      console.log(e);
       console.log("Not a url, trying to parse as table");
       const tableData = await api.getTableInfo(data);
       if (tableData) {
@@ -80,7 +104,7 @@ function QrScan() {
   const goToTableHandler = async () => {
     const socket = new Socket(
       null,
-      restaurantId,
+      state.restaurantId,
       false,
       state.tableInfo.currentTab._id
     );
@@ -88,6 +112,7 @@ function QrScan() {
 
     socket.on("order:new", (data) => {
       console.log("new order on tab");
+      console.log(data.order);
       state.addOrder(data.order);
     });
 

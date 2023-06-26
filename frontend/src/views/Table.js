@@ -17,7 +17,11 @@ const Table = () => {
     // state.totalProducts ? <Cart /> : null,
     state.orders.length
       ? state.orders.map((order, orderNr) => (
-          <Order key={order._id} orderNr={orderNr} order={order} />
+          <Order
+            key={order._id}
+            orderNr={state.orders.length - orderNr}
+            order={order}
+          />
         ))
       : null,
     !state.orders.length && !state.totalProducts ? (
