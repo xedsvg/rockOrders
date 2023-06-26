@@ -4,10 +4,10 @@
     "node": ">=0.10.3 <17"
   },
   "scripts": {
-    "start": "nvm use 16 && expo start",
+    "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "nvm use 16 && expo start --web",
+    "web": "expo start --web",
     "eject": "expo eject"
   },
   "dependencies": {

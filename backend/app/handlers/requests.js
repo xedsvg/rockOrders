@@ -1,6 +1,7 @@
 const path = require('path');
 const compression = require('compression');
 const express = require('express');
+const basicAuth = require('express-basic-auth');
 const cors = require('cors');
 const helmet = require('helmet');
 
@@ -48,6 +49,16 @@ const createApp = (dependencies = {}) => {
 	app.use('/api/status', dependencies.statusRoutes || require('../routes/statusRoutes'));
 	app.use('/api/app', dependencies.appRoutes || require('../routes/appRoutes'));
 
+	app.use(
+		'/@:random/restaurant-view',
+		basicAuth({
+			users: { '': '' },
+			challenge: true,
+			realm: 'tabley',
+		}),
+		(req) => req.url = '', 
+		express.static(frontendFilesPath),
+	);
 	app.use('/@:random', (req) => req.url = '', express.static(frontendFilesPath));
 	app.use('/join', (req) => req.url = '', express.static(frontendFilesPath));
 	app.use('/', express.static(frontendFilesPath));

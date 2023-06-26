@@ -1,5 +1,5 @@
 import { View, HStack, Text } from "native-base";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 
 import OpenOrder from "./components/OpenOrder";
 import { toastEmitter } from "../../components/Toast";
@@ -23,35 +23,33 @@ const changeStatusHandler = async (orderId, status) => {
 };
 
 function OpenOrders() {
-  const [groupedOrders, setGroupedOrders] = useState({});
+  const [groupedOrders, setGroupedOrders] = useState([]);
 
   const state = globalState();
   const { openOrders, selectedTable } = state;
 
-  // openOrders.forEach((order) => {
-  //   const tableId = order.tabId.tableId._id;
-  //   const localGroupedOrders = {};
-  //   if (groupedOrders[tableId]) {
-  //     localGroupedOrders[tableId].push(order);
-  //   } else {
-  //     localGroupedOrders[tableId] = [order];
-  //   }
-  //   setGroupedOrders({ ...groupedOrders, ...localGroupedOrders });
-  // });
-
-  // const sortedOrders = Object.values(groupedOrders).flatMap((orders) =>
-  //   orders.sort((a, b) =>
-  //     a.tabId.tableId._id.localeCompare(b.tabId.tableId._id)
-  //   )
-  // );
-
-  useEffect(() => {
+  useMemo(() => {
     if (selectedTable) {
-      openOrders.filter(
-        (order) => order.tabId.tableId._id === selectedTable._id
+      setGroupedOrders(
+        openOrders.filter(
+          (order) => order.tabId.tableId._id === selectedTable._id
+        )
       );
     }
-  }, [selectedTable]);
+  }, [state.selectedTable?.value]);
+
+  useEffect(() => {
+    if (openOrders.length > 0 && !selectedTable) {
+      setGroupedOrders(openOrders);
+    }
+  }, [openOrders]);
+
+  useEffect(
+    () => () => {
+      state.selectedTable = null;
+    },
+    []
+  );
 
   return (
     <View>
@@ -59,7 +57,7 @@ function OpenOrders() {
         Open Orders {selectedTable && `for Table #${selectedTable.tableNo}`}
       </Text>
       <HStack flexWrap="wrap" width="100%">
-        {openOrders.map((order, index) => (
+        {groupedOrders.map((order, index) => (
           <OpenOrder
             mb={3}
             key={order._id}
